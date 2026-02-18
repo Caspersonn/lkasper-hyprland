@@ -14,7 +14,7 @@ in
       # "SUPER CTRL, SPACE, exec, ~/.local/share/omarchy/bin/swaybg-next"
       # "SUPER SHIFT CTRL, SPACE, exec, ~/.local/share/omarchy/bin/omarchy-theme-next"
 
-      "SUPER, W, killactive,"
+      "SUPER, Q, killactive,"
       "SUPER, Backspace, killactive,"
 
       # End active session

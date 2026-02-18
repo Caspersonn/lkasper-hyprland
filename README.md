@@ -18,7 +18,7 @@ Once ready, add this flake to your system configuration, you'll also need [home-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     omarchy-nix = {
-        url = "github:henrysipp/omarchy-nix";
+        url = "github:caspersonn/lkasper-hyprland";
         inputs.nixpkgs.follows = "nixpkgs";
         inputs.home-manager.follows = "home-manager";
     };

@@ -1,20 +1,14 @@
-{
-  config,
-  lib,
-  pkgs,
-  osConfig ? { },
-  ...
-}:
+{ config, lib, pkgs, osConfig ? { }, ... }:
 let
   cfg = config.omarchy;
-  hasNvidiaDrivers = builtins.elem "nvidia" osConfig.services.xserver.videoDrivers;
+  hasNvidiaDrivers = osConfig != null
+    && builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
   nvidiaEnv = [
     "NVD_BACKEND,direct"
     "LIBVA_DRIVER_NAME,nvidia"
     "__GLX_VENDOR_LIBRARY_NAME,nvidia"
   ];
-in
-{
+in {
   wayland.windowManager.hyprland.settings = {
     # Environment variables
     env = (lib.optionals hasNvidiaDrivers nvidiaEnv) ++ [
@@ -38,7 +32,8 @@ in
       "OZONE_PLATFORM,wayland"
 
       # Make Chromium use XCompose and all Wayland
-      "CHROMIUM_FLAGS,\"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4\""
+      ''
+        CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
 
       # Make .desktop files available for wofi
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
@@ -48,19 +43,17 @@ in
       "EDITOR,nvim"
 
       # GTK theme
-      "GTK_THEME,${if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark"}"
+      "GTK_THEME,${
+        if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark"
+      }"
 
       # Podman compatibility. Probably need to add cfg.env?
       # "DOCKER_HOST,unix://$XDG_RUNTIME_DIR/podman/podman.sock"
     ];
 
-    xwayland = {
-      force_zero_scaling = true;
-    };
+    xwayland = { force_zero_scaling = true; };
 
     # Don't show update on first launch
-    ecosystem = {
-      no_update_news = true;
-    };
+    ecosystem = { no_update_news = true; };
   };
 }

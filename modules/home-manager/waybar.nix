@@ -152,7 +152,7 @@
             };
             wireplumber = {
               # Changed from "pulseaudio"
-              "format" = "";
+              "format" = "󰕾";
               format-muted = "󰝟";
               scroll-step = 5;
               on-click = "pavucontrol";

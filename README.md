@@ -31,8 +31,9 @@ Once ready, add this flake to your system configuration, you'll also need [home-
   outputs = { nixpkgs, omarchy-nix, home-manager, ... }: {
     nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
       modules = [
-        omarchy-nix.nixosModules.default
-        home-manager.nixosModules.home-manager #Add this import
+        omarchy-nix.nixosModules.omarchy-system
+        omarchy-nix.nixosModules.omarchy-hyprland
+        home-manager.nixosModules.home-manager
         {
           # Configure omarchy
           omarchy = {
@@ -40,10 +41,28 @@ Once ready, add this flake to your system configuration, you'll also need [home-
             email_address = "your.email@example.com";
             theme = "tokyo-night";
           };
-          
+
           home-manager = {
             users.your-username = {
-              imports = [ omarchy-nix.homeManagerModules.default ]; # And this one
+              imports = with omarchy-nix.homeManagerModules; [
+                omarchy-themes
+                omarchy-hyprland
+                omarchy-ghostty
+                omarchy-waybar
+                omarchy-wofi
+                omarchy-mako
+                omarchy-hyprlock
+                omarchy-hyprpaper
+                omarchy-hypridle
+                omarchy-btop
+                omarchy-git
+                omarchy-zsh
+                omarchy-starship
+                omarchy-direnv
+                omarchy-fonts
+                omarchy-vscode
+                omarchy-zoxide
+              ];
             };
           };
         }
@@ -52,6 +71,8 @@ Once ready, add this flake to your system configuration, you'll also need [home-
   };
 }
 ```
+
+> **Note:** Each module is imported individually, giving you full control over which components to include. `omarchy-themes` must be imported to provide the `omarchy.*` options and color scheme used by the other modules.
 
 ## Configuration Options
 

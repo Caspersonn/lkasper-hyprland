@@ -13,7 +13,7 @@
       "tile, class:^(chromium)$"
 
       # Settings management
-      "float, class:^(org.pulseaudio.pavucontrol|blueberry.py)$"
+      "float, class:^(org.pulseaudio.pavucontrol|blueberry.py|nwg-displays)$"
 
       # Float Steam, fullscreen RetroArch
       "float, class:^(steam)$"
@@ -33,15 +33,15 @@
       "nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0"
 
       # Float in the middle for clipse clipboard manager
-      "float, class:(clipse)"
-      "size 622 652, class:(clipse)"
-      "stayfocused, class:(clipse)"
+      "float, title:(clipse)"
+      "size 622 652, title:(clipse)"
+      "stayfocused, title:(clipse)"
     ];
 
     layerrule = [
       # Proper background blur for wofi
       "blur,wofi"
-      "blur,waybar"
+      #"blur,waybar"
     ];
   };
 }

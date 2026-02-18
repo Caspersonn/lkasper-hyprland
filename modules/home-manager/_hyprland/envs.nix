@@ -9,20 +9,36 @@ let
     "__GLX_VENDOR_LIBRARY_NAME,nvidia"
   ];
 in {
+  home.sessionVariables = {
+    GDK_SCALE = toString cfg.scale;
+    XCURSOR_SIZE = "24";
+    HYPRCURSOR_SIZE = "24";
+    XCURSOR_THEME = "Adwaita";
+    HYPRCURSOR_THEME = "Adwaita";
+    GDK_BACKEND = "wayland";
+    QT_QPA_PLATFORM = "wayland";
+    QT_STYLE_OVERRIDE = "kvantum";
+    SDL_VIDEODRIVER = "wayland";
+    MOZ_ENABLE_WAYLAND = "1";
+    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    OZONE_PLATFORM = "wayland";
+    CHROMIUM_FLAGS =
+      "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
+    XCOMPOSEFILE = "~/.XCompose";
+    EDITOR = "nvim";
+    GTK_THEME =
+      if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark";
+  };
+
   wayland.windowManager.hyprland.settings = {
-    # Environment variables
+    # Environment variables — mirrors home.sessionVariables so Hyprland
+    # child processes also see them before the session vars are sourced
     env = (lib.optionals hasNvidiaDrivers nvidiaEnv) ++ [
       "GDK_SCALE,${toString cfg.scale}"
-
-      # Cursor size
       "XCURSOR_SIZE,24"
       "HYPRCURSOR_SIZE,24"
-
-      # Cursor theme
       "XCURSOR_THEME,Adwaita"
       "HYPRCURSOR_THEME,Adwaita"
-
-      # Force all apps to use Wayland
       "GDK_BACKEND,wayland"
       "QT_QPA_PLATFORM,wayland"
       "QT_STYLE_OVERRIDE,kvantum"
@@ -30,25 +46,14 @@ in {
       "MOZ_ENABLE_WAYLAND,1"
       "ELECTRON_OZONE_PLATFORM_HINT,wayland"
       "OZONE_PLATFORM,wayland"
-
-      # Make Chromium use XCompose and all Wayland
       ''
         CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
-
-      # Make .desktop files available for wofi
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
-
-      # Use XCompose file
       "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-
-      # GTK theme
       "GTK_THEME,${
         if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark"
       }"
-
-      # Podman compatibility. Probably need to add cfg.env?
-      # "DOCKER_HOST,unix://$XDG_RUNTIME_DIR/podman/podman.sock"
     ];
 
     xwayland = { force_zero_scaling = true; };

@@ -26,11 +26,16 @@ in
     "$messenger" = lib.mkDefault "signal-desktop";
     #"$webapp" = lib.mkDefault "$browser --app";
 
-    monitor =
-      if cfg.monitors != [ ] then cfg.monitors else [ ",preferred,auto,1" ];
+    monitor = if cfg.monitors != [ ] then cfg.monitors else [ ",preferred,auto,1" ];
   };
+
+  wayland.windowManager.hyprland.plugins = [
+    pkgs.hyprlandPlugins.hyprsplit
+    pkgs.hyprlandPlugins.hyprspace
+  ];
 
   wayland.windowManager.hyprland.extraConfig = ''
     source = ~/.config/hypr/monitors.conf
+    source = ~/.config/hypr/workspaces.conf
   '';
 }

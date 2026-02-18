@@ -1,6 +1,9 @@
 {
   description = "Omarchy - Base configuration flake";
+
   inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     hyprland.url = "github:hyprwm/Hyprland";
     nix-colors.url = "github:misterio77/nix-colors";
@@ -9,27 +12,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = inputs@{ self, nixpkgs, hyprland, nix-colors, home-manager, }: {
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-tree;
 
-    nixosModules = {
-      default = { config, lib, pkgs, ... }: {
-        imports = [ (import ./modules/nixos/default.nix inputs) ];
+  outputs =
+    inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.home-manager.flakeModules.home-manager
+        (inputs.import-tree ./modules)
+      ];
 
-        options.omarchy = (import ./config.nix lib).omarchyOptions;
-        config = { nixpkgs.config.allowUnfree = true; };
-      };
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
     };
-
-    homeManagerModules = {
-      default = { config, lib, pkgs, osConfig ? { }, ... }: {
-        imports = [
-          nix-colors.homeManagerModules.default
-          (import ./modules/home-manager/default.nix inputs)
-        ];
-        options.omarchy = (import ./config.nix lib).omarchyOptions;
-
-      };
-    };
-  };
 }

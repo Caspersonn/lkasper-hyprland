@@ -89,8 +89,8 @@ in
       "SUPER SHIFT, S, movetoworkspace, special:magic"
 
       # Screenshots
-      ", PRINT, exec, hyprshot -m region"
-      "SHIFT, PRINT, exec, hyprshot -m window"
+      "SUPER CTRL, S, exec, hyprshot -m region"
+      "SUPER CTRL, W, exec, hyprshot -m window -m active"
       "CTRL, PRINT, exec, hyprshot -m output"
 
       # Color picker

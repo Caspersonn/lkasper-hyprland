@@ -58,7 +58,7 @@ lib: {
       description = "A list of single keystroke key bindings to launch common apps.";
       default = [
         "SUPER, return, exec, $terminal"
-        "SUPER, F, exec, $fileManager"
+        "SUPER, E, exec, $fileManager"
         "SUPER, B, exec, $browser"
         "SUPER, M, exec, $music"
         "SUPER, N, exec, $terminal -e nvim"

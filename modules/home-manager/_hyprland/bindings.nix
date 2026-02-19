@@ -21,14 +21,14 @@ in
       "SUPER, ESCAPE, exec, hyprlock"
       "SUPER SHIFT, ESCAPE, exit,"
       "SUPER CTRL, ESCAPE, exec, reboot"
-      "SUPER SHIFT CTRL, ESCAPE, exec, systemctl poweroff"
+      "SUPER SHIFT CTRL, ESCAPE, exec, hyprlock & disown && systemctl suspend"
       "SUPER, K, exec, ~/.local/share/omarchy/bin/omarchy-show-keybindings"
 
       # Control tiling
       "SUPER, J, togglesplit, # dwindle"
       "SUPER, P, pseudo, # dwindle"
       "SUPER, V, togglefloating,"
-      "SUPER SHIFT, Plus, fullscreen,"
+      "SUPER, F, fullscreen,"
 
       # Move focus with mainMod + arrow keys
       "SUPER, left, movefocus, l"

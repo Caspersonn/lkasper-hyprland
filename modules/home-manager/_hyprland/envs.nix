@@ -26,9 +26,14 @@ in {
       "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
     XCOMPOSEFILE = "~/.XCompose";
     EDITOR = "nvim";
-    GTK_THEME =
-      if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark";
+    GTK_THEME = "Adwaita";
+    # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
+    ADW_DISABLE_PORTAL = "1";
   };
+
+  # Import environment variables into systemd user environment
+  # This is needed for apps launched via .desktop files (e.g., from wofi)
+  systemd.user.sessionVariables = config.home.sessionVariables;
 
   wayland.windowManager.hyprland.settings = {
     # Environment variables — mirrors home.sessionVariables so Hyprland
@@ -51,9 +56,8 @@ in {
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
       "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-      "GTK_THEME,${
-        if cfg.theme == "generated_light" then "Adwaita" else "Adwaita:dark"
-      }"
+      "GTK_THEME,Adwaita"
+      "ADW_DISABLE_PORTAL,1"
     ];
 
     xwayland = { force_zero_scaling = true; };

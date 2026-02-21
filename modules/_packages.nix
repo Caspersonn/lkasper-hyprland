@@ -13,6 +13,8 @@ let
     pamixer
     playerctl
     gnome-themes-extra
+    libsForQt5.qtstyleplugin-kvantum
+    qt6Packages.qtstyleplugin-kvantum
     pavucontrol
   ];
 

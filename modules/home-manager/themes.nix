@@ -49,9 +49,17 @@
 
         home.packages = packages.homePackages;
 
-        home.file.".local/share/omarchy/bin" = {
-          source = ../../bin;
-          recursive = true;
+        home.file = {
+          ".local/share/omarchy/bin" = {
+            source = ../../bin;
+            recursive = true;
+          };
+          ".config/Kvantum/kvantum.kvconfig" = {
+            text = ''
+              [General]
+              theme=${if isLight then "KvGnome" else "KvGnomeDark"}
+            '';
+          };
         };
       };
     };

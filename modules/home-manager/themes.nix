@@ -40,14 +40,30 @@
         gtk = {
           enable = true;
           theme = {
-            name = if isLight then "Adwaita" else "Adwaita:dark";
+            name = "Adwaita";
             package = pkgs.gnome-themes-extra;
+          };
+          gtk3.extraConfig = {
+            gtk-application-prefer-dark-theme = if isLight then false else true;
+          };
+          gtk4.extraConfig = {
+            gtk-application-prefer-dark-theme = if isLight then false else true;
+          };
+        };
+
+        # Enable dark mode for GTK apps
+        dconf.settings = {
+          "org/gnome/desktop/interface" = {
+            color-scheme = if isLight then "default" else "prefer-dark";
           };
         };
 
         programs.neovim.enable = true;
 
-        home.packages = packages.homePackages;
+        home.packages = packages.homePackages ++ [
+          # Required for GTK-4 dark mode support
+          pkgs.libadwaita
+        ];
 
         home.file = {
           ".local/share/omarchy/bin" = {

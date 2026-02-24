@@ -26,7 +26,6 @@ in {
       "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
     XCOMPOSEFILE = "~/.XCompose";
     EDITOR = "nvim";
-    GTK_THEME = "Adwaita";
     # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
     ADW_DISABLE_PORTAL = "1";
   };
@@ -56,7 +55,7 @@ in {
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
       "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-      "GTK_THEME,Adwaita"
+      "GTK_THEME,${config.home.sessionVariables.GTK_THEME}"
       "ADW_DISABLE_PORTAL,1"
     ];
 

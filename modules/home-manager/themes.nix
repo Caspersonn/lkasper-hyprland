@@ -40,7 +40,7 @@
         gtk = {
           enable = true;
           theme = {
-            name = "Adwaita";
+            name = if isLight then "Adwaita" else "Adwaita:dark";
             package = pkgs.gnome-themes-extra;
           };
           gtk3.extraConfig = {
@@ -51,17 +51,19 @@
           };
         };
 
-        # Enable dark mode for GTK apps
+        # Enable dark mode for GTK/Electron apps (Slack, etc. read these)
         dconf.settings = {
           "org/gnome/desktop/interface" = {
             color-scheme = if isLight then "default" else "prefer-dark";
           };
         };
 
+        home.sessionVariables.GTK_THEME = if isLight then "Adwaita" else "Adwaita:dark";
+        systemd.user.sessionVariables.GTK_THEME = if isLight then "Adwaita" else "Adwaita:dark";
+
         programs.neovim.enable = true;
 
         home.packages = packages.homePackages ++ [
-          # Required for GTK-4 dark mode support
           pkgs.libadwaita
         ];
 

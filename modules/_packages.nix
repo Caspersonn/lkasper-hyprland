@@ -1,10 +1,5 @@
-{
-  pkgs,
-  lib,
-  exclude_packages ? [ ],
-}:
+{ pkgs, lib, exclude_packages ? [ ], }:
 let
-  # Essential Hyprland packages - cannot be excluded
   hyprlandPackages = with pkgs; [
     hyprshot
     hyprpicker
@@ -18,7 +13,6 @@ let
     pavucontrol
   ];
 
-  # Essential system packages - cannot be excluded
   systemPackages = with pkgs; [
     git
     vim
@@ -38,9 +32,7 @@ let
     gnumake
   ];
 
-  # Discretionary packages - can be excluded by user
-  discretionaryPackages =
-    with pkgs;
+  discretionaryPackages = with pkgs;
     [
       # TUIs
       lazygit
@@ -63,20 +55,14 @@ let
       docker-compose
       ffmpeg
     ]
-    ++ lib.optionals (pkgs.system == "x86_64-linux") [
-      typora
-      dropbox
-      spotify
-    ];
+    ++ lib.optionals (pkgs.system == "x86_64-linux") [ typora dropbox spotify ];
 
-  # Only allow excluding discretionary packages to prevent breaking the system
-  filteredDiscretionaryPackages = lib.lists.subtractLists exclude_packages discretionaryPackages;
-  allSystemPackages = hyprlandPackages ++ systemPackages ++ filteredDiscretionaryPackages;
-in
-{
-  # Regular packages
+  filteredDiscretionaryPackages = lib.lists.subtractLists exclude_packages discretionaryPackages; allSystemPackages = hyprlandPackages ++ systemPackages ++ filteredDiscretionaryPackages;
+in {
   systemPackages = allSystemPackages;
 
-  homePackages = with pkgs; [
-  ];
+  homePackages = with pkgs;
+    [
+      xdg-desktop-portal-gtk
+    ];
 }

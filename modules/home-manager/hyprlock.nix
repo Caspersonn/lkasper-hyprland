@@ -10,7 +10,6 @@
     let
       palette = config.colorScheme.palette;
       convert = inputs.nix-colors.lib.conversions.hexToRGBString;
-      selected_wallpaper_path = (import ../../lib/selected-wallpaper.nix config).wallpaper_path;
 
       backgroundRgb = "rgba(${convert ", " palette.base00}, 0.8)";
       surfaceRgb = "rgb(${convert ", " palette.base02})";
@@ -30,7 +29,7 @@
           };
           background = {
             monitor = "";
-            path = selected_wallpaper_path;
+            path = "~/.config/omarchy/current/wallpaper";
             # blur_passes = 3;
             # brightness = 0.5;
           };
@@ -64,7 +63,7 @@
             monitor = "";
             text = "$FPRINTPROMPT";
             text_align = "center";
-            color = "rgb(211, 198, 170)";
+            color = foregroundMutedRgb;
             font_size = 24;
             font_family = "CaskaydiaMono Nerd Font";
             position = "0, -100";

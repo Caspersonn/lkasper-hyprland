@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/waybar.css" ]]; then
+  mkdir -p "$HOME/.config/waybar"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/waybar.css" "$HOME/.config/waybar/runtime.css"
+fi
+
+if systemctl --user list-unit-files waybar.service >/dev/null 2>&1; then
+  systemctl --user restart waybar.service
+else
+  omarchy-restart-app waybar
+fi

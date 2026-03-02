@@ -75,6 +75,8 @@
             #entry image {
               -gtk-icon-transform: scale(0.7);
             }
+
+            @import url("file://${config.home.homeDirectory}/.config/wofi/runtime.css");
           '';
         };
       };

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/opencode.json" ]]; then
+  mkdir -p "$HOME/.config/opencode/themes"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/opencode.json" "$HOME/.config/opencode/themes/opencode.json"
+fi
+
+pkill -SIGUSR2 -f '(^|[[:space:]])opencode([[:space:]]|$)' >/dev/null 2>&1 || true

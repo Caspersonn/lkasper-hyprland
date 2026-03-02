@@ -8,7 +8,7 @@
       backgroundRgb = "rgb(${convert ", " palette.base00})";
       foregroundRgb = "rgb(${convert ", " palette.base05})";
     in
-    {
+      {
       home.file = {
         ".config/waybar/" = {
           source = ../../config/waybar;
@@ -24,6 +24,8 @@
             window#waybar {
               background-color: ${backgroundRgb};
             }
+
+            @import url("file://${config.home.homeDirectory}/.config/waybar/runtime.css");
           '';
         };
       };
@@ -62,15 +64,9 @@
                 "7" = "7";
                 "8" = "8";
                 "9" = "9";
+                "10" = "0";
                 active = "󱓻";
               };
-              #persistent-workspaces = {
-              #  "1" = [ ];
-              #  "2" = [ ];
-              #  "3" = [ ];
-              #  "4" = [ ];
-              #  "5" = [ ];
-              #};
             };
             cpu = {
               interval = 5;
@@ -146,12 +142,11 @@
             bluetooth = {
               format = "󰂯";
               format-disabled = "󰂲";
-              format-connected = "";
+              format-connected = "󰂯";
               tooltip-format = "Devices connected: {num_connections}";
               on-click = "blueberry";
             };
             wireplumber = {
-              # Changed from "pulseaudio"
               "format" = "󰕾";
               format-muted = "󰝟";
               scroll-step = 5;

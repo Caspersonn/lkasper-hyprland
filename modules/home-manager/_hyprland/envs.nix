@@ -1,14 +1,21 @@
-{ config, lib, pkgs, osConfig ? { }, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig ? { },
+  ...
+}:
 let
   cfg = config.omarchy;
-  hasNvidiaDrivers = osConfig != null
-    && builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
+  hasNvidiaDrivers =
+    osConfig != null && builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
   nvidiaEnv = [
     "NVD_BACKEND,direct"
     "LIBVA_DRIVER_NAME,nvidia"
     "__GLX_VENDOR_LIBRARY_NAME,nvidia"
   ];
-in {
+in
+{
   home.sessionVariables = {
     GDK_SCALE = toString cfg.scale;
     XCURSOR_SIZE = "24";
@@ -22,13 +29,13 @@ in {
     MOZ_ENABLE_WAYLAND = "1";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
     OZONE_PLATFORM = "wayland";
-    CHROMIUM_FLAGS =
-      "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
+    CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
     XCOMPOSEFILE = "~/.XCompose";
     EDITOR = "nvim";
-    GTK_THEME = "Adwaita";
+    OMARCHY_PATH = "${config.home.homeDirectory}/.local/share/omarchy";
     # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
     ADW_DISABLE_PORTAL = "1";
+    XDG_DATA_DIRS = "$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
   };
 
   # Import environment variables into systemd user environment
@@ -51,18 +58,22 @@ in {
       "MOZ_ENABLE_WAYLAND,1"
       "ELECTRON_OZONE_PLATFORM_HINT,wayland"
       "OZONE_PLATFORM,wayland"
-      ''
-        CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
+      ''CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
       "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-      "GTK_THEME,Adwaita"
+      "OMARCHY_PATH,${config.home.homeDirectory}/.local/share/omarchy"
+      "PATH,$PATH:${config.home.homeDirectory}/.local/share/omarchy/bin"
       "ADW_DISABLE_PORTAL,1"
     ];
 
-    xwayland = { force_zero_scaling = true; };
+    xwayland = {
+      force_zero_scaling = true;
+    };
 
     # Don't show update on first launch
-    ecosystem = { no_update_news = true; };
+    ecosystem = {
+      no_update_news = true;
+    };
   };
 }

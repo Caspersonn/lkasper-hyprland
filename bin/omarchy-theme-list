@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+THEME_DIRS=()
+
+if [[ -d "$HOME/.config/omarchy/themes" ]]; then
+  THEME_DIRS+=("$HOME/.config/omarchy/themes")
+fi
+
+if [[ -n ${OMARCHY_PATH:-} ]] && [[ -d "$OMARCHY_PATH/themes" ]]; then
+  THEME_DIRS+=("$OMARCHY_PATH/themes")
+fi
+
+if (( ${#THEME_DIRS[@]} == 0 )); then
+  exit 0
+fi
+
+{
+  for dir in "${THEME_DIRS[@]}"; do
+    find "$dir" -mindepth 1 -maxdepth 1 \( -type d -o -type l \) -printf '%f\n'
+  done
+} | sort -u | while read -r name; do
+  echo "$name" | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g'
+done

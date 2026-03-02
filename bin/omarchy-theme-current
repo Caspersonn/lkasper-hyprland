@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+THEME_NAME_PATH="$HOME/.config/omarchy/current/theme.name"
+DEFAULT_THEME_PATH="$HOME/.config/omarchy/theme-default"
+
+if [[ -f $THEME_NAME_PATH ]]; then
+  cat $THEME_NAME_PATH | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g'
+elif [[ -f $DEFAULT_THEME_PATH ]]; then
+  theme_name=$(head -n 1 "$DEFAULT_THEME_PATH")
+  mkdir -p "$HOME/.config/omarchy/current"
+  printf '%s\n' "$theme_name" > "$THEME_NAME_PATH"
+  printf '%s\n' "$theme_name" | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g'
+else
+  echo "Unknown"
+fi

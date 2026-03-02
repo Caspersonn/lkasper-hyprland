@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/btop.theme" ]]; then
+  mkdir -p "$HOME/.config/btop/themes"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/btop.theme" "$HOME/.config/btop/themes/omarchy-runtime.theme"
+fi
+
+# Reload btop configuration (used by the Omarchy theme switching).
+
+pkill -SIGUSR2 btop

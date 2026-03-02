@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/hyprland.conf" ]]; then
+  mkdir -p "$HOME/.config/hypr"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/hyprland.conf" "$HOME/.config/hypr/theme.conf"
+elif [[ -f "$HOME/.config/omarchy/current/theme/hypr/theme.conf" ]]; then
+  mkdir -p "$HOME/.config/hypr"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/hypr/theme.conf" "$HOME/.config/hypr/theme.conf"
+fi
+
+# Reload hyprland configuration (used by the Omarchy theme switching).
+
+hyprctl reload >/dev/null

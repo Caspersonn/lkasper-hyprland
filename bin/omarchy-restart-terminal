@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/starship.toml" ]]; then
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/starship.toml" "$HOME/.config/starship.toml"
+fi
+
+if command -v tmux >/dev/null && [[ -f "$HOME/.config/omarchy/current/theme/tmux.conf" ]]; then
+  declare -A seen_sockets
+  tmux_sockets=()
+
+  if [[ -n ${TMUX:-} ]]; then
+    s="${TMUX%%,*}"
+    if [[ -z ${seen_sockets[$s]:-} ]]; then
+      seen_sockets[$s]=1
+      tmux_sockets+=("$s")
+    fi
+  fi
+
+  if [[ -d "/tmp/tmux-$(id -u)" ]]; then
+    while IFS= read -r socket_path; do
+      if [[ -z ${seen_sockets[$socket_path]:-} ]]; then
+        seen_sockets[$socket_path]=1
+        tmux_sockets+=("$socket_path")
+      fi
+    done < <(find "/tmp/tmux-$(id -u)" -maxdepth 1 -type s 2>/dev/null)
+  fi
+
+  for socket_path in "${tmux_sockets[@]}"; do
+    tmux -S "$socket_path" source-file "$HOME/.config/omarchy/current/theme/tmux.conf" >/dev/null 2>&1 || true
+    tmux -S "$socket_path" refresh-client -S >/dev/null 2>&1 || true
+  done
+fi
+
+if [[ -f ~/.config/alacritty/alacritty.toml ]]; then
+  touch ~/.config/alacritty/alacritty.toml
+fi
+
+if pgrep -x kitty >/dev/null; then
+  killall -SIGUSR1 kitty >/dev/null
+fi
+
+if ! systemctl --user reload app-com.mitchellh.ghostty.service >/dev/null 2>&1; then
+  pkill -SIGUSR2 -f '(^|[[:space:]])ghostty([[:space:]]|$)' >/dev/null 2>&1 || true
+fi

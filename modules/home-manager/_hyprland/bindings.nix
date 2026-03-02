@@ -1,18 +1,16 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 let
   cfg = config.omarchy;
 in
 {
   wayland.windowManager.hyprland.settings = {
     bind = cfg.quick_app_bindings ++ [
-      "SUPER, space, exec, wofi --show drun --sort-order=alphabetical"
+      "SUPER, space, exec, omarchy-launch-walker"
+      "SUPER ALT, SPACE, exec, omarchy-menu"
+      "SUPER SHIFT CTRL, SPACE, exec, omarchy-menu theme"
       "SUPER SHIFT, SPACE, exec, pkill -SIGUSR1 waybar"
       # "SUPER CTRL, SPACE, exec, ~/.local/share/omarchy/bin/swaybg-next"
-      # "SUPER SHIFT CTRL, SPACE, exec, ~/.local/share/omarchy/bin/omarchy-theme-next"
+      "SUPER CTRL, SPACE, exec, omarchy-theme-bg-next"
 
       "SUPER, Q, killactive,"
       "SUPER, Backspace, killactive,"
@@ -22,7 +20,7 @@ in
       "SUPER SHIFT, ESCAPE, exit,"
       "SUPER CTRL, ESCAPE, exec, reboot"
       "SUPER SHIFT CTRL, ESCAPE, exec, hyprlock & disown && systemctl suspend"
-      "SUPER, K, exec, ~/.local/share/omarchy/bin/omarchy-show-keybindings"
+      "SUPER, K, exec, omarchy-menu-keybindings"
 
       # Control tiling
       "SUPER, J, togglesplit, # dwindle"
@@ -78,11 +76,6 @@ in
       # Scroll through existing workspaces with mainMod + scroll
       "SUPER, mouse_down, workspace, e+1"
       "SUPER, mouse_up, workspace, e-1"
-
-      # Control Apple Display brightness
-      "CTRL, F1, exec, ~/.local/share/omarchy/bin/apple-display-brightness -5000"
-      "CTRL, F2, exec, ~/.local/share/omarchy/bin/apple-display-brightness +5000"
-      "SHIFT CTRL, F2, exec, ~/.local/share/omarchy/bin/apple-display-brightness +60000"
 
       # Super workspace floating layer
       "SUPER, S, togglespecialworkspace, magic"

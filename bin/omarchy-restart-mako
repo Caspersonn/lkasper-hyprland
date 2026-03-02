@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [[ -f "$HOME/.config/omarchy/current/theme/mako.conf" ]]; then
+  mkdir -p "$HOME/.config/mako"
+  cp --remove-destination "$HOME/.config/omarchy/current/theme/mako.conf" "$HOME/.config/mako/runtime.conf"
+fi
+
+# Reload mako configuration (used by the Omarchy theme switching).
+
+makoctl reload

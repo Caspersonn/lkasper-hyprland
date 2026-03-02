@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+add_xdg_data_dir() {
+  local dir="$1"
+  [[ -d "$dir" ]] || return 0
+
+  case ":$XDG_DATA_DIRS:" in
+  *":$dir:"*) ;;
+  *)
+    if [[ -n "$XDG_DATA_DIRS" ]]; then
+      XDG_DATA_DIRS="$XDG_DATA_DIRS:$dir"
+    else
+      XDG_DATA_DIRS="$dir"
+    fi
+    ;;
+  esac
+}
+
+add_schema_data_dirs() {
+  local root="$1"
+  local schema_dir
+
+  for schema_dir in "$root"/gsettings-schemas/*; do
+    [[ -d "$schema_dir" ]] || continue
+    add_xdg_data_dir "$schema_dir"
+  done
+}
+
+ensure_gsettings_schemas() {
+  gsettings list-schemas >/dev/null 2>&1 && return 0
+
+  add_xdg_data_dir "/run/current-system/sw/share"
+  add_xdg_data_dir "$HOME/.nix-profile/share"
+  add_xdg_data_dir "/nix/var/nix/profiles/default/share"
+  add_xdg_data_dir "/etc/profiles/per-user/$USER/share"
+
+  add_schema_data_dirs "/run/current-system/sw/share"
+  add_schema_data_dirs "$HOME/.nix-profile/share"
+  add_schema_data_dirs "/nix/var/nix/profiles/default/share"
+  add_schema_data_dirs "/etc/profiles/per-user/$USER/share"
+
+  export XDG_DATA_DIRS
+  gsettings list-schemas >/dev/null 2>&1
+}
+
+gsettings_set() {
+  local schema="$1"
+  local key="$2"
+  local value="$3"
+  local path="/${schema//./\/}/$key"
+  local escaped
+
+  if ensure_gsettings_schemas; then
+    gsettings set "$schema" "$key" "$value" && return 0
+  fi
+
+  command -v dconf >/dev/null 2>&1 || {
+    printf 'Failed to resolve gsettings schemas and dconf is unavailable\n' >&2
+    return 1
+  }
+
+  escaped=${value//\'/\'\\\'\'}
+  dconf write "$path" "'$escaped'"
+}
+
+# Change gnome modes
+if [[ -f ~/.config/omarchy/current/theme/light.mode ]]; then
+  gsettings_set org.gnome.desktop.interface color-scheme "prefer-light" || exit 1
+  gsettings_set org.gnome.desktop.interface gtk-theme "Adwaita" || exit 1
+  mkdir -p ~/.config/Kvantum
+  printf '%s\n' "[General]" "theme=KvGnome" > ~/.config/Kvantum/kvantum.kvconfig
+else
+  gsettings_set org.gnome.desktop.interface color-scheme "prefer-dark" || exit 1
+  gsettings_set org.gnome.desktop.interface gtk-theme "Adwaita-dark" || exit 1
+  mkdir -p ~/.config/Kvantum
+  printf '%s\n' "[General]" "theme=KvGnomeDark" > ~/.config/Kvantum/kvantum.kvconfig
+fi
+
+# Change gnome icon theme color
+GNOME_ICONS_THEME=~/.config/omarchy/current/theme/icons.theme
+if [[ -f $GNOME_ICONS_THEME ]]; then
+  gsettings_set org.gnome.desktop.interface icon-theme "$(<$GNOME_ICONS_THEME)" || exit 1
+else
+  gsettings_set org.gnome.desktop.interface icon-theme "Yaru-blue" || exit 1
+fi

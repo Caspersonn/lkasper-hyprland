@@ -1,8 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.settings = {
     exec-once = [
@@ -11,10 +7,9 @@
       "hyprsunset"
       "systemctl --user start hyprpolkitagent"
       "wl-clip-persist --clipboard regular & clipse -listen"
+      "sh -lc '~/.local/share/omarchy/bin/omarchy-theme-set \"$(~/.local/share/omarchy/bin/omarchy-theme-current)\"'"
     ];
 
-    exec = [
-      "pkill -SIGUSR2 waybar || waybar"
-    ];
+    exec = [ "pkill -SIGUSR2 waybar || waybar" ];
   };
 }

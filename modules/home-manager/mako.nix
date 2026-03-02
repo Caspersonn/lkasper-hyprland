@@ -5,6 +5,9 @@
     {
       services.mako = {
         enable = true;
+        extraConfig = ''
+          include=${config.home.homeDirectory}/.config/mako/runtime.conf
+        '';
 
         settings = {
           background-color = "#${config.colorScheme.palette.base00}";

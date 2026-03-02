@@ -1,0 +1,19 @@
+schema: spec-driven
+context: |
+  Nix flake for a themed Hyprland desktop, exported as reusable NixOS and home-manager modules.
+  Built with `flake-parts` + `import-tree`; non-`_` files in `modules/` are flake-parts modules, `_`-prefixed paths are plain helpers excluded from auto-import.
+  Keep user-facing configuration under `omarchy.*`; options are declared once per side (`modules/nixos/system.nix`, `modules/home-manager/themes.nix`) and consumed elsewhere.
+  Theme logic is base16-first: derive UI colors from `config.colorScheme.palette.base0X`; do not hardcode colors.
+  Use `mkDefault` for user-overridable defaults; package exclusion uses `omarchy.exclude_packages` and applies only to discretionary packages.
+  Format Nix with `nix fmt` (`nixfmt-tree`).
+
+rules:
+  proposal:
+    - State whether the change targets NixOS modules, home-manager modules, or shared flake plumbing.
+    - Name impacted outputs/options explicitly (e.g., `nixosModules.omarchy-system`, `homeManagerModules.omarchy-hyprland`, `omarchy.theme`).
+  specs:
+    - Write acceptance criteria in Given/When/Then.
+    - Reference concrete paths/options instead of vague component names.
+  tasks:
+    - Keep tasks file-scoped with explicit paths.
+    - Include verification commands when relevant (`nix fmt`, `nix flake check`).

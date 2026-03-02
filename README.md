@@ -39,7 +39,6 @@ Once ready, add this flake to your system configuration, you'll also need [home-
           omarchy = {
             full_name = "Your Name";
             email_address = "your.email@example.com";
-            theme = "tokyo-night";
           };
 
           home-manager = {
@@ -47,6 +46,7 @@ Once ready, add this flake to your system configuration, you'll also need [home-
               imports = with omarchy-nix.homeManagerModules; [
                 omarchy-themes
                 omarchy-hyprland
+                omarchy-walker
                 omarchy-ghostty
                 omarchy-waybar
                 omarchy-wofi
@@ -82,48 +82,26 @@ Refer to [the root configuration](https://github.com/henrysipp/omarchy-nix/blob/
 
 ### Themes
 
-Omarchy-nix includes several predefined themes:
+Theme switching is runtime-based (imperative), not a static Nix option.
+
+Use the included commands to switch instantly without running `home-manager switch`:
+
+```bash
+omarchy-theme-list
+omarchy-theme-set "Gruvbox Light"
+omarchy-theme-current
+```
+
+Available built-in themes:
 - `tokyo-night` (default)
 - `kanagawa`
 - `everforest`
-- `catppuccin`
+- `catppuccin-macchiato`
 - `nord`
 - `gruvbox`
 - `gruvbox-light`
 
-You can also generate themes from wallpaper images using:
-- `generated_light` - generates a light color scheme from wallpaper
-- `generated_dark` - generates a dark color scheme from wallpaper
-
-Generated themes require a wallpaper path to be specified:
-
-```nix
-{
-  omarchy = {
-    theme = "generated_dark"; # or "generated_light"
-    theme_overrides = {
-      wallpaper_path = ./path/to/your/wallpaper.png;
-    };
-  };
-}
-```
-
-#### Wallpaper Overrides
-
-Any theme can be customized with a custom wallpaper by specifying `wallpaper_path` in theme_overrides. For predefined themes, this will only change the wallpaper but keep the original color scheme:
-
-```nix
-{
-  omarchy = {
-    theme = "tokyo-night"; # or any other predefined theme
-    theme_overrides = {
-      wallpaper_path = ./path/to/your/wallpaper.png;
-    };
-  };
-}
-```
-
-Generated themes automatically extract colors from the wallpaper and create a matching color scheme for all Omarchy applications (terminal, editor, launcher, etc.). 
+Theme assets are rendered into `~/.config/omarchy/current/theme/` and apps are reloaded by the `omarchy-restart-*` scripts.
 
 ## License
 

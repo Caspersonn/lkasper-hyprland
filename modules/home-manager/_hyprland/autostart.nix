@@ -10,6 +10,6 @@
       "sh -lc '~/.local/share/omarchy/bin/omarchy-theme-set \"$(~/.local/share/omarchy/bin/omarchy-theme-current)\"'"
     ];
 
-    exec = [ "pkill -SIGUSR2 waybar || waybar" ];
+    #exec = [ "pkill -SIGUSR2 waybar || waybar" ];
   };
 }

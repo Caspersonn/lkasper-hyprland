@@ -1,6 +1,6 @@
 { config, pkgs, ... }: {
   wayland.windowManager.hyprland.settings = {
-    windowrulev2 = [
+    windowrule = [
       "suppressevent maximize, class:.*"
 
       "tile, class:^(chromium)$"
@@ -25,6 +25,6 @@
       "stayfocused, title:(clipse)"
     ];
 
-    layerrule = [ "blur, namespace:wofi" ];
+    layerrule = [ "blur on, namespace:wofi" ];
   };
 }

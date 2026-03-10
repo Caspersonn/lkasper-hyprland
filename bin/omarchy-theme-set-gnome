@@ -81,5 +81,5 @@ GNOME_ICONS_THEME=~/.config/omarchy/current/theme/icons.theme
 if [[ -f $GNOME_ICONS_THEME ]]; then
   gsettings_set org.gnome.desktop.interface icon-theme "$(<$GNOME_ICONS_THEME)" || exit 1
 else
-  gsettings_set org.gnome.desktop.interface icon-theme "Yaru-blue" || exit 1
+  gsettings_set org.gnome.desktop.interface icon-theme "Adwaita" || exit 1
 fi

@@ -24,7 +24,6 @@ let
   # Essential system packages - cannot be excluded
   systemPackages = with pkgs; [
     git
-    vim
     libnotify
     nautilus
     alejandra

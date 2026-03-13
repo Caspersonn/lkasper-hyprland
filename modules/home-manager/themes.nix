@@ -129,8 +129,6 @@
           };
         };
 
-        programs.neovim.enable = true;
-
         home.packages = packages.homePackages ++ [ pkgs.libadwaita ];
 
         home.sessionPath =

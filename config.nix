@@ -33,7 +33,6 @@ lib: {
         "SUPER, E, exec, $fileManager"
         "SUPER, B, exec, $browser"
         "SUPER, M, exec, $music"
-        "SUPER, N, exec, $terminal -e nvim"
         "SUPER, T, exec, $terminal -e btop"
         "SUPER, D, exec, $terminal -e lazydocker"
         "SUPER, G, exec, $messenger"

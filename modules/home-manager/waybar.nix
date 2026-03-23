@@ -142,7 +142,7 @@
             bluetooth = {
               format = "󰂯";
               format-disabled = "󰂲";
-              format-connected = "󰂯";
+              format-connected = "󰂱";
               tooltip-format = "Devices connected: {num_connections}";
               on-click = "blueberry";
             };

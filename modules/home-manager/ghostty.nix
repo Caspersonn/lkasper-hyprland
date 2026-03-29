@@ -20,6 +20,7 @@
           config-file = "~/.config/omarchy/current/theme/ghostty.conf";
           gtk-single-instance = true;
           keybind = [ "ctrl+k=reset" ];
+          confirm-close-surface = false;
         };
       };
 

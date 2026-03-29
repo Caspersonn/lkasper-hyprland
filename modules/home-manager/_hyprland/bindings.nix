@@ -5,6 +5,9 @@ in
 {
   wayland.windowManager.hyprland.settings = {
     bind = cfg.quick_app_bindings ++ [
+      "SUPER, I, exec, [workspace 1 silent;] ghostty"
+      "SUPER, I, exec, [workspace 2 silent;] firefox"
+
       "SUPER, space, exec, omarchy-launch-walker"
       "SUPER ALT, SPACE, exec, omarchy-menu"
       "SUPER SHIFT CTRL, SPACE, exec, omarchy-menu theme"

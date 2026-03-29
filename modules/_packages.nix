@@ -6,7 +6,6 @@
 let
   # Essential Hyprland packages - cannot be excluded
   hyprlandPackages = with pkgs; [
-    hyprshot
     hyprpicker
     hyprsunset
     brightnessctl

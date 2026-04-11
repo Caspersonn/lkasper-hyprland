@@ -5,15 +5,20 @@
   "height": 26,
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": [
-    "tray",
-    "bluetooth",
-    "network",
-    "wireplumber",
-    "cpu",
-    "power-profiles-daemon",
-    "battery"
-  ],
+  "modules-right": ["group/right-cluster"],
+  "group/right-cluster": {
+    "orientation": "inherit",
+    "modules": [
+      "tray",
+      "bluetooth",
+      "network",
+      "wireplumber",
+      "cpu",
+      "custom/fan",
+      "custom/weather",
+      "battery"
+    ]
+  },
   "hyprland/workspaces": {
     "on-click": "activate",
     "format": "{icon}",
@@ -44,13 +49,13 @@
       "7": "7",
       "8": "8",
       "9": "9",
-      "10": "0",
-      // "active": "󱓻"
+      "10": "10",
     }
   },
   "cpu": {
     "interval": 5,
-    "format": "󰍛",
+    "format": "󰍛 {usage:>2}%",
+    "tooltip-format": "CPU {usage}%\nLoad {load}\nAvg {avg_frequency} GHz",
     "on-click": "ghostty -e btop"
   },
   "clock": {
@@ -81,7 +86,7 @@
     "format": "{icon} {capacity}%",
     "format-discharging": "{icon} {time}",
     "format-charging": "{icon} {capacity}%",
-    "format-plugged": "",
+    "format-plugged": "",
     "format-full": "󰂅",
     "format-time": "{H}:{m}",
     "format-icons": {
@@ -125,28 +130,35 @@
     "format-disabled": "󰂲",
     "format-connected": "󰂱",
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "blueberry"
+    "on-click": "ghostty -e bluetuith"
   },
   "wireplumber": {
     "format": "󰕾",
     "format-muted": "󰝟",
     "scroll-step": 5,
-    "on-click": "pavucontrol",
+    "on-click": "ghostty -e pulsemixer",
     "tooltip-format": "Playing at {volume}%",
-    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle", // Updated command
-    "max-volume": 150 // Optional: allow volume over 100%
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "max-volume": 150
   },
   "tray": {
     "spacing": 13
   },
-  "power-profiles-daemon": {
-    "format": "{icon}",
-    "tooltip-format": "Power profile: {profile}",
+  "custom/fan": {
+    "format": "{text}",
+    "return-type": "json",
+    "exec": "$HOME/.config/waybar/scripts/fan.sh",
+    "exec-if": "$HOME/.config/waybar/scripts/fan.sh --check",
+    "interval": 3,
+    "hide-empty-text": true,
+    "tooltip": true
+  },
+  "custom/weather": {
+    "format": "{text}",
+    "return-type": "json",
+    "exec": "$HOME/.config/waybar/scripts/weather-brief.sh",
+    "interval": 900,
     "tooltip": true,
-    "format-icons": {
-      "power-saver": "󰡳",
-      "balanced": "󰊚",
-      "performance": "󰡴"
-    }
+    "on-click": "xdg-open https://wttr.in"
   }
 }

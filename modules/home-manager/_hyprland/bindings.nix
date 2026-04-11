@@ -119,5 +119,12 @@ in
       ", XF86AudioPlay, exec, playerctl play-pause"
       ", XF86AudioPrev, exec, playerctl previous"
     ];
+
+    bindp = [
+      # Powerprofileselecter
+      "$mainMod+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
+      "$mainMod+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
+      "$mainMod+Ctrl+Shift, R, exec, powerprofilesctl set performance"
+    ];
   };
 }

@@ -154,7 +154,7 @@
             }
 
             window#waybar {
-              background-color: #{{ base00 }};
+              background-color: transparent;
             }
           '';
           ".local/share/omarchy/default/themed/wofi.css.tpl".text = ''
@@ -351,7 +351,7 @@
             }
 
             window#waybar {
-              background-color: #${config.colorScheme.palette.base00};
+              background-color: transparent;
             }
           '';
           ".config/wofi/runtime.css".text = ''

@@ -1,4 +1,3 @@
-
 @import "./theme.css";
 * {
   border: none;
@@ -18,6 +17,45 @@
   all: initial;
   padding: 2px 6px;
   margin-right: 3px;
+}
+
+#workspaces button {
+  all: unset;
+  color: alpha(@foreground, 0.78);
+  padding: 0 9px;
+  margin: 3px 2px;
+  min-width: 13px;
+  border-radius: 9px;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px transparent;
+}
+
+#workspaces button:hover {
+  background-color: alpha(@foreground, 0.08);
+  color: @foreground;
+}
+
+#workspaces button.empty:not(.active) {
+  color: alpha(@foreground, 0.38);
+  background-color: transparent;
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+#workspaces button:not(.empty):not(.active) {
+  color: alpha(@foreground, 0.88);
+  background-color: alpha(@foreground, 0.04);
+  box-shadow: inset 0 0 0 1px alpha(@foreground, 0.08);
+  opacity: 1;
+}
+
+#workspaces button.active,
+#workspaces button.active.empty {
+  color: @foreground;
+  background-color: alpha(@foreground, 0.12);
+  box-shadow: inset 0 0 0 1px alpha(@foreground, 0.18);
+  font-weight: 700;
+  opacity: 1;
 }
 
 #custom-dropbox,

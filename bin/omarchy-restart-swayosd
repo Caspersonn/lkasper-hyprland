@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-omarchy-restart-app swayosd-server

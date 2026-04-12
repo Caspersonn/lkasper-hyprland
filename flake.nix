@@ -1,5 +1,5 @@
 {
-  description = "Omarchy - Base configuration flake";
+  description = "lkasper-hyprland - Personal Hyprland desktop";
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -7,11 +7,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     hyprland.url = "github:hyprwm/Hyprland";
     nix-colors.url = "github:misterio77/nix-colors";
-    walker = {
-      url = "github:abenz1267/walker";
-      inputs.elephant.follows = "elephant";
-    };
-    elephant.url = "github:abenz1267/elephant";
+    ags.url = "github:aylur/ags";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

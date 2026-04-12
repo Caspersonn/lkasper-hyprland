@@ -1,0 +1,148 @@
+$base: #1e1e2e;
+$mantle: #181825;
+$crust: #11111b;
+$surface0: #313244;
+$surface1: #45475a;
+$surface2: #585b70;
+$overlay0: #6c7086;
+$overlay1: #7f849c;
+$overlay2: #9399b2;
+$subtext0: #a6adc8;
+$subtext1: #bac2de;
+$text: #cdd6f4;
+$lavender: #b4befe;
+$blue: #89b4fa;
+$sapphire: #74c7ec;
+$sky: #89dceb;
+$teal: #94e2d5;
+$green: #a6e3a1;
+$yellow: #f9e2af;
+$peach: #fab387;
+$maroon: #eba0ac;
+$red: #f38ba8;
+$mauve: #cba6f7;
+$pink: #f5c2e7;
+$flamingo: #f2cdcd;
+$rosewater: #f5e0dc;
+
+$bg: $base;
+$fg: $text;
+$fg-dim: $subtext0;
+$accent: $blue;
+
+$bar-margin: 8px;
+$pill-padding-h: 14px;
+$pill-padding-v: 6px;
+$pill-gap: 8px;
+$module-spacing: 8px;
+$dot-size: 8px;
+
+window.bar {
+    background-color: transparent;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.pill {
+    background-color: $bg;
+    border-radius: 999px;
+    padding: $pill-padding-v $pill-padding-h;
+    color: $fg;
+}
+
+.left-pill {
+    margin-right: $pill-gap;
+}
+
+.center-pill {
+    margin-left: $pill-gap;
+    margin-right: $pill-gap;
+}
+
+.right-pill {
+    margin-left: $pill-gap;
+}
+
+.workspace-dot {
+    min-width: $dot-size;
+    min-height: $dot-size;
+    border-radius: 999px;
+    margin: 0 3px;
+
+    &.active {
+        background-color: $fg;
+    }
+
+    &.occupied {
+        background-color: transparent;
+        border: 1.5px solid $fg;
+    }
+}
+
+.clock {
+    font-weight: 700;
+}
+
+.media-label {
+    margin-left: $module-spacing;
+    color: $fg-dim;
+}
+
+.separator {
+    border-left: 1px solid rgba($text, 0.12);
+    padding-left: 8px;
+    margin-left: 8px;
+}
+
+.module-icon {
+    font-size: 14px;
+    min-width: 14px;
+}
+
+.module-text {
+    font-weight: 700;
+}
+
+.battery {
+    &.charging {
+        color: $green;
+    }
+
+    &.warning {
+        color: $yellow;
+    }
+
+    &.critical {
+        color: $red;
+    }
+}
+
+.volume {
+    &.muted {
+        color: $fg-dim;
+    }
+}
+
+.bluetooth {
+    &.disabled {
+        color: $fg-dim;
+    }
+}
+
+.wifi {
+    &.disconnected {
+        color: $fg-dim;
+    }
+}
+
+.notification-bell {
+    font-size: 14px;
+}
+
+tooltip {
+    background-color: $surface0;
+    color: $fg;
+    border-radius: 8px;
+    padding: 6px 10px;
+    border: 1px solid rgba($text, 0.08);
+}

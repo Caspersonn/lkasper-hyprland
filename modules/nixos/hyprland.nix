@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.nixosModules.omarchy-hyprland =
+  flake.nixosModules.lkh-hyprland =
     { pkgs, ... }:
     {
       programs.hyprland = {

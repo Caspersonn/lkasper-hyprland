@@ -6,7 +6,7 @@
   ...
 }:
 let
-  cfg = config.omarchy;
+  cfg = config."lkasper-hyprland";
   hasNvidiaDrivers =
     osConfig != null && builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
   nvidiaEnv = [
@@ -32,7 +32,6 @@ in
     CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
     XCOMPOSEFILE = "~/.XCompose";
     EDITOR = "nvim";
-    OMARCHY_PATH = "${config.home.homeDirectory}/.local/share/omarchy";
     # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
     ADW_DISABLE_PORTAL = "1";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
@@ -62,8 +61,6 @@ in
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
       "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-      "OMARCHY_PATH,${config.home.homeDirectory}/.local/share/omarchy"
-      "PATH,$PATH:${config.home.homeDirectory}/.local/share/omarchy/bin"
       "ADW_DISABLE_PORTAL,1"
     ];
 

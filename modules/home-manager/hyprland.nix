@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.homeManagerModules.omarchy-hyprland =
+  flake.homeManagerModules.lkh-hyprland =
     { config, pkgs, ... }:
     {
       imports = [ ./_hyprland/configuration.nix ];

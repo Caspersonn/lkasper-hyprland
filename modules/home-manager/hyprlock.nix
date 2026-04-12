@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.homeManagerModules.omarchy-hyprlock =
+  flake.homeManagerModules.lkh-hyprlock =
     {
       config,
       pkgs,
@@ -29,7 +29,7 @@
           };
           background = {
             monitor = "";
-            path = "~/.config/omarchy/current/wallpaper";
+            path = "~/.config/lkasper-hyprland/current/wallpaper";
             # blur_passes = 3;
             # brightness = 0.5;
           };

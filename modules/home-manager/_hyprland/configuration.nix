@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.omarchy;
+  cfg = config."lkasper-hyprland";
 in
 {
   imports = [

@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-zsh =
+  flake.homeManagerModules.lkh-zsh =
     { ... }:
     {
       programs.zsh = {

@@ -1,13 +1,13 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-btop =
+  flake.homeManagerModules.lkh-btop =
     { config, pkgs, ... }:
     let
       palette = config.colorScheme.palette;
     in
     {
       home.file = {
-        ".config/btop/themes/omarchy-runtime.theme" = {
+        ".config/btop/themes/lkh-runtime.theme" = {
           text = ''
             # Main text color
             theme[main_fg]="${palette.base05}"
@@ -83,7 +83,7 @@
       programs.btop = {
         enable = true;
         settings = {
-          color_theme = "omarchy-runtime";
+          color_theme = "lkh-runtime";
           theme_background = false;
           truecolor = true;
           force_tty = false;

@@ -37,6 +37,8 @@ let
     unzip
     wget
     gnumake
+    gtk4
+    gtk3
   ];
 
   # Discretionary packages - can be excluded by user

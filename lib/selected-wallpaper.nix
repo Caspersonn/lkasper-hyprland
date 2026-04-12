@@ -1,3 +1,1 @@
-_: {
-  wallpaper_path = "~/Pictures/Wallpapers/1-Pawel-Czerwinski-Abstract-Purple-Blue.jpg";
-}
+_: { wallpaper_path = "~/Pictures/Wallpapers/catppuccin/1-totoro.png"; }

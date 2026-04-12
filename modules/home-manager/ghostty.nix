@@ -1,9 +1,9 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-ghostty =
+  flake.homeManagerModules.lkh-ghostty =
     { config, pkgs, ... }:
     let
-      cfg = config.omarchy;
+      cfg = config."lkasper-hyprland";
     in
     {
       programs.ghostty = {
@@ -17,7 +17,6 @@
           font-family = cfg.primary_font;
           font-size = 12;
 
-          config-file = "~/.config/omarchy/current/theme/ghostty.conf";
           gtk-single-instance = true;
           keybind = [ "ctrl+k=reset" ];
           confirm-close-surface = false;

@@ -29,11 +29,11 @@ All work happens on `feature/ags` (big-bang migration). Main branch remains unto
 - **Bar**: Top, floating, split into 3 separate capsule pills (Left / Center / Right) with gaps between them
   - Left pill: Workspace dots (filled = active, outline = occupied, hidden = empty)
   - Center pill: Clock + short day ("Mon 14:32") + media info when playing (artist - title)
-  - Right pill: System tray, Bluetooth, WiFi, Volume, CPU, Notification bell, Battery
+  - Right pill: System tray, Bluetooth, WiFi, Volume, CPU, Battery, Notification bell (bell always far right)
   - Pill shape: Fully rounded capsule (border-radius = height / 2)
   - Pill background: Solid opaque (theme background color, no transparency)
   - Separators: Subtle border-left between right pill modules
-- **Quick settings**: Dropdown panel below bar (appears on click of WiFi/BT/Volume icons)
+- **Quick settings**: Single unified dropdown panel below bar. Opens when any right pill icon is clicked except tray and notification bell. When open, the trigger icons (BT, WiFi, Volume, CPU, Battery) get a highlighted/light background. Click outside or toggle to close.
 - **Notification center**: Right sidebar (slides in from right edge, full height)
 - **Launcher**: Centered spotlight-style overlay
 - **Notifications**: Toast pop-ups + notification center sidebar with history
@@ -79,12 +79,17 @@ AGS v2 Shell (single GTK4 application: lkasper-shell)
 │   ├── CENTER PILL (capsule): Clock "Mon HH:mm" + Media (astal-mpris, shown when playing)
 │   └── RIGHT PILL (capsule): Tray (astal-tray) │ BT (astal-bluetooth)
 │         │ WiFi (astal-network) │ Volume (astal-wireplumber) │ CPU (poll)
-│         │ Notifications bell │ Battery (astal-battery)
+│         │ Battery (astal-battery) │ Notification bell (far right)
 │
-├── Quick Settings Panel (dropdown below bar, anchored to clicked icon)
-│   ├── Bluetooth: toggle + connected device name
-│   ├── WiFi: toggle + current network name
-│   └── Volume: slider + output device selector
+├── Quick Settings Panel (single unified dropdown below right pill)
+│   │   Opens on click of BT/WiFi/Volume/CPU/Battery icons (not tray, not bell)
+│   │   Trigger icons get highlighted background when panel is open
+│   ├── Bluetooth: pill-switch toggle + device list (collapsed/expandable)
+│   │     Connect, Disconnect, Forget actions per device
+│   ├── WiFi: pill-switch toggle + network list (collapsed/expandable)
+│   │     Connect (inline password for secured), Disconnect
+│   ├── Volume: slider + output device selector
+│   └── Brightness: slider
 │
 ├── Launcher (spotlight-style overlay window)
 │   ├── App search (astal-apps)
@@ -131,7 +136,7 @@ ags/                                # AGS v2 TypeScript project
       index.tsx                     # Bar window (Astal.Window, 3 split capsule pills)
       left-pill.tsx                 # Left pill container (workspaces)
       center-pill.tsx               # Center pill container (clock + media)
-      right-pill.tsx                # Right pill container (tray, bt, wifi, vol, cpu, bell, battery)
+      right-pill.tsx                # Right pill container (tray, bt, wifi, vol, cpu, battery, bell)
       workspaces.tsx                # Hyprland workspace dots (astal-hyprland)
       clock.tsx                     # Clock ("Mon HH:mm")
       media.tsx                     # MPRIS media info (hidden when no player)
@@ -267,12 +272,19 @@ Runtime theme switching.
 
 ### Phase 3: `ags-quick-settings`
 Quick-settings dropdown panel.
-- Dropdown panel anchored below the clicked icon in the right pill
-- Bluetooth: toggle + connected device name
-- WiFi: toggle + current network name
+- Single unified dropdown panel below the right pill
+- Opens when any right pill icon is clicked (except tray and notification bell)
+- Trigger icons (BT, WiFi, Volume, CPU, Battery) get highlighted/light background when panel is open
+- Bluetooth: pill-switch toggle + connected device name. Collapsed by default (current device + chevron). Expand to see paired devices with Connect/Disconnect/Forget actions.
+- WiFi: pill-switch toggle + current network name. Collapsed by default (current network + chevron). Expand to see available networks with Connect/Disconnect. Password entry inline in panel for secured networks.
 - Volume: slider + output device selector
+- Brightness: slider (below volume)
+- BT/WiFi sections: collapsed by default, expand on click of section header
+- CPU/Battery have no dedicated panel section (clicking them just opens the panel)
+- Trigger icon highlight: lighter shade of pill background (not accent)
 - Click outside or toggle to close
 - Solid opaque background, matching capsule radius
+- Notification bell moved to far right of right pill (after battery)
 
 ### Phase 4: `ags-launcher`
 Spotlight-style launcher.

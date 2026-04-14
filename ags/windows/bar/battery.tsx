@@ -10,7 +10,6 @@ export default function Battery() {
         if (c) return `${base} charging`
         return base
     })}>
-        <image class="module-icon" iconName={createBinding(bat, "iconName")} />
-        <label label={createBinding(bat, "percentage").as(p => `${p * 100}%`)} />
+        <image class="module-icon" iconName={createBinding(bat, "batteryIconName")} />
     </box>
 }

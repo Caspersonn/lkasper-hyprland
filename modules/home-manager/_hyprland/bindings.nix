@@ -115,9 +115,9 @@ in
 
     bindp = [
       # Powerprofileselecter
-      "$mainMod+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
-      "$mainMod+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
-      "$mainMod+Ctrl+Shift, R, exec, powerprofilesctl set performance"
+      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
+      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
+      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance"
     ];
   };
 }

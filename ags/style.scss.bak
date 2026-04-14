@@ -31,16 +31,30 @@ $fg-dim: $subtext0;
 $accent: $blue;
 
 $bar-margin: 8px;
-$pill-padding-h: 14px;
-$pill-padding-v: 6px;
+$pill-padding-h: 12px;
+$pill-padding-v: 8px;
 $pill-gap: 8px;
-$module-spacing: 8px;
+$module-spacing: 6px;
 $dot-size: 8px;
+$dot-active-width: 20px;
 
 window.bar {
     background-color: transparent;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 500;
+
+    button {
+        min-height: 0;
+        min-width: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    image {
+        -gtk-icon-size: 16px;
+    }
 }
 
 .pill {
@@ -67,16 +81,33 @@ window.bar {
     min-width: $dot-size;
     min-height: $dot-size;
     border-radius: 999px;
-    margin: 0 3px;
+    margin: 0 2px;
+    transition: min-width 200ms ease;
 
     &.active {
+        min-width: $dot-active-width;
         background-color: $fg;
     }
 
     &.occupied {
         background-color: transparent;
-        border: 1.5px solid $fg;
+        border: 2px solid rgba($fg, 0.5);
     }
+}
+
+.client-button {
+    padding: 2px;
+    border-radius: 999px;
+
+    image {
+        -gtk-icon-size: 20px;
+    }
+}
+
+.clients-separator {
+    border-left: 1px solid rgba($text, 0.12);
+    padding-left: 6px;
+    margin-left: 6px;
 }
 
 .clock {
@@ -90,13 +121,13 @@ window.bar {
 
 .separator {
     border-left: 1px solid rgba($text, 0.12);
-    padding-left: 8px;
-    margin-left: 8px;
+    padding-left: $module-spacing;
+    margin-left: $module-spacing;
 }
 
 .module-icon {
     font-size: 14px;
-    min-width: 14px;
+    min-width: 16px;
 }
 
 .module-text {

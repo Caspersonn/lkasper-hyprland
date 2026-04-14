@@ -13,7 +13,7 @@ export default function RightPill() {
         <Wifi />
         <Volume />
         <Cpu />
-        <NotificationBell />
         <Battery />
+        <NotificationBell />
     </box>
 }

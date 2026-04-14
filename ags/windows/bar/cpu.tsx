@@ -21,5 +21,6 @@ const cpu = createPoll(0, 3000, () => {
 export default function Cpu() {
     return <box class="cpu module-text separator">
         <label label={cpu.as(v => `${v}%`)} />
+        <image class="cpu-icon" iconName="cpu-symbolic" />
     </box>
 }

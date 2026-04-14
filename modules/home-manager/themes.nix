@@ -125,83 +125,14 @@
             package = pkgs.gnome-themes-extra;
           };
           iconTheme = {
-            name = "Adwaita";
-            package = pkgs.adwaita-icon-theme;
+            name = "Gruvbox-Plus-Dark";
+            package = pkgs.gruvbox-plus-icons;
           };
         };
 
         home.packages = packages.homePackages ++ [ pkgs.libadwaita ];
 
         home.file = {
-          ".config/hypr/theme.conf".text = ''
-            general {
-              col.active_border = rgba(${config.colorScheme.palette.base0D}aa)
-              col.inactive_border = rgba(${config.colorScheme.palette.base09}aa)
-            }
-
-            group {
-              col.border_active = rgba(${config.colorScheme.palette.base0D}aa)
-              col.border_inactive = rgba(${config.colorScheme.palette.base09}aa)
-            }
-          '';
-          ".config/btop/themes/lkh-runtime.theme".text = ''
-            theme[main_fg]="${config.colorScheme.palette.base05}"
-            theme[title]="${config.colorScheme.palette.base05}"
-            theme[hi_fg]="${config.colorScheme.palette.base0D}"
-            theme[selected_bg]="${config.colorScheme.palette.base01}"
-            theme[selected_fg]="${config.colorScheme.palette.base05}"
-            theme[inactive_fg]="${config.colorScheme.palette.base04}"
-            theme[proc_misc]="${config.colorScheme.palette.base0D}"
-            theme[cpu_box]="${config.colorScheme.palette.base0B}"
-            theme[mem_box]="${config.colorScheme.palette.base09}"
-            theme[net_box]="${config.colorScheme.palette.base0E}"
-            theme[proc_box]="${config.colorScheme.palette.base0C}"
-            theme[div_line]="${config.colorScheme.palette.base04}"
-            theme[temp_start]="${config.colorScheme.palette.base0B}"
-            theme[temp_mid]="${config.colorScheme.palette.base0A}"
-            theme[temp_end]="${config.colorScheme.palette.base08}"
-            theme[cpu_start]="${config.colorScheme.palette.base0B}"
-            theme[cpu_mid]="${config.colorScheme.palette.base0A}"
-            theme[cpu_end]="${config.colorScheme.palette.base08}"
-            theme[free_start]="${config.colorScheme.palette.base0B}"
-            theme[cached_start]="${config.colorScheme.palette.base0A}"
-            theme[available_start]="${config.colorScheme.palette.base09}"
-            theme[used_start]="${config.colorScheme.palette.base08}"
-            theme[download_start]="${config.colorScheme.palette.base0E}"
-            theme[download_mid]="${config.colorScheme.palette.base0D}"
-            theme[download_end]="${config.colorScheme.palette.base0C}"
-            theme[upload_start]="${config.colorScheme.palette.base0E}"
-            theme[upload_mid]="${config.colorScheme.palette.base0D}"
-            theme[upload_end]="${config.colorScheme.palette.base0C}"
-          '';
-          ".config/ghostty/themes/lkh-runtime".text = ''
-            background = #${config.colorScheme.palette.base00}
-            foreground = #${config.colorScheme.palette.base05}
-            selection-background = #${config.colorScheme.palette.base02}
-            selection-foreground = #${config.colorScheme.palette.base00}
-            palette = 0=#${config.colorScheme.palette.base00}
-            palette = 1=#${config.colorScheme.palette.base08}
-            palette = 2=#${config.colorScheme.palette.base0B}
-            palette = 3=#${config.colorScheme.palette.base0A}
-            palette = 4=#${config.colorScheme.palette.base0D}
-            palette = 5=#${config.colorScheme.palette.base0E}
-            palette = 6=#${config.colorScheme.palette.base0C}
-            palette = 7=#${config.colorScheme.palette.base05}
-            palette = 8=#${config.colorScheme.palette.base03}
-            palette = 9=#${config.colorScheme.palette.base08}
-            palette = 10=#${config.colorScheme.palette.base0B}
-            palette = 11=#${config.colorScheme.palette.base0A}
-            palette = 12=#${config.colorScheme.palette.base0D}
-            palette = 13=#${config.colorScheme.palette.base0E}
-            palette = 14=#${config.colorScheme.palette.base0C}
-            palette = 15=#${config.colorScheme.palette.base07}
-            palette = 16=#${config.colorScheme.palette.base09}
-            palette = 17=#${config.colorScheme.palette.base0F}
-            palette = 18=#${config.colorScheme.palette.base01}
-            palette = 19=#${config.colorScheme.palette.base02}
-            palette = 20=#${config.colorScheme.palette.base04}
-            palette = 21=#${config.colorScheme.palette.base06}
-          '';
           ".config/opencode/themes/opencode.json".text = ''
             {
               "$schema": "https://opencode.ai/theme.json",
@@ -259,26 +190,114 @@
               }
             }
           '';
-          ".config/starship.toml".text = ''
-            add_newline = false
-            format = "$directory$git_branch$git_status$character"
-
-            [directory]
-            style = "bold #${config.colorScheme.palette.base0D}"
-            truncation_length = 4
-
-            [git_branch]
-            style = "bold #${config.colorScheme.palette.base05}"
-
-            [git_status]
-            style = "#${config.colorScheme.palette.base05}"
-
-            [character]
-            success_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
-            error_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
-          '';
         }
         // runtimeThemeFiles;
+
+        home.activation.writeThemeDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          mkdir -p "$HOME/.config/lkasper-hyprland/current"
+          mkdir -p "$HOME/.config/hypr"
+          mkdir -p "$HOME/.config/btop/themes"
+          mkdir -p "$HOME/.config/ghostty/themes"
+
+          if [ ! -f "$HOME/.config/hypr/theme.conf" ]; then
+            cat > "$HOME/.config/hypr/theme.conf" << 'HYPREOF'
+          general {
+            col.active_border = rgba(${config.colorScheme.palette.base0D}aa)
+            col.inactive_border = rgba(${config.colorScheme.palette.base09}aa)
+          }
+
+          group {
+            col.border_active = rgba(${config.colorScheme.palette.base0D}aa)
+            col.border_inactive = rgba(${config.colorScheme.palette.base09}aa)
+          }
+          HYPREOF
+          fi
+
+          if [ ! -f "$HOME/.config/btop/themes/lkh-runtime.theme" ]; then
+            cat > "$HOME/.config/btop/themes/lkh-runtime.theme" << 'BTOPEOF'
+          theme[main_fg]="${config.colorScheme.palette.base05}"
+          theme[title]="${config.colorScheme.palette.base05}"
+          theme[hi_fg]="${config.colorScheme.palette.base0D}"
+          theme[selected_bg]="${config.colorScheme.palette.base01}"
+          theme[selected_fg]="${config.colorScheme.palette.base05}"
+          theme[inactive_fg]="${config.colorScheme.palette.base04}"
+          theme[proc_misc]="${config.colorScheme.palette.base0D}"
+          theme[cpu_box]="${config.colorScheme.palette.base0B}"
+          theme[mem_box]="${config.colorScheme.palette.base09}"
+          theme[net_box]="${config.colorScheme.palette.base0E}"
+          theme[proc_box]="${config.colorScheme.palette.base0C}"
+          theme[div_line]="${config.colorScheme.palette.base04}"
+          theme[temp_start]="${config.colorScheme.palette.base0B}"
+          theme[temp_mid]="${config.colorScheme.palette.base0A}"
+          theme[temp_end]="${config.colorScheme.palette.base08}"
+          theme[cpu_start]="${config.colorScheme.palette.base0B}"
+          theme[cpu_mid]="${config.colorScheme.palette.base0A}"
+          theme[cpu_end]="${config.colorScheme.palette.base08}"
+          theme[free_start]="${config.colorScheme.palette.base0B}"
+          theme[cached_start]="${config.colorScheme.palette.base0A}"
+          theme[available_start]="${config.colorScheme.palette.base09}"
+          theme[used_start]="${config.colorScheme.palette.base08}"
+          theme[download_start]="${config.colorScheme.palette.base0E}"
+          theme[download_mid]="${config.colorScheme.palette.base0D}"
+          theme[download_end]="${config.colorScheme.palette.base0C}"
+          theme[upload_start]="${config.colorScheme.palette.base0E}"
+          theme[upload_mid]="${config.colorScheme.palette.base0D}"
+          theme[upload_end]="${config.colorScheme.palette.base0C}"
+          BTOPEOF
+          fi
+
+          if [ ! -f "$HOME/.config/ghostty/themes/lkh-runtime" ]; then
+            cat > "$HOME/.config/ghostty/themes/lkh-runtime" << 'GHOSTTYEOF'
+          background = #${config.colorScheme.palette.base00}
+          foreground = #${config.colorScheme.palette.base05}
+          selection-background = #${config.colorScheme.palette.base02}
+          selection-foreground = #${config.colorScheme.palette.base00}
+          palette = 0=#${config.colorScheme.palette.base00}
+          palette = 1=#${config.colorScheme.palette.base08}
+          palette = 2=#${config.colorScheme.palette.base0B}
+          palette = 3=#${config.colorScheme.palette.base0A}
+          palette = 4=#${config.colorScheme.palette.base0D}
+          palette = 5=#${config.colorScheme.palette.base0E}
+          palette = 6=#${config.colorScheme.palette.base0C}
+          palette = 7=#${config.colorScheme.palette.base05}
+          palette = 8=#${config.colorScheme.palette.base03}
+          palette = 9=#${config.colorScheme.palette.base08}
+          palette = 10=#${config.colorScheme.palette.base0B}
+          palette = 11=#${config.colorScheme.palette.base0A}
+          palette = 12=#${config.colorScheme.palette.base0D}
+          palette = 13=#${config.colorScheme.palette.base0E}
+          palette = 14=#${config.colorScheme.palette.base0C}
+          palette = 15=#${config.colorScheme.palette.base07}
+          palette = 16=#${config.colorScheme.palette.base09}
+          palette = 17=#${config.colorScheme.palette.base0F}
+          palette = 18=#${config.colorScheme.palette.base01}
+          palette = 19=#${config.colorScheme.palette.base02}
+          palette = 20=#${config.colorScheme.palette.base04}
+          palette = 21=#${config.colorScheme.palette.base06}
+          GHOSTTYEOF
+          fi
+
+          if [ ! -f "$HOME/.config/starship.toml" ]; then
+            cat > "$HOME/.config/starship.toml" << 'STARSHIPEOF'
+          add_newline = false
+          format = "$directory$git_branch$git_status$character"
+
+          [directory]
+          style = "bold #${config.colorScheme.palette.base0D}"
+          truncation_length = 4
+
+          [git_branch]
+          style = "bold #${config.colorScheme.palette.base05}"
+
+          [git_status]
+          style = "#${config.colorScheme.palette.base05}"
+
+          [character]
+          success_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
+          error_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
+          STARSHIPEOF
+          fi
+        '';
       };
     };
 }

@@ -1,7 +1,5 @@
-{ inputs, ... }:
-{
-  flake.homeManagerModules.lkh-ags =
-    { pkgs, ... }:
+{ inputs, ... }: {
+  flake.homeManagerModules.lkh-ags = { pkgs, ... }:
     let
       system = pkgs.stdenv.hostPlatform.system;
       agsPkgs = inputs.ags.packages.${system};
@@ -30,19 +28,13 @@
           agsNixpkgs.gobject-introspection
         ];
 
-        buildInputs = astalLibs ++ [
-          pkgs.gtk4
-          pkgs.gjs
-          pkgs.glib
-        ];
+        buildInputs = astalLibs
+          ++ [ pkgs.gtk4 pkgs.gjs pkgs.glib pkgs.gnome-themes-extra ];
 
         installPhase = ''
           mkdir -p $out/bin
           ags bundle app.ts $out/bin/lkasper-shell
         '';
       };
-    in
-    {
-      home.packages = [ lkasper-shell ];
-    };
+    in { home.packages = [ lkasper-shell ]; };
 }

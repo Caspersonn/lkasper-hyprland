@@ -1,27 +1,52 @@
 ## ADDED Requirements
 
-### Requirement: Volume slider control
-The audio section in `ags/windows/quick-settings/volume.tsx` SHALL expose a volume slider bound to the current default speaker endpoint from `astal-wireplumber`.
+### Requirement: Volume slider
+The sliders component in `ags/windows/quick-settings/sliders.tsx` SHALL include a volume slider row with mute toggle, slider bound to the default speaker endpoint from `astal-wireplumber`, and a "more" button opening the Sound detail page.
 
-#### Scenario: Increase or decrease output volume
+#### Scenario: Adjust output volume
 - **GIVEN** an active default speaker endpoint exists
 - **WHEN** the user drags the volume slider
 - **THEN** the system SHALL update output volume to the slider value
 
 #### Scenario: Reflect external volume changes
 - **GIVEN** volume is changed by another source (hotkey or app)
-- **WHEN** the panel is open
+- **WHEN** the control center is open
 - **THEN** the slider position SHALL update to reflect the current endpoint volume
 
-### Requirement: Output device selector
-The audio section SHALL provide an output selector listing available speaker endpoints and allow switching default output.
+#### Scenario: Toggle mute via button
+- **GIVEN** the volume slider row is rendered
+- **WHEN** the user clicks the mute/unmute button
+- **THEN** the system SHALL toggle the default speaker mute state and the button icon SHALL update accordingly
+
+#### Scenario: Mute icon reflects state
+- **GIVEN** the volume slider row is rendered
+- **WHEN** the speaker is muted or volume is 0
+- **THEN** the button icon SHALL show audio-volume-muted, otherwise the standard volume icon
+
+#### Scenario: Open Sound page via more button
+- **GIVEN** the volume slider row is rendered
+- **WHEN** the user clicks the "more" (go-next) button
+- **THEN** the Sound detail page SHALL open in the sliders Pages zone
+
+### Requirement: Sound detail page
+The Sound page in `ags/windows/quick-settings/modules/sound-page.tsx` SHALL list available speaker endpoints and allow switching the default output device, plus show per-app audio stream sliders.
 
 #### Scenario: Show available output devices
-- **GIVEN** wireplumber reports one or more speaker endpoints
-- **WHEN** the output selector is opened
-- **THEN** the selector SHALL list available endpoints with a clear current default indication
+- **GIVEN** the Sound page is open
+- **WHEN** wireplumber reports one or more speaker endpoints
+- **THEN** a "Devices" section SHALL list each endpoint with icon, description, and a selected indicator for the current default
 
 #### Scenario: Switch default output device
 - **GIVEN** at least two speaker endpoints are available
-- **WHEN** the user selects a non-default endpoint
-- **THEN** the system SHALL set that endpoint as default output
+- **WHEN** the user clicks a non-default endpoint
+- **THEN** the system SHALL set that endpoint as the default output
+
+#### Scenario: Show per-app audio streams
+- **GIVEN** the Sound page is open and audio streams are active
+- **WHEN** apps are producing audio
+- **THEN** an "Apps" section SHALL list each stream with app icon, name, and a volume slider
+
+#### Scenario: Adjust per-app volume
+- **GIVEN** a per-app stream slider is visible
+- **WHEN** the user drags the app volume slider
+- **THEN** the system SHALL update that stream's volume

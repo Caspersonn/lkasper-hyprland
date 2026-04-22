@@ -69,6 +69,7 @@ function generateGtkCss(p: Palette): string {
     const yellow = `#${p.base0A}`
     const red = `#${p.base08}`
     const accent = `#${p.base0C}`
+    const bgDark = `#${p.base01}`
 
     return `
 window.bar {
@@ -107,7 +108,7 @@ window.bar image {
 }
 
 .right-pill {
-    margin-left: 8px;
+      margin-left: 8px;
 }
 
 .workspace-dot {
@@ -168,6 +169,12 @@ window.bar image {
     margin-left: 6px;
 }
 
+.tray-separator {
+    border-left: 1px solid alpha(${fg}, 0.12);
+    padding-left: 6px;
+    margin-left: 6px;
+}
+
 .module-icon {
     font-size: 14px;
     min-width: 16px;
@@ -202,7 +209,7 @@ window.bar image {
     color: ${fgDim};
 }
 
-.wifi.disconnected {
+.network.disconnected {
     color: ${fgDim};
 }
 
@@ -216,6 +223,227 @@ tooltip {
     border-radius: 8px;
     padding: 6px 10px;
     border: 1px solid alpha(${fg}, 0.08);
+}
+
+/* === Trigger highlight === */
+
+.qs-triggers.qs-open {
+    opacity: 0.5;
+}
+
+/* === Quick Settings / Control Center === */
+
+window.quick-settings {
+    background-color: transparent;
+}
+
+.quick-settings-panel {
+    margin-top: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.control-center-container {
+    background-color: ${bgDark};
+    border-radius: 28px;
+    padding: 20px;
+    color: ${fg};
+}
+
+.control-center-container > * {
+    margin: 9px 0;
+}
+
+.control-center-container > *:first-child {
+    margin-top: 0;
+}
+
+.control-center-container > *:last-child {
+    margin-bottom: 0;
+}
+
+.control-center-container button:focus-visible {
+    box-shadow: inset 0 0 0 1px ${fg};
+}
+
+/* QuickActions */
+
+.quickactions .user-face {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 32px;
+    min-width: 34px;
+    margin-right: 6px;
+    border-radius: 999px;
+}
+
+.quickactions .user-host .user {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.quickactions .user-host .host {
+    color: ${fgDim};
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.quickactions > box:not(.button-row) image {
+    -gtk-icon-size: 12px;
+    color: ${fgDim};
+    margin-right: 3px;
+}
+
+.quickactions .uptime {
+    font-size: 10px;
+    color: ${fgDim};
+}
+
+.quickactions .button-row button {
+    padding: 7px;
+    margin: 2px 0;
+}
+
+/* Tiles */
+
+.tiles-container .tile {
+    background-color: ${bg};
+    border-radius: 18px;
+    padding: 4px;
+    min-height: 40px;
+}
+
+.tiles-container .tile .icon {
+    transition: 120ms ease-in;
+    border-radius: 14px;
+    padding: 8px 12px;
+    margin-right: 6px;
+    background-color: alpha(${fg}, 0.06);
+}
+
+.tiles-container .tile .icon image {
+    -gtk-icon-size: 18px;
+}
+
+.tiles-container .tile .content .title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.tiles-container .tile .content .description {
+    font-size: 12px;
+    color: ${fgDim};
+    font-weight: 400;
+}
+
+.tiles-container .tile .arrow {
+    -gtk-icon-size: 12px;
+    color: alpha(${fgDim}, 0.4);
+}
+
+.tiles-container .tile.enabled .icon {
+    background-color: ${surface0};
+}
+
+.tile-pages #page {
+    margin-top: 10px;
+}
+
+/* Sliders */
+
+.sliders image {
+    -gtk-icon-size: 16px;
+}
+
+.sliders button {
+    padding: 4px;
+    border-radius: 16px;
+}
+
+.sliders button image {
+    -gtk-icon-size: 14px;
+}
+
+
+/* Pages */
+
+.control-center-container #page,
+.control-center-container .page.container {
+    transition: 120ms linear;
+    background-color: ${surface0};
+    padding: 14px;
+    border-radius: 24px;
+}
+
+.control-center-container .page .header {
+    margin-bottom: 12px;
+}
+
+.control-center-container .page .header .top .title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.control-center-container .page .header .description {
+    font-size: 12px;
+    font-weight: 500;
+    color: ${fgDim};
+}
+
+.control-center-container .page .sub-header {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.control-center-container .page .page-button button,
+.control-center-container .page .extra-buttons button {
+    padding: 6px;
+    border-radius: 12px;
+}
+
+.control-center-container .page .page-button button.selected {
+    background-color: alpha(${fg}, 0.04);
+}
+
+.control-center-container .page .page-button .title {
+    font-size: 14px;
+}
+
+.control-center-container .page .page-button .description {
+    font-size: 10px;
+    font-weight: 400;
+    color: ${fgDim};
+}
+
+.control-center-container .page .page-button image {
+    -gtk-icon-size: 16px;
+}
+
+.control-center-container .page .bottom-buttons button .title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.control-center-container .page .bottom-buttons button .description {
+    font-size: 10px;
+    margin-top: -1px;
+    font-weight: 400;
+    color: ${fgDim};
+}
+
+.control-center-container .page .extra-buttons {
+    margin-left: 2px;
+}
+
+.control-center-container .page .extra-buttons button {
+    border-radius: 10px;
+}
+
+.sliders .page .content .name {
+    font-size: 14px;
+    font-weight: 500;
 }
 `
 }

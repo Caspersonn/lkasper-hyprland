@@ -1,6 +1,7 @@
 import AstalHyprland from "gi://AstalHyprland"
 import { createBinding, For } from "ags"
 import { Gtk } from "ags/gtk4"
+import { exec } from "ags/process"
 
 export default function Clients() {
     const hypr = AstalHyprland.get_default()
@@ -21,7 +22,11 @@ export default function Clients() {
                 <button
                     class="client-button separator"
                     valign={Gtk.Align.CENTER}
-                    onClicked={() => client.focus()}
+                    onClicked={() => {
+                      exec(`hyprctl keyword cursor:no_warps true`)
+                      client.focus()
+                      exec(`hyprctl keyword cursor:no_warps false`)
+                    }}
                     tooltipText={client.title}
                 >
                     <image

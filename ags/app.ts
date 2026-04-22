@@ -1,6 +1,7 @@
 import App from "ags/gtk4/app"
 //import style from "./style.scss"
 import Bar from "./windows/bar"
+import QuickSettings from "./windows/quick-settings"
 import { initTheme, loadTheme, getCurrentTheme, getThemeList, nextWallpaper } from "./services/theme"
 
 App.start({
@@ -36,5 +37,6 @@ App.start({
     main() {
         initTheme()
         Bar()
+        QuickSettings()
     },
 })

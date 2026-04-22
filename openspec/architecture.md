@@ -29,11 +29,11 @@ All work happens on `feature/ags` (big-bang migration). Main branch remains unto
 - **Bar**: Top, floating, split into 3 separate capsule pills (Left / Center / Right) with gaps between them
   - Left pill: Workspace dots (filled = active, outline = occupied, hidden = empty)
   - Center pill: Clock + short day ("Mon 14:32") + media info when playing (artist - title)
-  - Right pill: System tray, Bluetooth, WiFi, Volume, CPU, Battery, Notification bell (bell always far right)
+  - Right pill: System tray, Bluetooth, Network (WiFi or wired), Volume, CPU, Battery, Notification bell (bell always far right)
   - Pill shape: Fully rounded capsule (border-radius = height / 2)
   - Pill background: Solid opaque (theme background color, no transparency)
   - Separators: Subtle border-left between right pill modules
-- **Quick settings**: Single unified dropdown panel below bar. Opens when any right pill icon is clicked except tray and notification bell. When open, the trigger icons (BT, WiFi, Volume, CPU, Battery) get a highlighted/light background. Click outside or toggle to close.
+- **Quick settings / Control center**: Single unified control center panel below the right pill. Opens when any right pill icon is clicked except tray and notification bell. Contains QuickActions row (user info + lock/logout), toggle tiles grid (Network, BT, DND, NightLight), sliders (volume, brightness), and inline drill-down pages via Revealer animation. Trigger icons get highlighted background when open. Click outside or Escape to close.
 - **Notification center**: Right sidebar (slides in from right edge, full height)
 - **Launcher**: Centered spotlight-style overlay
 - **Notifications**: Toast pop-ups + notification center sidebar with history
@@ -78,18 +78,25 @@ AGS v2 Shell (single GTK4 application: lkasper-shell)
 │   │     ● active  ○ occupied  (empty hidden)
 │   ├── CENTER PILL (capsule): Clock "Mon HH:mm" + Media (astal-mpris, shown when playing)
 │   └── RIGHT PILL (capsule): Tray (astal-tray) │ BT (astal-bluetooth)
-│         │ WiFi (astal-network) │ Volume (astal-wireplumber) │ CPU (poll)
-│         │ Battery (astal-battery) │ Notification bell (far right)
+│         │ Network (astal-network, WiFi or wired) │ Volume (astal-wireplumber)
+│         │ CPU (poll) │ Battery (astal-battery) │ Notification bell (far right)
 │
-├── Quick Settings Panel (single unified dropdown below right pill)
-│   │   Opens on click of BT/WiFi/Volume/CPU/Battery icons (not tray, not bell)
+├── Quick Settings / Control Center (popup below right pill)
+│   │   PopupWindow overlay, opens on BT/WiFi/Volume/CPU/Battery click (not tray, not bell)
 │   │   Trigger icons get highlighted background when panel is open
-│   ├── Bluetooth: pill-switch toggle + device list (collapsed/expandable)
-│   │     Connect, Disconnect, Forget actions per device
-│   ├── WiFi: pill-switch toggle + network list (collapsed/expandable)
-│   │     Connect (inline password for secured), Disconnect
-│   ├── Volume: slider + output device selector
-│   └── Brightness: slider
+│   ├── QuickActions: User avatar + name + uptime │ Lock │ Logout
+│   ├── Tiles (2-col FlowBox grid, toggle + optional drill-down)
+│   │   ├── Network: WiFi/wired toggle, SSID/status, arrow → Network page
+│   │   ├── Bluetooth: adapter power toggle, device name, arrow → Bluetooth page
+│   │   ├── Do Not Disturb: notification mute toggle (no detail page)
+│   │   └── Night Light: hyprsunset toggle, temp display, arrow → NightLight page
+│   ├── Sliders (button + slider + "more" → detail page)
+│   │   ├── Volume (speaker): astal-wireplumber → Sound page (device selector, per-app streams)
+│   │   └── Brightness: backlight sysfs → Brightness page (multi-device control)
+│   └── Reusable widgets
+│       ├── Tile: GObject-registered toggleable tile (icon, title, description, state, arrow)
+│       ├── Page: detail view (header, content, bottom buttons)
+│       └── Pages: Revealer-based manager (one page open at a time per zone)
 │
 ├── Launcher (spotlight-style overlay window)
 │   ├── App search (astal-apps)
@@ -136,22 +143,35 @@ ags/                                # AGS v2 TypeScript project
       index.tsx                     # Bar window (Astal.Window, 3 split capsule pills)
       left-pill.tsx                 # Left pill container (workspaces)
       center-pill.tsx               # Center pill container (clock + media)
-      right-pill.tsx                # Right pill container (tray, bt, wifi, vol, cpu, battery, bell)
+      right-pill.tsx                # Right pill container (tray, bt, network, vol, cpu, battery, bell)
       workspaces.tsx                # Hyprland workspace dots (astal-hyprland)
       clock.tsx                     # Clock ("Mon HH:mm")
       media.tsx                     # MPRIS media info (hidden when no player)
-      battery.tsx                   # Battery (upower)
-      wifi.tsx                      # WiFi (NetworkManager)
+      battery.tsx                   # Battery (upower, hidden when no battery present)
+      network.tsx                   # Network (WiFi or wired, astal-network)
       bluetooth.tsx                 # Bluetooth (bluez)
       volume.tsx                    # Volume (WirePlumber)
       cpu.tsx                       # CPU usage (poll /proc/stat)
       tray.tsx                      # System tray
       notifications.tsx             # Bell icon + counter
     quick-settings/
-      index.tsx                     # Quick-settings popup window
-      bluetooth.tsx                 # BT toggle + device
-      wifi.tsx                      # WiFi toggle + network
-      volume.tsx                    # Volume slider + output
+      index.tsx                     # Control center popup window layout
+      quick-actions.tsx             # User info + lock + logout buttons
+      sliders.tsx                   # Volume + brightness sliders with "more" buttons
+      widgets/
+        tile.tsx                    # Reusable Tile component (GObject-registered)
+        page.tsx                    # Page class + PageButton helper
+        pages.tsx                   # Pages manager (Revealer-based open/close/toggle)
+      modules/
+        network-tile.tsx            # Network toggle tile
+        bluetooth-tile.tsx          # Bluetooth toggle tile
+        dnd-tile.tsx                # DND toggle tile
+        night-light-tile.tsx        # NightLight toggle tile
+        network-page.tsx            # Network detail page (devices, WiFi APs)
+        bluetooth-page.tsx          # Bluetooth detail page (device list + actions)
+        night-light-page.tsx        # NightLight settings page (temp + gamma sliders)
+        sound-page.tsx              # Sound output device selector + per-app streams
+        brightness-page.tsx         # Brightness/backlight detail page
     launcher/
       index.tsx                     # Spotlight overlay window
       apps.tsx                      # App search provider
@@ -271,20 +291,27 @@ Runtime theme switching.
 - Persist and restore theme selection
 
 ### Phase 3: `ags-quick-settings`
-Quick-settings dropdown panel.
-- Single unified dropdown panel below the right pill
+Control center panel (colorshell-inspired tile + inline page pattern).
+- Single unified control center as a PopupWindow overlay below the right pill
 - Opens when any right pill icon is clicked (except tray and notification bell)
 - Trigger icons (BT, WiFi, Volume, CPU, Battery) get highlighted/light background when panel is open
-- Bluetooth: pill-switch toggle + connected device name. Collapsed by default (current device + chevron). Expand to see paired devices with Connect/Disconnect/Forget actions.
-- WiFi: pill-switch toggle + current network name. Collapsed by default (current network + chevron). Expand to see available networks with Connect/Disconnect. Password entry inline in panel for secured networks.
-- Volume: slider + output device selector
-- Brightness: slider (below volume)
-- BT/WiFi sections: collapsed by default, expand on click of section header
-- CPU/Battery have no dedicated panel section (clicking them just opens the panel)
+- **QuickActions row**: User avatar (from ~/.face), username, uptime, lock button (hyprlock), logout button (opens logout menu)
+- **Tiles grid**: 2-column FlowBox of toggleable Tile widgets, each with icon, title, description, state, and optional arrow for drill-down
+  - Network: toggle WiFi/wired on/off, shows SSID/connection status, arrow → Network detail page (device list, WiFi AP list with connect/disconnect, inline password for secured)
+  - Bluetooth: toggle adapter power, shows connected device name/battery, arrow → Bluetooth detail page (paired/discovered device list with connect/disconnect/forget)
+  - Do Not Disturb: toggle notification muting via astal-notifd (no detail page, toggleOnClick)
+  - Night Light: toggle hyprsunset, shows temperature, arrow → NightLight settings page (temperature + gamma sliders). Hidden when hyprsunset not installed.
+- **Sliders**: button + slider + "more" button opening detail pages
+  - Volume (speaker): mute toggle + slider bound to default speaker endpoint from astal-wireplumber. "More" → Sound page (output device selector + per-app stream sliders)
+  - Brightness: brightness button + slider bound to backlight via sysfs/brightnessctl. "More" → Brightness page (multi-backlight control). Hidden gracefully when unsupported.
+- **Inline Pages system**: Tiles and sliders open detail pages within the panel via Gtk.Revealer slide-down animation. Only one page open at a time per zone (tiles Pages instance, sliders Pages instance). Pages have header (title, description, action buttons), scrollable content, and optional bottom buttons.
+- **Reusable widgets**: Tile (GObject-registered toggle tile), Page (detail page class with header/content/buttons), Pages (Revealer-based page manager), PageButton (list item button)
+- CPU/Battery have no dedicated tile or detail page (clicking them just opens the panel)
 - Trigger icon highlight: lighter shade of pill background (not accent)
-- Click outside or toggle to close
+- Click outside or Escape to close
 - Solid opaque background, matching capsule radius
 - Notification bell moved to far right of right pill (after battery)
+- Nix dependencies: brightnessctl (for brightness writes), hyprsunset (for night light)
 
 ### Phase 4: `ags-launcher`
 Spotlight-style launcher.

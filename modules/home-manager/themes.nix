@@ -120,10 +120,6 @@
 
         gtk = {
           enable = true;
-          theme = {
-            name = "Adwaita";
-            package = pkgs.gnome-themes-extra;
-          };
           iconTheme = {
             name = "Gruvbox-Plus-Dark";
             package = pkgs.gruvbox-plus-icons;

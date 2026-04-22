@@ -1,4 +1,5 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+{
   wayland.windowManager.hyprland.settings = {
     exec-once = [
       "sleep 1 && lkasper-shell"

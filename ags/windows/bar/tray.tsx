@@ -10,7 +10,7 @@ export default function Tray() {
         <For each={items}>
             {item => (
                 <button
-                    class="tray-item separator"
+                    class="tray-item tray-separator"
                     tooltipMarkup={createBinding(item, "tooltipMarkup")}
                     onClicked={() => item.activate(0, 0)}
                 >

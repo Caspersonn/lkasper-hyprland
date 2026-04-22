@@ -19,7 +19,8 @@ in
       "SUPER CTRL, ESCAPE, exec, reboot"
       "SUPER SHIFT CTRL, ESCAPE, exec, hyprlock & disown && systemctl suspend"
       # Control tiling
-      "SUPER, J, togglesplit, # dwindle"
+      #"SUPER, J, togglesplit, # dwindle"
+      "SUPER, J, layoutmsg, togglesplit"
       "SUPER, P, pseudo, # dwindle"
       "SUPER, V, togglefloating,"
       "SUPER, F, fullscreen,"

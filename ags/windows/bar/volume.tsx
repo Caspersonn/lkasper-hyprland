@@ -13,14 +13,14 @@ export default function Volume() {
     }
 
     return <box
-        class={createBinding(speaker, "mute").as(m =>
+        class={createBinding(speaker, "mute").as((m: any) =>
             m
                 ? "volume module-icon separator muted"
                 : "volume module-icon separator"
         )}
     >
         <Gtk.EventControllerScroll
-            onScroll={(_self, _dx, dy) => {
+            onScroll={(_self: any, _dx: any, dy: any) => {
                 const step = 0.05
                 speaker.volume = Math.max(0, Math.min(1, speaker.volume - dy * step))
             }}

@@ -1,8 +1,19 @@
 import App from "ags/gtk4/app"
 import { Astal } from "ags/gtk4"
-import LeftPill from "./left-pill"
-import CenterPill from "./center-pill"
-import RightPill from "./right-pill"
+
+import Tray from "./tray"
+import Bluetooth from "./bluetooth"
+import Network from "./network"
+import Volume from "./volume"
+import NotificationBell from "./notifications"
+import Battery from "./battery"
+import QuickSettings from "../quick-settings"
+
+import Clock from "./clock"
+import Media from "./media"
+
+import Workspaces from "./workspaces"
+import Clients from "./clients"
 
 export default function Bar() {
     return <window
@@ -19,14 +30,28 @@ export default function Bar() {
     >
         <centerbox>
             <box $type="start">
-                <LeftPill />
+              <box class="pill left-pill">
+                  <Workspaces />
+                  <Clients />
+              </box>
             </box>
             <box $type="center">
-                <CenterPill />
+              <box class="pill center-pill">
+                  <Clock />
+                  <Media />
+              </box>
             </box>
             <box $type="end">
-                <RightPill />
+            <box class="pill right-pill">
+              <Tray />
+              <Bluetooth />
+              <Network />
+              <Volume />
+              <Battery />
+              <NotificationBell />
+              <QuickSettings />
             </box>
+          </box>
         </centerbox>
     </window>
 }

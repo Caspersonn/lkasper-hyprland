@@ -24,7 +24,6 @@ in
     "$music" = lib.mkDefault "spotify";
     "$passwordManager" = lib.mkDefault "bitwarden";
     "$messenger" = lib.mkDefault "signal-desktop";
-    #"$webapp" = lib.mkDefault "$browser --app";
 
     monitor = if cfg.monitors != [ ] then cfg.monitors else [ ",preferred,auto,1" ];
   };

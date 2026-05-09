@@ -8,6 +8,7 @@ in
       "SUPER, I, exec, [workspace 1 silent;] ghostty"
       "SUPER, I, exec, [workspace 2 silent;] firefox"
 
+      "SUPER, SPACE, exec, walker"
       "SUPER SHIFT, SPACE, exec, ags toggle bar"
 
       "SUPER, Q, killactive,"

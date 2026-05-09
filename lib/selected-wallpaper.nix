@@ -1,1 +1,1 @@
-_: { wallpaper_path = "~/Pictures/Wallpapers/catppuccin/1-totoro.png"; }
+_: { wallpaper_path = "~/Pictures/Wallpapers/gruvbox/1-the-backwater.jpg"; }

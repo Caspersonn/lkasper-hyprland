@@ -10,7 +10,7 @@
     let
       cfg = config."lkasper-hyprland";
       themes = import ../_themes.nix;
-      declarativeTheme = themes."tokyo-night";
+      declarativeTheme = themes."gruvbox";
 
       packages = import ../_packages.nix {
         inherit pkgs lib;
@@ -35,24 +35,8 @@
       );
 
       defaultWallpapers = {
-        "catppuccin" = "catppuccin";
-        "catppuccin-latte" = "catppuccin-latte";
-        "ethereal" = "ethereal";
-        "everforest" = "everforest";
-        "flexoki-light" = "flexoki-light";
         "gruvbox" = "gruvbox";
         "gruvbox-light" = "gruvbox";
-        "hackerman" = "hackerman";
-        "kanagawa" = "kanagawa";
-        "matte-black" = "matte-black";
-        "miasma" = "miasma";
-        "nord" = "nord";
-        "osaka-jade" = "osaka-jade";
-        "ristretto" = "ristretto";
-        "rose-pine" = "rose-pine";
-        "tokyo-night" = "tokyo-night";
-        "vantablack" = "vantablack";
-        "white" = "white";
       };
 
       wallpaperFilesForTheme =
@@ -185,6 +169,12 @@
                 "syntaxPunctuation": "#${config.colorScheme.palette.base04}"
               }
             }
+          '';
+          ".config/mako/runtime.conf".text = ''
+            background-color=#${config.colorScheme.palette.base00}
+            text-color=#${config.colorScheme.palette.base05}
+            border-color=#${config.colorScheme.palette.base04}
+            progress-color=#${config.colorScheme.palette.base0D}
           '';
         }
         // runtimeThemeFiles;

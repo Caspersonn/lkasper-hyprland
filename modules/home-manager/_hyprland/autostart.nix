@@ -8,6 +8,7 @@
       "wl-clip-persist --clipboard regular & clipse -listen"
       "elephant"
       "walker --gapplication-service"
+      "mako"
     ];
   };
 }

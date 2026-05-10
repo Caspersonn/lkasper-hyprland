@@ -176,6 +176,9 @@
             border-color=#${config.colorScheme.palette.base04}
             progress-color=#${config.colorScheme.palette.base0D}
           '';
+          ".config/lkasper-hyprland/current/theme.name".text = ''
+            gruvbox
+          '';
         }
         // runtimeThemeFiles;
 

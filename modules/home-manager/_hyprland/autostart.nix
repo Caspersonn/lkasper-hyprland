@@ -7,6 +7,7 @@
       "systemctl --user start hyprpolkitagent"
       "wl-clip-persist --clipboard regular & clipse -listen"
       "elephant"
+      "walker --gapplication-service"
     ];
   };
 }

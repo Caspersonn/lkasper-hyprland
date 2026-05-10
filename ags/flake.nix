@@ -36,6 +36,7 @@
 
           astalLibs = with agsPkgs; [
             astal4
+            notifd
             io
             hyprland
             mpris

@@ -1,29 +1,12 @@
-$base: #1e1e2e;
-$mantle: #181825;
-$crust: #11111b;
+$base: #282828;
 $surface0: #313244;
-$surface1: #45475a;
-$surface2: #585b70;
-$overlay0: #6c7086;
-$overlay1: #7f849c;
-$overlay2: #9399b2;
-$subtext0: #a6adc8;
-$subtext1: #bac2de;
-$text: #cdd6f4;
-$lavender: #b4befe;
-$blue: #89b4fa;
-$sapphire: #74c7ec;
-$sky: #89dceb;
-$teal: #94e2d5;
-$green: #a6e3a1;
-$yellow: #f9e2af;
-$peach: #fab387;
-$maroon: #eba0ac;
-$red: #f38ba8;
-$mauve: #cba6f7;
-$pink: #f5c2e7;
-$flamingo: #f2cdcd;
-$rosewater: #f5e0dc;
+$subtext0: #d5c4a1;
+$text: #ebdbb2;
+$blue: #458588;
+$green: #98971a;
+$yellow: #d79921;
+$red: #cc241d;
+$purple: #b16286;
 
 $bg: $base;
 $fg: $text;
@@ -87,7 +70,7 @@ window.bar {
     &.active {
         min-width: $dot-active-width;
         min-height: 10px;
-        background-color: $fg;
+        background-color: $green;
         border: none;
     }
 
@@ -204,10 +187,14 @@ tooltip {
 }
 
 .QuickSettings {
-    .StatusIcon {
-      padding: 0 2px;
-    }
+  > button {
+    color: $fg;
   }
+  .StatusIcon {
+    padding: 0 2px;
+    color: $fg;
+  }
+}
 
 .QuickSettingsPanel {
   padding: 12px;

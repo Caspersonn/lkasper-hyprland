@@ -3,22 +3,25 @@ import AstalTray from "gi://AstalTray";
 
 
 export default function Tray() {
-    const tray = AstalTray.get_default();
+  const tray = AstalTray.get_default();
+  const items = createBinding(tray, "items");
 
-    const items = createBinding(tray, "items");
+  const init = (btn: Gtk.MenuButton, item: AstalTray.TrayItem) => {
+    btn.menuModel = item.menuModel
+    btn.insert_action_group("dbusmenu", item.actionGroup)
+    item.connect("notify::action-group", () => {
+      btn.insert_action_group("dbusmenu", item.actionGroup)
+    })
+  }
 
-    return <box class="tray">
-        <For each={items}>
-            {(item: any) => (
-                <button
-                    class="tray-item tray-separator"
-                    tooltipMarkup={createBinding(item, "tooltipMarkup")}
-                    onClicked={() => { item.aboutToShow(); item.activate(0, 0); }}
-                >
-                    <image gicon={createBinding(item, "gicon")} pixelSize={16} />
-                </button>
-            )}
-        </For>
-    </box>;
+  return <box class="tray">
+    <For each={items}>
+      {(item) => (
+        <menubutton $={(self) => init(self, item)}>
+          <image gicon={createBinding(item, "gicon")} pixelSize={16} />
+        </menubutton>
+      )}
+    </For>
+  </box>;
 }
 

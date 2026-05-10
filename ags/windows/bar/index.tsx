@@ -7,7 +7,7 @@ import Network from "./network"
 import Volume from "./volume"
 import NotificationBell from "./notifications"
 import Battery from "./battery"
-import QuickSettings from "../quick-settings"
+import QuickSettings from "../QuickSettings/quick-settings"
 
 import Clock from "./clock"
 import Media from "./media"

@@ -6,7 +6,7 @@
   ...
 }:
 let
-  cfg = config.omarchy;
+  cfg = config."lkasper-hyprland";
   hasNvidiaDrivers =
     osConfig != null && builtins.elem "nvidia" (osConfig.services.xserver.videoDrivers or [ ]);
   nvidiaEnv = [
@@ -24,18 +24,17 @@ in
     HYPRCURSOR_THEME = "Adwaita";
     GDK_BACKEND = "wayland";
     QT_QPA_PLATFORM = "wayland";
-    QT_STYLE_OVERRIDE = "kvantum";
+    QT_STYLE_OVERRIDE = "adwaita";
     SDL_VIDEODRIVER = "wayland";
     MOZ_ENABLE_WAYLAND = "1";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
     OZONE_PLATFORM = "wayland";
     CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
-    XCOMPOSEFILE = "~/.XCompose";
     EDITOR = "nvim";
-    OMARCHY_PATH = "${config.home.homeDirectory}/.local/share/omarchy";
     # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
     ADW_DISABLE_PORTAL = "1";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
+    GTK_THEME = "Adwaita-dark";
   };
 
   # Import environment variables into systemd user environment
@@ -60,11 +59,9 @@ in
       "OZONE_PLATFORM,wayland"
       ''CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
-      "XCOMPOSEFILE,~/.XCompose"
       "EDITOR,nvim"
-      "OMARCHY_PATH,${config.home.homeDirectory}/.local/share/omarchy"
-      "PATH,$PATH:${config.home.homeDirectory}/.local/share/omarchy/bin"
       "ADW_DISABLE_PORTAL,1"
+      "GTK_THEME,Adwaita-dark"
     ];
 
     xwayland = {

@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-direnv =
+  flake.homeManagerModules.lkh-direnv =
     { ... }:
     {
       programs.direnv = {

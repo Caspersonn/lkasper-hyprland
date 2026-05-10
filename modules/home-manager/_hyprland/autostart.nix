@@ -2,14 +2,13 @@
 {
   wayland.windowManager.hyprland.settings = {
     exec-once = [
-      # "hypridle & mako & waybar & fcitx5"
-      # "swaybg -i ~/.config/omarchy/current/background -m fill"
+      "sleep 1 && lkasper-shell"
       "hyprsunset"
       "systemctl --user start hyprpolkitagent"
       "wl-clip-persist --clipboard regular & clipse -listen"
-      "sh -lc '~/.local/share/omarchy/bin/omarchy-theme-set \"$(~/.local/share/omarchy/bin/omarchy-theme-current)\"'"
+      "elephant"
+      "walker --gapplication-service"
+      "mako"
     ];
-
-    #exec = [ "pkill -SIGUSR2 waybar || waybar" ];
   };
 }

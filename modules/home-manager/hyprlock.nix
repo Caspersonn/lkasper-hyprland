@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.homeManagerModules.omarchy-hyprlock =
+  flake.homeManagerModules.lkh-hyprlock =
     {
       config,
       pkgs,
@@ -15,6 +15,8 @@
       surfaceRgb = "rgb(${convert ", " palette.base02})";
       foregroundRgb = "rgb(${convert ", " palette.base05})";
       foregroundMutedRgb = "rgb(${convert ", " palette.base04})";
+
+      selected_wallpaper_path = (import ../../lib/selected-wallpaper.nix config).wallpaper_path;
     in
     {
       programs.hyprlock = {
@@ -29,9 +31,8 @@
           };
           background = {
             monitor = "";
-            path = "~/.config/omarchy/current/wallpaper";
-            # blur_passes = 3;
-            # brightness = 0.5;
+            path =  selected_wallpaper_path;
+            blur_passes = 1;
           };
 
           input-field = {

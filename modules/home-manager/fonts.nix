@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-fonts =
+  flake.homeManagerModules.lkh-fonts =
     { ... }:
     {
       fonts.fontconfig = {

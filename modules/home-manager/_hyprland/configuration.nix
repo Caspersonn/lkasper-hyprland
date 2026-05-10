@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.omarchy;
+  cfg = config."lkasper-hyprland";
 in
 {
   imports = [
@@ -24,10 +24,12 @@ in
     "$music" = lib.mkDefault "spotify";
     "$passwordManager" = lib.mkDefault "bitwarden";
     "$messenger" = lib.mkDefault "signal-desktop";
-    #"$webapp" = lib.mkDefault "$browser --app";
 
     monitor = if cfg.monitors != [ ] then cfg.monitors else [ ",preferred,auto,1" ];
   };
+
+  # Remove start-hyprland error
+  wayland.windowManager.hyprland.settings.misc.disable_watchdog_warning = true;
 
   wayland.windowManager.hyprland.plugins = [
     pkgs.hyprlandPlugins.hyprsplit

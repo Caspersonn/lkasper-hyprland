@@ -1,0 +1,302 @@
+$base: #282828;
+$surface0: #313244;
+$subtext0: #d5c4a1;
+$text: #ebdbb2;
+$blue: #458588;
+$green: #98971a;
+$yellow: #d79921;
+$red: #cc241d;
+$purple: #b16286;
+
+$bg: $base;
+$fg: $text;
+$fg-dim: $subtext0;
+$accent: $blue;
+
+$bar-margin: 8px;
+$pill-padding-h: 12px;
+$pill-padding-v: 8px;
+$pill-gap: 8px;
+$module-spacing: 6px;
+$dot-size: 8px;
+$dot-active-width: 20px;
+
+window.bar {
+    background-color: transparent;
+    font-size: 15px;
+    font-weight: 500;
+
+    button {
+        min-height: 0;
+        min-width: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    image {
+        -gtk-icon-size: 16px;
+    }
+}
+
+.pill {
+    background-color: $bg;
+    border-radius: 999px;
+    padding: $pill-padding-v $pill-padding-h;
+    color: $fg;
+}
+
+.left-pill {
+    margin-right: $pill-gap;
+}
+
+.center-pill {
+    margin-left: $pill-gap;
+    margin-right: $pill-gap;
+}
+
+.right-pill {
+    margin-left: $pill-gap;
+}
+
+.workspace-dot {
+    min-width: $dot-size;
+    min-height: $dot-size;
+    border-radius: 999px;
+    margin: 0 2px;
+    transition: min-width 200ms ease;
+
+    &.active {
+        min-width: $dot-active-width;
+        min-height: 10px;
+        background-color: $green;
+        border: none;
+    }
+
+    &.occupied {
+        background-color: transparent;
+        border: 2px solid rgba($fg, 0.5);
+    }
+}
+
+.client-button {
+  padding: 4px;
+  border-radius: 999px;
+  color: rgba($fg, 0.55);
+  background-color: transparent;
+  min-width: 28px;
+  min-height: 28px;
+  transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+
+  image {
+    -gtk-icon-size: 20px;
+    opacity: 0.55;
+    transition: opacity 150ms ease, color 150ms ease;
+  }
+
+  &.active {
+    color: $green;
+    background-color: rgba($green, 0.16);
+
+    image {
+      opacity: 1;
+      color: $green;
+    }
+  }
+}
+
+.clients-separator {
+    border-left: 1px solid rgba($text, 0.12);
+    padding-left: 2px;
+    margin-left: 2px;
+}
+
+.tray-separator {
+    border-left: 1px solid rgba($fg, 0.12);
+    padding-left: 6px;
+    margin-left: 6px;
+}
+
+.clock {
+    font-weight: 700;
+}
+
+.media-label {
+    margin-left: $module-spacing;
+    color: $fg-dim;
+}
+
+.separator {
+    border-left: 1px solid rgba($text, 0.12);
+    padding-left: $module-spacing;
+    margin-left: $module-spacing;
+}
+
+.module-icon {
+    font-size: 14px;
+    min-width: 16px;
+}
+
+.module-text {
+    font-weight: 700;
+}
+
+.battery {
+    &.charging {
+        color: $green;
+    }
+
+    &.warning {
+        color: $yellow;
+    }
+
+    &.critical {
+        color: $red;
+    }
+}
+
+.volume {
+    &.muted {
+        color: $fg-dim;
+    }
+}
+
+.bluetooth {
+    &.disabled {
+        color: $fg-dim;
+    }
+}
+
+.wifi {
+    &.disconnected {
+        color: $fg-dim;
+    }
+}
+
+.notification-bell {
+    font-size: 14px;
+}
+
+tooltip {
+    background-color: $surface0;
+    color: $fg;
+    border-radius: 8px;
+    padding: 6px 10px;
+    border: 1px solid rgba($text, 0.08);
+}
+
+.QuickSettings {
+  > button {
+    color: $fg;
+  }
+  .StatusIcon {
+    padding: 0 2px;
+    color: $fg;
+  }
+}
+
+.QuickSettingsPanel {
+  padding: 12px;
+  min-width: 300px;
+
+  .ToggleRow {
+    margin-bottom: 8px;
+
+    .Toggle {
+      border-radius: 12px;
+      padding: 8px 4px;
+      margin: 0 4px;
+      background: #{"alpha(@theme_fg_color, 0.06)"};
+
+      &:checked {
+        background: #{"alpha(@accent_bg_color, 0.3)"};
+      }
+
+      image {
+        -gtk-icon-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      label {
+        font-size: 0.8em;
+        font-weight: normal;
+      }
+    }
+  }
+
+  .VolumeSliders {
+    padding: 4px 0;
+
+    .VolumeRow {
+      padding: 4px 0;
+
+      image {
+        -gtk-icon-size: 16px;
+        margin-right: 8px;
+      }
+
+      slider {
+        min-height: 16px;
+        min-width: 16px;
+        border-radius: 50%;
+      }
+
+      trough {
+        min-height: 6px;
+        border-radius: 3px;
+      }
+    }
+  }
+
+  .StatusRow {
+    padding: 6px 0;
+
+    image {
+      -gtk-icon-size: 16px;
+      margin-right: 8px;
+    }
+
+    label {
+      font-weight: normal;
+      font-size: 0.9em;
+    }
+
+    .ActionSmall {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.8em;
+      font-weight: normal;
+      background: #{"alpha(@theme_fg_color, 0.08)"};
+
+      &:hover {
+        background: #{"alpha(@theme_fg_color, 0.14)"};
+      }
+    }
+  }
+
+  .ActionButtons {
+    margin-top: 8px;
+
+    .ActionButton {
+      border-radius: 12px;
+      padding: 8px 4px;
+      margin: 0 4px;
+      background: #{"alpha(@theme_fg_color, 0.06)"};
+
+      &:hover {
+        background: #{"alpha(@theme_fg_color, 0.12)"};
+      }
+
+      image {
+        -gtk-icon-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      label {
+        font-size: 0.8em;
+        font-weight: normal;
+      }
+    }
+  }
+}

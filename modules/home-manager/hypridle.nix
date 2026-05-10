@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-hypridle =
+  flake.homeManagerModules.lkh-hypridle =
     { ... }:
     {
       services.hypridle = {

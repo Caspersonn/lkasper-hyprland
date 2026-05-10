@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  cfg = config.omarchy;
+  cfg = config."lkasper-hyprland";
 in
 {
   wayland.windowManager.hyprland.settings = {
@@ -8,12 +8,8 @@ in
       "SUPER, I, exec, [workspace 1 silent;] ghostty"
       "SUPER, I, exec, [workspace 2 silent;] firefox"
 
-      "SUPER, space, exec, omarchy-launch-walker"
-      "SUPER ALT, SPACE, exec, omarchy-menu"
-      "SUPER SHIFT CTRL, SPACE, exec, omarchy-menu theme"
-      "SUPER SHIFT, SPACE, exec, pkill -SIGUSR1 waybar"
-      # "SUPER CTRL, SPACE, exec, ~/.local/share/omarchy/bin/swaybg-next"
-      "SUPER CTRL, SPACE, exec, omarchy-theme-bg-next"
+      "SUPER, SPACE, exec, walker"
+      "SUPER SHIFT, SPACE, exec, ags toggle bar"
 
       "SUPER, Q, killactive,"
       "SUPER, Backspace, killactive,"
@@ -23,10 +19,9 @@ in
       "SUPER SHIFT, ESCAPE, exit,"
       "SUPER CTRL, ESCAPE, exec, reboot"
       "SUPER SHIFT CTRL, ESCAPE, exec, hyprlock & disown && systemctl suspend"
-      "SUPER, K, exec, omarchy-menu-keybindings"
-
       # Control tiling
-      "SUPER, J, togglesplit, # dwindle"
+      #"SUPER, J, togglesplit, # dwindle"
+      "SUPER, J, layoutmsg, togglesplit"
       "SUPER, P, pseudo, # dwindle"
       "SUPER, V, togglefloating,"
       "SUPER, F, fullscreen,"
@@ -122,9 +117,9 @@ in
 
     bindp = [
       # Powerprofileselecter
-      "$mainMod+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
-      "$mainMod+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
-      "$mainMod+Ctrl+Shift, R, exec, powerprofilesctl set performance"
+      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
+      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
+      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance"
     ];
   };
 }

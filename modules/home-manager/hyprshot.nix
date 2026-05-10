@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.homeManagerModules.omarchy-hyprshot =
+  flake.homeManagerModules.lkh-hyprshot =
     { config, pkgs, ... }:
     {
       programs.hyprshot = {

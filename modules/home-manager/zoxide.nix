@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-zoxide =
+  flake.homeManagerModules.lkh-zoxide =
     { ... }:
     {
       programs.zoxide = {

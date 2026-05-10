@@ -11,12 +11,12 @@ let
     brightnessctl
     pamixer
     playerctl
-    swaybg
     gnome-themes-extra
     libsForQt5.qtstyleplugin-kvantum
     qt6Packages.qtstyleplugin-kvantum
     pavucontrol
     adwaita-icon-theme
+    gruvbox-plus-icons
     hicolor-icon-theme
   ];
 

@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.nixosModules.omarchy-system =
+  flake.nixosModules.lkh-system =
     {
       config,
       pkgs,
@@ -8,14 +8,14 @@
       ...
     }:
     let
-      cfg = config.omarchy;
+      cfg = config."lkasper-hyprland";
       packages = import ../_packages.nix {
         inherit pkgs lib;
         exclude_packages = cfg.exclude_packages;
       };
     in
     {
-      options.omarchy = (import ../../config.nix lib).omarchyOptions;
+      options."lkasper-hyprland" = (import ../../config.nix lib).lkasperHyprlandOptions;
 
       config = {
         nixpkgs.config.allowUnfree = true;
@@ -46,6 +46,14 @@
         networking = {
           networkmanager.enable = true;
         };
+
+        # For battery display ags
+        services.upower = {
+          enable = true;
+        };
+
+        # For mpris cached spotify covers ags
+        services.gvfs.enable = true;
 
         fonts.packages = with pkgs; [
           noto-fonts

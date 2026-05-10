@@ -1,6 +1,6 @@
 { ... }:
 {
-  flake.homeManagerModules.omarchy-hyprpaper =
+  flake.homeManagerModules.lkh-hyprpaper =
     { config, pkgs, ... }:
     let
       selected_wallpaper_path = (import ../../lib/selected-wallpaper.nix config).wallpaper_path;

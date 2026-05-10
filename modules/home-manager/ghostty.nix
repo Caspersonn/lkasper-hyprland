@@ -17,6 +17,7 @@
           font-family = cfg.primary_font;
           font-size = 12;
 
+          config-file = "$HOME/.config/ghostty/themes/lkh-runtime";
           gtk-single-instance = true;
           keybind = [ "ctrl+k=reset" ];
           confirm-close-surface = false;

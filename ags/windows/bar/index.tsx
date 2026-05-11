@@ -1,3 +1,4 @@
+import Gdk from "gi://Gdk"
 import App from "ags/gtk4/app"
 import { Astal } from "ags/gtk4"
 
@@ -15,11 +16,12 @@ import Media from "./media"
 import Workspaces from "./workspaces"
 import Clients from "./clients"
 
-export default function Bar() {
+export default function Bar(gdkmonitor: Gdk.Monitor) {
     return <window
         name="bar"
         namespace="bar"
         application={App}
+        gdkmonitor={gdkmonitor}
         class="bar"
         anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}
         exclusivity={Astal.Exclusivity.EXCLUSIVE}

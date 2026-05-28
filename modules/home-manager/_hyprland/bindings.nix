@@ -89,6 +89,9 @@ in
 
       # Clipse
       "CTRL SUPER, V, exec, foot --title=clipse clipse"
+
+      # Nmtui
+      "CTRL SUPER, N, exec, foot --title=nmtui nmtui"
     ];
 
     bindm = [

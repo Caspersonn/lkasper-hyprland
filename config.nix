@@ -33,8 +33,8 @@ lib: {
         "SUPER, E, exec, $fileManager"
         "SUPER, B, exec, $browser"
         "SUPER, M, exec, $music"
-        "SUPER, T, exec, $terminal -e btop"
-        "SUPER, D, exec, $terminal -e lazydocker"
+        "SUPER, T, exec, foot btop"
+        "SUPER, D, exec, foot lazydocker"
         "SUPER, G, exec, $messenger"
         "SUPER, slash, exec, $passwordManager"
       ];

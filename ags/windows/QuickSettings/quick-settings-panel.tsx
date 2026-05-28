@@ -110,7 +110,7 @@ function WifiStatus() {
           <label label={createBinding(w, "ssid")((s) => s || "Not connected")} hexpand halign={Gtk.Align.START} />
           <button
             class="ActionSmall"
-            onClicked={() => execAsync("ghostty -e nmtui")}
+            onClicked={() => execAsync("foot nmtui")}
           >
             <label label="Manage" />
           </button>

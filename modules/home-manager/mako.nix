@@ -6,7 +6,7 @@
       services.mako = {
         enable = true;
         extraConfig = ''
-            include=${config.home.homeDirectory}/.config/mako/runtime.conf
+          include=${config.home.homeDirectory}/.config/mako/runtime.conf
         '';
 
         settings = {

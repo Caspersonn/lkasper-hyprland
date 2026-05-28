@@ -31,7 +31,7 @@
           };
           background = {
             monitor = "";
-            path =  selected_wallpaper_path;
+            path = selected_wallpaper_path;
             blur_passes = 1;
           };
 

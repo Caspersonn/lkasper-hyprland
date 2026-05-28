@@ -88,7 +88,7 @@ in
       "SUPER, PRINT, exec, hyprpicker -a"
 
       # Clipse
-      "CTRL SUPER, V, exec, ghostty --title=clipse -e clipse"
+      "CTRL SUPER, V, exec, foot --title=clipse clipse"
     ];
 
     bindm = [

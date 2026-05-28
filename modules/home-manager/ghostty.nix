@@ -14,10 +14,9 @@
           background-opacity = 0.95;
           window-decoration = "none";
 
-          font-family = cfg.primary_font;
+          font-family = "CaskaydiaMono NF";
           font-size = 12;
 
-          config-file = "~/.config/ghostty/themes/lkh-runtime";
           gtk-single-instance = true;
           keybind = [ "ctrl+k=reset" ];
           confirm-close-surface = false;

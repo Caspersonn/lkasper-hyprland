@@ -33,7 +33,6 @@ in
 
   wayland.windowManager.hyprland.plugins = [
     pkgs.hyprlandPlugins.hyprsplit
-    pkgs.hyprlandPlugins.hyprspace
   ];
 
   wayland.windowManager.hyprland.extraConfig = ''

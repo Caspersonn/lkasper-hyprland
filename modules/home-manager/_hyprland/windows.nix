@@ -6,7 +6,7 @@
 
       "tile on, match:class ^(chromium)$"
 
-      "float on, match:class ^(org.pulseaudio.pavucontrol|blueberry.py|nwg-displays)$"
+      "float on, match:class ^(org.pulseaudio.pavucontrol|blueman|nwg-displays)$"
 
       "float on, match:class ^(steam)$"
       "fullscreen on, match:class ^(com.libretro.RetroArch)$"

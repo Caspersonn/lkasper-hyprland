@@ -32,7 +32,6 @@ in
   wayland.windowManager.hyprland.settings.misc.disable_watchdog_warning = true;
 
   wayland.windowManager.hyprland.plugins = [
-    pkgs.hyprlandPlugins.hyprsplit
   ];
 
   wayland.windowManager.hyprland.extraConfig = ''

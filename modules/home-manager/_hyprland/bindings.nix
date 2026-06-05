@@ -9,7 +9,7 @@ in
       "SUPER, I, exec, [workspace 2 silent;] firefox"
 
       "SUPER, SPACE, exec, walker"
-      "SUPER SHIFT, SPACE, exec, ags toggle bar"
+      "SUPER SHIFT, SPACE, exec, ags request toggle-bars"
 
       "SUPER, Q, killactive,"
       "SUPER, Backspace, killactive,"

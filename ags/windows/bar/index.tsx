@@ -1,6 +1,7 @@
 import Gdk from "gi://Gdk"
 import App from "ags/gtk4/app"
-import { Astal } from "ags/gtk4"
+import { For, createBinding } from "ags"
+import { Astal, Gtk } from "ags/gtk4"
 
 import Tray from "./tray"
 import Bluetooth from "./bluetooth"
@@ -16,9 +17,9 @@ import Media from "./media"
 import Workspaces from "./workspaces"
 import Clients from "./clients"
 
-export default function Bar(gdkmonitor: Gdk.Monitor) {
+function Bar(gdkmonitor: Gdk.Monitor, name: string) {
     return <window
-        name="bar"
+        name={name}
         namespace="bar"
         application={App}
         gdkmonitor={gdkmonitor}
@@ -56,4 +57,20 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
           </box>
         </centerbox>
     </window>
+}
+
+// Reactively maintain one bar per monitor. `For` is driven by the App's
+// `monitors` property (which fires on Gdk monitor add/remove), creating a bar
+// for each new monitor and running `cleanup` to destroy the window of a
+// monitor that is unplugged. This delegates the GTK4 window lifecycle to the
+// framework, which is required for reliable hot-plug/replug handling.
+export default function Bars() {
+    const monitors = createBinding(App, "monitors")
+    return (
+        <For each={monitors} cleanup={(win) => (win as Gtk.Window).destroy()}>
+            {(monitor: Gdk.Monitor) =>
+                Bar(monitor, `bar-${monitor.get_connector() ?? "unknown"}`)
+            }
+        </For>
+    )
 }

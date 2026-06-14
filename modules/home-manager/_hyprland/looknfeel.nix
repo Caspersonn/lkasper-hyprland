@@ -34,7 +34,7 @@ in
         enabled = false;
         range = 30;
         render_power = 3;
-        ignore_window = true;
+        #ignore_window = true;
         color = "rgba(00000045)";
       };
 
@@ -77,7 +77,7 @@ in
     };
 
     dwindle = {
-      pseudotile = true;
+      #pseudotile = true;
       preserve_split = true;
       force_split = 2;
     };

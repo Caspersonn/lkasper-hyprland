@@ -186,6 +186,60 @@ tooltip {
     border: 1px solid rgba($text, 0.08);
 }
 
+window.osd {
+    background-color: transparent;
+
+    .osd-content {
+        padding: 14px 20px;
+        min-width: 280px;
+    }
+
+    .osd-icon {
+        -gtk-icon-size: 22px;
+        margin-right: 14px;
+    }
+
+    .osd-volume {
+        .osd-level {
+            min-width: 160px;
+            min-height: 8px;
+
+            trough {
+                min-height: 8px;
+                border-radius: 999px;
+                background-color: rgba($fg, 0.15);
+            }
+
+            block.filled {
+                border-radius: 999px;
+                background-color: $accent;
+            }
+        }
+
+        .osd-percent {
+            margin-left: 14px;
+            font-weight: 700;
+            min-width: 44px;
+        }
+    }
+
+    .osd-media {
+        .osd-media-title {
+            font-weight: 700;
+        }
+
+        .osd-media-artist {
+            color: $fg-dim;
+            font-size: 0.9em;
+        }
+
+        .osd-entry-icon {
+            -gtk-icon-size: 18px;
+            margin-left: 14px;
+        }
+    }
+}
+
 .QuickSettings {
   > button {
     color: $fg;

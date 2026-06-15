@@ -45,6 +45,9 @@
     {
       home.packages = [
         lkasper-shell
+        # The ags CLI provides `ags request`, used by keybinds to talk to the
+        # running shell instance (e.g. `toggle-bars`, `osd-skip`).
+        agsPkgs.default
         pkgs.brightnessctl
         pkgs.hyprsunset
       ];

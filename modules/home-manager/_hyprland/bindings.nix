@@ -112,10 +112,13 @@ in
 
     bindl = [
       # Requires playerctl
-      ", XF86AudioNext, exec, playerctl next"
-      ", XF86AudioPause, exec, playerctl play-pause"
-      ", XF86AudioPlay, exec, playerctl play-pause"
-      ", XF86AudioPrev, exec, playerctl previous"
+      # Each media key pings AGS with its action so the OSD shows the matching
+      # icon (play/pause/next/prev). Keyboard-only on purpose: MPRIS cannot tell
+      # a user skip from a track auto-advance, so we never trigger reactively.
+      ", XF86AudioNext, exec, playerctl next && ags request osd-media next"
+      ", XF86AudioPause, exec, playerctl play-pause && ags request osd-media playpause"
+      ", XF86AudioPlay, exec, playerctl play-pause && ags request osd-media playpause"
+      ", XF86AudioPrev, exec, playerctl previous && ags request osd-media prev"
     ];
 
     bindp = [

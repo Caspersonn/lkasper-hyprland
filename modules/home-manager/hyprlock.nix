@@ -31,7 +31,7 @@
           };
           background = {
             monitor = "";
-            path = selected_wallpaper_path;
+            path = "screenshot";
             blur_passes = 1;
           };
 
@@ -62,12 +62,12 @@
 
           label = {
             monitor = "";
-            text = "$FPRINTPROMPT";
-            text_align = "center";
+            text = ''cmd[update:1000] echo "$(date +"%H:%M")"'';
+
             color = foregroundMutedRgb;
-            font_size = 24;
+            font_size = 64;
             font_family = "CaskaydiaMono Nerd Font";
-            position = "0, -100";
+            position = "0, 120";
             halign = "center";
             valign = "center";
           };

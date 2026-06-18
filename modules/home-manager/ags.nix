@@ -17,6 +17,7 @@
         bluetooth
         wireplumber
         tray
+        notifd
       ];
 
       lkasper-shell = pkgs.stdenv.mkDerivation {

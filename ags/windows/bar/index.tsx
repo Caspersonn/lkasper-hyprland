@@ -51,8 +51,8 @@ function Bar(gdkmonitor: Gdk.Monitor, name: string) {
               <Network />
               <Volume />
               <Battery />
-              <NotificationBell />
               <QuickSettings />
+              <NotificationBell />
             </box>
           </box>
         </centerbox>

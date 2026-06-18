@@ -3,6 +3,9 @@ import style from "./style.scss"
 import Bars from "./windows/bar"
 import Osd from "./windows/osd"
 import { initOsd, triggerMedia } from "./windows/osd/controller"
+import NotificationPopups from "./windows/notifications"
+import { initPopups } from "./windows/notifications/popups"
+import NotificationCenter, { initCenter, toggleCenter, toggleDnd } from "./windows/notifications/center"
 
 App.start({
     css: style,
@@ -21,11 +24,25 @@ App.start({
             res("ok")
             return
         }
+        if (argv.includes("toggle-notifications")) {
+            toggleCenter()
+            res("ok")
+            return
+        }
+        if (argv.includes("toggle-dnd")) {
+            toggleDnd()
+            res("ok")
+            return
+        }
         res(`unknown request: ${argv.join(" ")}`)
     },
     main() {
+        initCenter()
         Bars()
         Osd()
         initOsd()
+        NotificationPopups()
+        initPopups()
+        NotificationCenter()
     },
 })

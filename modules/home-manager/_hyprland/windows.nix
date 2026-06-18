@@ -28,6 +28,10 @@
       "float on, match:title (nmtui)"
       "size 622 652, match:title (nmtui)"
       "stay_focused on, match:title (nmtui)"
+
+      "float on, match:title ^(yazi)$"
+      "size 992 608, match:title ^(yazi)$"
+      "stay_focused on, match:title ^(yazi)$"
     ];
 
     layerrule = [ "blur on, match:namespace wofi" ];

@@ -176,6 +176,14 @@ window.bar {
 
 .notification-bell {
     font-size: 14px;
+    color: $fg;
+}
+
+.nc-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: $accent;
+    margin-left: 4px;
 }
 
 tooltip {
@@ -184,6 +192,189 @@ tooltip {
     border-radius: 8px;
     padding: 6px 10px;
     border: 1px solid rgba($text, 0.08);
+}
+
+window.notification-center {
+    background-color: transparent;
+
+    .nc-panel {
+        background-color: $bg;
+        color: $fg;
+        border-left: 2px solid $surface0;
+        padding: 12px;
+        min-width: 380px;
+    }
+
+    .nc-header {
+        margin-bottom: 10px;
+
+        .nc-dnd,
+        .nc-clear {
+            padding: 6px 10px;
+            border-radius: 8px;
+            background-color: $surface0;
+            color: $fg;
+        }
+
+        .nc-dnd:checked {
+            background-color: $accent;
+            color: $bg;
+        }
+    }
+
+    .nc-media {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background-color: $surface0;
+
+        .nc-media-icon {
+            -gtk-icon-size: 28px;
+            margin-right: 10px;
+        }
+
+        .nc-media-title {
+            font-weight: 700;
+        }
+
+        .nc-media-artist {
+            color: $fg-dim;
+            font-size: 0.9em;
+        }
+
+        .nc-media-btn {
+            padding: 4px;
+            margin: 0 2px;
+        }
+    }
+
+    .nc-empty {
+        color: $fg-dim;
+        margin: 20px 0;
+    }
+
+    .nc-group-header {
+        color: $fg-dim;
+        font-size: 0.85em;
+        font-weight: 700;
+        margin: 8px 2px 4px;
+    }
+
+    .nc-card {
+        background-color: $surface0;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 6px;
+
+        .nc-card-icon {
+            -gtk-icon-size: 24px;
+            margin-right: 10px;
+        }
+
+        .nc-card-summary {
+            font-weight: 700;
+        }
+
+        .nc-card-body {
+            color: $fg-dim;
+            margin-top: 2px;
+        }
+
+        .nc-card-time {
+            color: $fg-dim;
+            font-size: 0.8em;
+        }
+
+        .nc-card-close {
+            min-width: 18px;
+            min-height: 18px;
+            padding: 2px;
+
+            image {
+                -gtk-icon-size: 12px;
+            }
+        }
+
+        .nc-card-actions {
+            margin-top: 8px;
+
+            .nc-action {
+                margin: 0 4px;
+                padding: 4px 8px;
+                border-radius: 6px;
+                background-color: $bg;
+                color: $fg;
+            }
+        }
+    }
+}
+
+window.notification-popups {
+    background-color: transparent;
+
+    .notification {
+        background-color: $bg;
+        color: $fg;
+        border: 2px solid $surface0;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 8px;
+        min-width: 420px;
+        max-width: 420px;
+
+        &.urgency-critical {
+            border-color: $red;
+        }
+
+        &.urgency-low {
+            color: $fg-dim;
+        }
+    }
+
+    .notification-header {
+        // icon | (summary/body) | close
+    }
+
+    .notification-icon {
+        -gtk-icon-size: 40px;
+        margin-right: 12px;
+    }
+
+    .notification-image {
+        margin-right: 12px;
+        border-radius: 6px;
+    }
+
+    .notification-summary {
+        font-weight: 700;
+    }
+
+    .notification-body {
+        color: $fg-dim;
+        margin-top: 2px;
+    }
+
+    .notification-close {
+        min-width: 20px;
+        min-height: 20px;
+        padding: 2px;
+
+        image {
+            -gtk-icon-size: 14px;
+        }
+    }
+
+    .notification-actions {
+        margin-top: 10px;
+
+        .notification-action {
+            margin: 0 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: $surface0;
+            color: $fg;
+        }
+    }
 }
 
 window.osd {

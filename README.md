@@ -60,6 +60,7 @@ Add this flake to your system configuration with [home-manager](https://github.c
               lkh-direnv
               lkh-fonts
               lkh-zoxide
+              lkh-yazi
               lkh-hyprshot
             ];
           };

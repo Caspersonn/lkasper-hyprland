@@ -5,11 +5,17 @@ in
 {
   wayland.windowManager.hyprland.settings = {
     bind = cfg.quick_app_bindings ++ [
-      "SUPER, I, exec, [workspace 1 silent;] ghostty"
-      "SUPER, I, exec, [workspace 2 silent;] firefox"
+      #"SUPER, I, exec, [workspace 1 silent;] ghostty"
+      #"SUPER, I, exec, [workspace 2 silent;] firefox"
 
       "SUPER, SPACE, exec, walker"
       "SUPER SHIFT, SPACE, exec, ags request toggle-bars"
+
+      # Notification center
+      "SUPER, N, exec, ags request toggle-notifications"
+      "SUPER SHIFT, N, exec, ags request toggle-dnd"
+
+      "SUPER, I, exec, hyprctl dispatch pin"
 
       "SUPER, Q, killactive,"
       "SUPER, Backspace, killactive,"
@@ -24,7 +30,9 @@ in
       "SUPER, J, layoutmsg, togglesplit"
       "SUPER, P, pseudo, # dwindle"
       "SUPER, V, togglefloating,"
-      "SUPER, F, fullscreen,"
+
+      "SUPER, F, fullscreen, 1"
+      "SUPER SHIFT, F, fullscreen, 0"
 
       # Move focus with mainMod + arrow keys
       "SUPER, left, movefocus, l"
@@ -123,9 +131,9 @@ in
 
     bindp = [
       # Powerprofileselecter
-      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver"
-      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced"
-      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance"
+      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver & notify-send -u low 'Power Profile 🚀' 'power-saver'"
+      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced & notify-send -u low 'Power Profile 🚀' 'balanced'"
+      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance & notify-send -u low 'Power Profile 🚀' 'perfomance'"
     ];
   };
 }

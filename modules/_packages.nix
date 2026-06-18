@@ -24,7 +24,6 @@ let
   systemPackages = with pkgs; [
     git
     libnotify
-    nautilus
     alejandra
     blueman
     clipse

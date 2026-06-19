@@ -4,9 +4,6 @@ import AstalMpris from "gi://AstalMpris"
 import AstalHyprland from "gi://AstalHyprland"
 import { createState } from "ags"
 
-// Shared OSD state. A single controller drives one transient overlay that
-// swaps between a "volume" view and a "media" view (latest trigger wins),
-// shown only on the focused monitor and auto-hidden after a short timeout.
 export type OsdView = "volume" | "media" | null
 
 export interface VolumeData {
@@ -18,13 +15,11 @@ export interface VolumeData {
 export interface MediaData {
     title: string
     artist: string
-    icon: string // action / play-state glyph (left)
-    entry: string // media player's source icon (right)
+    icon: string
+    entry: string
 }
 
 const OSD_TIMEOUT_MS = 1500
-// Delay before the OSD will react to signals, so the initial notify::volume
-// emission during shell startup does not flash an OSD on login.
 const READY_DELAY_MS = 1000
 
 const PLAY_ICON = "media-playback-start-symbolic"
@@ -46,7 +41,6 @@ const [media, setMedia] = createState<MediaData>({
     entry: "audio-x-generic-symbolic",
 })
 
-// Reactive accessors consumed by the OSD window(s).
 export const osdView = view
 export const osdConnector = connector
 export const osdVolume = volume
@@ -69,8 +63,6 @@ function armTimer() {
     })
 }
 
-// Open the OSD on the monitor focused at trigger time (snapshotted, so the OSD
-// stays put even if focus moves during the timeout) and (re)arm the auto-hide.
 function present(v: OsdView) {
     if (!ready) return
     const fm = hypr.focusedMonitor
@@ -137,30 +129,20 @@ function iconForAction(action: string, p: AstalMpris.Player): string {
     return playStateIcon(p)
 }
 
-// Watchers only REFRESH content while the OSD is visible; they never open it
-// (opening is exclusively the IPC handler's job, which keeps auto-advance and
-// app-side changes from popping the OSD).
 function watchPlayer(player: AstalMpris.Player) {
     player.connect("notify::playback-status", () => {
         if (player.playbackStatus === PLAYING) activePlayer = player
-        // Settle the play/pause glyph after the async `playerctl play-pause`.
         if (player === activePlayer && view() === "media" && lastAction === "playpause") {
             setMedia({ ...media(), icon: playStateIcon(player) })
         }
     })
     player.connect("notify::title", () => {
-        // Settle the new track's title after a skip.
         if (player === activePlayer && view() === "media") {
             setMedia({ ...media(), title: player.title || "", artist: player.artist || "" })
         }
     })
 }
 
-// --- Public API -----------------------------------------------------------
-
-// Invoked by the `osd-media <action>` IPC request. `action` is one of
-// "playpause" | "next" | "prev". Resolves the player fresh each call so it is
-// robust to media-player restarts.
 export function triggerMedia(action: string) {
     const player = pickBest()
     if (!player) return
@@ -175,8 +157,6 @@ export function triggerMedia(action: string) {
     present("media")
 }
 
-// Set up signal subscriptions and arm the startup-flash guard. Called once
-// from app main() so get_default() runs after the GTK app is initialized.
 export function initOsd() {
     watchDefaultSpeaker()
     wp?.connect("notify::default-speaker", () => watchDefaultSpeaker())

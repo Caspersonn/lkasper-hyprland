@@ -10,9 +10,6 @@ import {
     osdMedia,
 } from "./controller"
 
-// One OSD window per monitor. Visibility is gated so only the window on the
-// monitor that was focused at trigger time is shown. Bottom-center, on the
-// overlay layer, non-exclusive, and never grabs keyboard focus.
 function OsdWindow(gdkmonitor: Gdk.Monitor) {
     const myConnector = gdkmonitor.get_connector() ?? "unknown"
 
@@ -83,8 +80,6 @@ function OsdWindow(gdkmonitor: Gdk.Monitor) {
     </window>
 }
 
-// Reactively maintain one OSD window per monitor, mirroring the bar's
-// `For`-over-monitors pattern for reliable hot-plug/replug handling.
 export default function Osd() {
     const monitors = createBinding(App, "monitors")
     return (

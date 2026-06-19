@@ -2,19 +2,11 @@ import GLib from "gi://GLib"
 import AstalNotifd from "gi://AstalNotifd"
 import { createState } from "ags"
 
-// The AGS shell is the org.freedesktop.Notifications daemon (AstalNotifd).
-// This controller drives the transient popup-toast stack: it adds a toast on
-// the `notified` signal and removes it on `resolved`, with an urgency-aware
-// auto-dismiss timeout, a max-visible cap, and Do Not Disturb suppression.
-// It never replays popups for the notifications AstalNotifd restores from its
-// on-disk cache at startup — `notified` only fires for genuinely new ones.
-
 const MAX_VISIBLE = 5
 const DEFAULT_TIMEOUT_MS = 5000
 
 const [popups, setPopups] = createState<AstalNotifd.Notification[]>([])
 
-// Reactive list of currently-visible toasts, newest first.
 export const activePopups = popups
 
 let notifd: AstalNotifd.Notifd | null = null
@@ -41,7 +33,6 @@ function addPopup(n: AstalNotifd.Notification) {
     }
     setPopups(next)
 
-    // Sticky if critical, or if the app explicitly requested no expiry (0).
     const sticky =
         n.urgency === AstalNotifd.Urgency.CRITICAL || n.expireTimeout === 0
     if (!sticky) {
@@ -58,8 +49,6 @@ function addPopup(n: AstalNotifd.Notification) {
     }
 }
 
-// Acquire the notification daemon and wire the popup lifecycle. Called from
-// app main() so get_default() runs after the GTK app is initialized.
 export function initPopups() {
     notifd = AstalNotifd.get_default()
 

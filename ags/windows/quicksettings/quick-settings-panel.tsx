@@ -202,9 +202,9 @@ function ActionButtons() {
   )
 }
 
-export default function quicksettingsPanel() {
+export default function QuickSettingsPanel() {
   return (
-    <box orientation={Gtk.Orientation.VERTICAL} class="quicksettingsPanel">
+    <box orientation={Gtk.Orientation.VERTICAL} class="quicksettingspanel">
       <ToggleRow />
       <Gtk.Separator />
       <VolumeSliders />

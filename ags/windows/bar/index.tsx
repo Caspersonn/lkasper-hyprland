@@ -9,7 +9,7 @@ import Network from "./network"
 import Volume from "./volume"
 import NotificationBell from "./notifications"
 import Battery from "./battery"
-import quicksettings from "../quicksettings/quick-settings"
+import QuickSettings from "../quicksettings/quick-settings"
 
 import Clock from "./clock"
 import Media from "./media"
@@ -51,7 +51,7 @@ function Bar(gdkmonitor: Gdk.Monitor, name: string) {
               <Network />
               <Volume />
               <Battery />
-              <quicksettings />
+              <QuickSettings />
               <NotificationBell />
             </box>
           </box>

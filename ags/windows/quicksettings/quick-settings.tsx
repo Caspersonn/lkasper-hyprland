@@ -1,10 +1,10 @@
-import quicksettingsPanel from "./quick-settings-panel"
+import QuickSettingsPanel from "./quick-settings-panel"
 
-export default function quicksettings() {
+export default function QuickSettings() {
   return (
     <menubutton class="quicksettings separator">
       <popover>
-        <quicksettingsPanel />
+        <QuickSettingsPanel />
       </popover>
     </menubutton>
   )

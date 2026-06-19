@@ -118,6 +118,14 @@ window.bar {
     margin-left: 6px;
 }
 
+.tray menubutton {
+  padding: 2px;
+
+  image {
+    -gtk-icon-size: 16px;
+  }
+}
+
 .clock {
     font-weight: 700;
 }

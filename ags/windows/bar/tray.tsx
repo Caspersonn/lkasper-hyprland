@@ -18,7 +18,7 @@ export default function Tray() {
     <For each={items}>
       {(item) => (
         <menubutton $={(self) => init(self, item)}>
-          <image gicon={createBinding(item, "gicon")} pixelSize={16} />
+          <image gicon={createBinding(item, "gicon")}/>
         </menubutton>
       )}
     </For>

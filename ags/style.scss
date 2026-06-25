@@ -1,17 +1,19 @@
 $base: #282828;
-$surface0: #313244;
-$subtext0: #d5c4a1;
+$surface0: #3c3836;
+$surface1: #504945;
+$subtext0: #a89984;
 $text: #ebdbb2;
-$blue: #458588;
-$green: #98971a;
-$yellow: #d79921;
-$red: #cc241d;
-$purple: #b16286;
+$green: #b8bb26;
+$yellow: #fabd2f;
+$red: #fb4934;
+$orange: #fe8019;
+$purple: #d3869b;
+$blue: #83a598;
 
 $bg: $base;
 $fg: $text;
 $fg-dim: $subtext0;
-$accent: $blue;
+$accent: $orange;
 
 $bar-margin: 8px;
 $pill-padding-h: 12px;
@@ -60,56 +62,87 @@ window.bar {
     margin-left: $pill-gap;
 }
 
-.workspace-dot {
-    min-width: $dot-size;
-    min-height: $dot-size;
-    border-radius: 999px;
-    margin: 0 2px;
-    transition: min-width 200ms ease;
+.workspaces {
+    button.workspace {
+        min-width: 0;
+        min-height: 0;
+        padding: 1px 8px; // horizontal padding sets the gap between cells
+        border-radius: 10px;
+        transition: background-color 150ms ease;
 
-    &.active {
-        min-width: $dot-active-width;
-        min-height: 10px;
-        background-color: $green;
-        border: none;
+        &.active {
+            background-color: rgba($fg, 0.1);
+        }
     }
 
-    &.occupied {
+    .ws-icon {
+        -gtk-icon-size: 15px;
+        margin-right: 5px;
+        opacity: 0.9;
+    }
+
+    .ws-num {
+        font-weight: 700;
+        color: rgba($fg, 0.5);
+    }
+
+    button.workspace.active .ws-num {
+        color: $fg;
+    }
+
+    button.workspace.empty .ws-num {
+        color: rgba($fg, 0.3);
+    }
+
+    // Short centered underline (~50%), coloured by the bound monitor's accent.
+    .ws-underline {
+        min-width: 18px;
+        min-height: 2.5px;
+        margin-top: 3px;
+        border-radius: 2px;
         background-color: transparent;
-        border: 2px solid rgba($fg, 0.5);
+    }
+
+    .ws-accent {
+        background-color: $accent;
     }
 }
 
-.client-button {
-  padding: 4px;
-  border-radius: 999px;
-  color: rgba($fg, 0.55);
-  background-color: transparent;
-  min-width: 28px;
-  min-height: 28px;
-  transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
+.screen-picker {
+    padding: 6px;
+    min-width: 240px;
 
-  image {
-    -gtk-icon-size: 20px;
-    opacity: 0.55;
-    transition: opacity 150ms ease, color 150ms ease;
-  }
-
-  &.active {
-    color: $green;
-    background-color: rgba($green, 0.16);
-
-    image {
-      opacity: 1;
-      color: $green;
+    .screen-picker-header {
+        color: $fg-dim;
+        font-size: 0.8em;
+        font-weight: 700;
+        margin-bottom: 6px;
     }
-  }
-}
 
-.clients-separator {
-    border-left: 1px solid rgba($text, 0.12);
-    padding-left: 2px;
-    margin-left: 2px;
+    .screen-row {
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: none;
+
+        &:hover {
+            background-color: rgba($fg, 0.1);
+        }
+
+        .screen-icon {
+            -gtk-icon-size: 28px;
+            margin-right: 10px;
+        }
+
+        .screen-model {
+            font-weight: 700;
+            color: $fg;
+        }
+
+        .screen-specs {
+            color: $fg-dim;
+            font-size: 0.85em;
+        }
+    }
 }
 
 .tray-separator {

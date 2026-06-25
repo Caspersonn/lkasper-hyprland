@@ -147,14 +147,28 @@ export function triggerMedia(action: string) {
     const player = pickBest()
     if (!player) return
     activePlayer = player
+
     lastAction = action === "next" || action === "prev" ? action : "playpause"
-    setMedia({
+
+    if (action === "next" || "prev") {
+      console.log("Next")
+      setMedia({
+        title: player.title || "",
+        artist: "test",
+        icon: iconForAction(action, player),
+        entry: player.entry || "audio-x-generic-symbolic",
+      })
+    present("media")
+    }
+    else {
+      setMedia({
         title: player.title || "",
         artist: player.artist || "",
         icon: iconForAction(action, player),
         entry: player.entry || "audio-x-generic-symbolic",
-    })
+      })
     present("media")
+    }
 }
 
 export function initOsd() {

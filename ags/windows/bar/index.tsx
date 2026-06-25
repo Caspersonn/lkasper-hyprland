@@ -15,7 +15,6 @@ import Clock from "./clock"
 import Media from "./media"
 
 import Workspaces from "./workspaces"
-import Clients from "./clients"
 
 function Bar(gdkmonitor: Gdk.Monitor, name: string) {
     return <window
@@ -35,13 +34,11 @@ function Bar(gdkmonitor: Gdk.Monitor, name: string) {
             <box $type="start">
               <box class="pill left-pill">
                   <Workspaces />
-                  <Clients />
               </box>
             </box>
             <box $type="center">
               <box class="pill center-pill">
                   <Clock />
-                  <Media />
               </box>
             </box>
             <box $type="end">

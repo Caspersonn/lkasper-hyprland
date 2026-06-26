@@ -59,6 +59,7 @@
           noto-fonts
           noto-fonts-color-emoji
           nerd-fonts.caskaydia-mono
+          nerd-fonts.jetbrains-mono
         ];
       };
     };

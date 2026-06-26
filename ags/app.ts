@@ -5,7 +5,7 @@ import Osd from "./windows/osd"
 import { initOsd, triggerMedia } from "./windows/osd/controller"
 import NotificationPopups from "./windows/notifications"
 import { initPopups } from "./windows/notifications/popups"
-import NotificationCenter, { initCenter, toggleCenter, toggleDnd } from "./windows/notifications/center"
+import { initCenter, toggleCenter, toggleDnd } from "./windows/notifications/center"
 
 App.start({
     css: style,
@@ -43,6 +43,5 @@ App.start({
         initOsd()
         NotificationPopups()
         initPopups()
-        NotificationCenter()
     },
 })

@@ -9,11 +9,25 @@ $red: #fb4934;
 $orange: #fe8019;
 $purple: #d3869b;
 $blue: #83a598;
+$aqua: #8ec07c;
+$surface2: #665c54;
+$fg2: #d5c4a1;
+$gray: #928374;
+$nixos-blue: #7eb8e8;
+$base-dark: #1d2021;
 
 $bg: $base;
 $fg: $text;
 $fg-dim: $subtext0;
 $accent: $orange;
+
+$island-radius: 14px;
+$island-height: 42px;
+$island-border: rgba($subtext0, 0.24);
+$island-fill: rgba($base-dark, 0.8);
+$island-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+$divider: rgba($subtext0, 0.18);
+$hover-bg: rgba($fg, 0.1);
 
 $bar-margin: 8px;
 $pill-padding-h: 12px;
@@ -25,6 +39,7 @@ $dot-active-width: 20px;
 
 window.bar {
     background-color: transparent;
+    font-family: "JetBrainsMono Nerd Font", monospace;
     font-size: 15px;
     font-weight: 500;
 
@@ -42,105 +57,265 @@ window.bar {
     }
 }
 
-.pill {
-    background-color: $bg;
-    border-radius: 999px;
-    padding: $pill-padding-v $pill-padding-h;
+.island {
+    background-color: $island-fill;
+    border: 1px solid $island-border;
+    border-radius: $island-radius;
+    box-shadow: $island-shadow;
+    min-height: $island-height;
+    padding: 0 5px;
     color: $fg;
 }
 
-.left-pill {
-    margin-right: $pill-gap;
+.island-divider {
+    min-width: 1px;
+    min-height: 22px;
+    background-color: $divider;
+    margin: 10px 3px;
+
+    &.wide {
+        margin: 10px 14px;
+    }
 }
 
-.center-pill {
-    margin-left: $pill-gap;
-    margin-right: $pill-gap;
+.island-btn {
+    border-radius: 8px;
+    padding: 0 6px;
+
+    &:hover {
+        background-color: $hover-bg;
+    }
 }
 
-.right-pill {
-    margin-left: $pill-gap;
+.bar-inner {
+    padding: 10px 14px;
 }
 
-.workspaces {
-    button.workspace {
-        min-width: 0;
-        min-height: 0;
-        padding: 1px 8px; // horizontal padding sets the gap between cells
-        border-radius: 10px;
-        transition: background-color 150ms ease;
+.left-island {
+    padding-left: 3px;
+    padding-right: 3px;
+}
 
-        &.active {
-            background-color: rgba($fg, 0.1);
-        }
+.right-island {
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.launcher {
+    min-width: 40px;
+    min-height: 34px;
+    padding: 0;
+}
+
+.launcher-icon {
+    min-width: 20px;
+    margin-right: 5px;
+    font-size: 19px;
+    color: $nixos-blue;
+}
+
+.active-window {
+    padding: 0 9px;
+
+    .active-window-icon {
+        -gtk-icon-size: 16px;
+        margin-right: 8px;
     }
 
-    .ws-icon {
-        -gtk-icon-size: 15px;
-        margin-right: 5px;
-        opacity: 0.9;
-    }
-
-    .ws-num {
-        font-weight: 700;
-        color: rgba($fg, 0.5);
-    }
-
-    button.workspace.active .ws-num {
+    .active-window-title {
+        font-size: 12.5px;
+        font-weight: 600;
         color: $fg;
     }
+}
 
-    button.workspace.empty .ws-num {
-        color: rgba($fg, 0.3);
-    }
+window.bar .clock {
+    background-color: $island-fill;
+    border: 1px solid $island-border;
+    border-radius: 13px;
+    min-height: $island-height;
+    padding: 0 16px;
 
-    // Short centered underline (~50%), coloured by the bound monitor's accent.
-    .ws-underline {
-        min-width: 18px;
-        min-height: 2.5px;
-        margin-top: 3px;
-        border-radius: 2px;
-        background-color: transparent;
-    }
-
-    .ws-accent {
-        background-color: $accent;
+    &:hover {
+        background-color: $base;
     }
 }
 
-.screen-picker {
-    padding: 6px;
-    min-width: 240px;
+.clock-cal-icon {
+    font-size: 16px;
+    color: $yellow;
+    margin-right: 10px;
+}
 
-    .screen-picker-header {
-        color: $fg-dim;
-        font-size: 0.8em;
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
+.clock-time {
+    font-size: 16px;
+    font-weight: 600;
+    color: $fg;
+    letter-spacing: 0.5px;
+}
 
-    .screen-row {
-        padding: 6px 8px;
-        border-radius: 8px;
-        background: none;
+.clock-divider {
+    min-width: 1px;
+    min-height: 22px;
+    background-color: rgba($subtext0, 0.28);
+    margin: 0 10px;
+}
 
-        &:hover {
-            background-color: rgba($fg, 0.1);
-        }
+.clock-date {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $fg2;
+}
 
-        .screen-icon {
-            -gtk-icon-size: 28px;
-            margin-right: 10px;
-        }
+.popover-wrap > contents {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
 
-        .screen-model {
-            font-weight: 700;
+.calendar-popover {
+    min-width: 320px;
+    padding: 18px;
+    border-radius: 18px;
+    background-color: $base-dark;
+    border: 1px solid rgba($subtext0, 0.18);
+
+    .cal-header {
+        margin-bottom: 14px;
+
+        .cal-time {
+            font-size: 26px;
+            font-weight: 800;
             color: $fg;
         }
 
-        .screen-specs {
-            color: $fg-dim;
-            font-size: 0.85em;
+        .cal-seconds {
+            font-size: 14px;
+            color: $gray;
+            margin-left: 2px;
+        }
+
+        .cal-nav {
+            .cal-chevron {
+                min-width: 24px;
+                min-height: 24px;
+                border-radius: 8px;
+                color: $subtext0;
+                font-size: 18px;
+
+                &:hover {
+                    background-color: $hover-bg;
+                }
+            }
+
+            .cal-month {
+                min-width: 88px;
+                font-size: 12px;
+                font-weight: 700;
+                color: $accent;
+            }
+        }
+    }
+
+    .cal-weekdays {
+        margin-bottom: 6px;
+
+        .cal-weekday {
+            min-width: 38px;
+            font-size: 10px;
+            font-weight: 700;
+            color: $gray;
+        }
+    }
+
+    .cal-grid {
+        .cal-week {
+            .cal-cell {
+                min-width: 38px;
+                min-height: 32px;
+                border-radius: 9px;
+                font-size: 12px;
+                font-weight: 600;
+                color: $fg2;
+
+                &.other-month {
+                    color: $surface1;
+                }
+
+                &.today {
+                    background-color: $accent;
+                    color: $base-dark;
+                    font-weight: 800;
+                }
+            }
+        }
+    }
+}
+
+$mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
+
+.workspaces {
+    .asg-ws {
+        min-width: 0;
+        min-height: 30px;
+        padding: 0 10px;
+        margin: 0 2px;
+        border-radius: 9px;
+        transition: background-color 200ms ease;
+
+        .ws-icons {
+            -gtk-icon-size: 13px;
+        }
+
+        .ws-icon {
+            margin-right: 4px;
+        }
+
+        .ws-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: $surface2;
+        }
+
+        .ws-underline {
+            min-width: 14px;
+            min-height: 2px;
+            margin-top: 2px;
+            border-radius: 2px;
+            background-color: transparent;
+        }
+
+        &.occupied {
+            background-color: rgba($fg, 0.07);
+
+            .ws-num {
+                color: $fg;
+            }
+        }
+    }
+
+    @for $i from 0 through 4 {
+        .asg-ws.mon-#{$i} {
+            .ws-underline {
+                background-color: nth($mon-accents, $i + 1);
+            }
+
+            &.occupied .ws-underline {
+                opacity: 0.8;
+            }
+
+            &.focused {
+                background-color: rgba(nth($mon-accents, $i + 1), 0.18);
+
+                .ws-num {
+                    color: nth($mon-accents, $i + 1);
+                }
+
+                .ws-underline {
+                    background-color: nth($mon-accents, $i + 1);
+                }
+            }
         }
     }
 }
@@ -157,15 +332,6 @@ window.bar {
   image {
     -gtk-icon-size: 16px;
   }
-}
-
-.clock {
-    font-weight: 700;
-}
-
-.media-label {
-    margin-left: $module-spacing;
-    color: $fg-dim;
 }
 
 .separator {
@@ -235,116 +401,837 @@ tooltip {
     border: 1px solid rgba($text, 0.08);
 }
 
-window.notification-center {
-    background-color: transparent;
+.island-sub {
+    border-radius: 10px;
+    padding: 0 10px;
+    min-height: 34px;
 
-    .nc-panel {
-        background-color: $bg;
-        color: $fg;
-        border-left: 2px solid $surface0;
-        padding: 12px;
-        min-width: 380px;
+    &:hover {
+        background-color: rgba($fg, 0.1);
+    }
+}
+
+.media {
+    padding: 0 8px;
+
+    .media-art {
+        min-width: 28px;
+        min-height: 28px;
+        border-radius: 8px;
+        background-image: linear-gradient(135deg, $orange, $purple);
+        margin-right: 8px;
     }
 
-    .nc-header {
-        margin-bottom: 10px;
+    .media-art-icon {
+        margin-left: 7px;
+        font-size: 14px;
+        color: rgba($base-dark, 0.85);
+    }
 
-        .nc-dnd,
-        .nc-clear {
-            padding: 6px 10px;
-            border-radius: 8px;
-            background-color: $surface0;
+    .media-title {
+        font-size: 11.5px;
+        font-weight: 700;
+        color: $fg;
+    }
+
+    .media-artist {
+        font-size: 10px;
+        font-weight: 500;
+        color: $gray;
+    }
+}
+
+.media-eq {
+    margin-left: 8px;
+
+    .eq-bar {
+        min-width: 3px;
+        min-height: 4px;
+        margin: 0 1px;
+        border-radius: 2px;
+        background-color: $aqua;
+        opacity: 0.5;
+    }
+
+    &.playing .eq-bar {
+        opacity: 1;
+        animation: asgEq 0.9s ease-in-out infinite;
+    }
+
+    &.playing .eq-bar-1 {
+        animation-duration: 0.7s;
+    }
+
+    &.playing .eq-bar-2 {
+        animation-duration: 0.88s;
+        animation-delay: 0.12s;
+    }
+
+    &.playing .eq-bar-3 {
+        animation-duration: 1.06s;
+        animation-delay: 0.24s;
+    }
+}
+
+@keyframes asgEq {
+    0%,
+    100% {
+        min-height: 4px;
+    }
+
+    50% {
+        min-height: 13px;
+    }
+}
+
+.media-popover {
+    background-color: $base-dark;
+    border: 1px solid rgba($subtext0, 0.18);
+    border-radius: 18px;
+    padding: 18px;
+    min-width: 330px;
+
+    .mp-top {
+        margin-bottom: 14px;
+
+        .mp-art {
+            min-width: 72px;
+            min-height: 72px;
+            border-radius: 12px;
+            background-image: linear-gradient(135deg, $orange, $purple);
+            margin-right: 14px;
+        }
+
+        .mp-art-icon {
+            margin-left: 20px;
+            font-size: 30px;
+            color: rgba($base-dark, 0.85);
+        }
+
+        .mp-now {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: $accent;
+            margin-bottom: 2px;
+        }
+
+        .mp-title {
+            font-size: 16px;
+            font-weight: 800;
             color: $fg;
         }
 
-        .nc-dnd:checked {
-            background-color: $accent;
-            color: $bg;
+        .mp-artist {
+            font-size: 12px;
+            color: $subtext0;
+        }
+
+        .mp-album {
+            font-size: 11px;
+            color: $surface2;
         }
     }
 
-    .nc-media {
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 8px;
-        background-color: $surface0;
-
-        .nc-media-icon {
-            -gtk-icon-size: 28px;
-            margin-right: 10px;
-        }
-
-        .nc-media-title {
-            font-weight: 700;
-        }
-
-        .nc-media-artist {
-            color: $fg-dim;
-            font-size: 0.9em;
-        }
-
-        .nc-media-btn {
-            padding: 4px;
-            margin: 0 2px;
-        }
-    }
-
-    .nc-empty {
-        color: $fg-dim;
-        margin: 20px 0;
-    }
-
-    .nc-group-header {
-        color: $fg-dim;
-        font-size: 0.85em;
-        font-weight: 700;
-        margin: 8px 2px 4px;
-    }
-
-    .nc-card {
-        background-color: $surface0;
-        border-radius: 8px;
-        padding: 10px;
+    .mp-seek {
         margin-bottom: 6px;
 
-        .nc-card-icon {
-            -gtk-icon-size: 24px;
-            margin-right: 10px;
+        trough {
+            min-height: 5px;
+            border-radius: 3px;
+            background-color: rgba($subtext0, 0.2);
         }
 
-        .nc-card-summary {
-            font-weight: 700;
+        highlight {
+            border-radius: 3px;
+            background-color: $accent;
         }
 
-        .nc-card-body {
-            color: $fg-dim;
-            margin-top: 2px;
+        slider {
+            min-width: 0;
+            min-height: 0;
+            margin: 0;
+            background: none;
+            border: none;
+            box-shadow: none;
         }
+    }
 
-        .nc-card-time {
-            color: $fg-dim;
-            font-size: 0.8em;
+    .mp-times {
+        margin-bottom: 12px;
+
+        .mp-elapsed,
+        .mp-total {
+            font-size: 11px;
+            font-weight: 600;
+            color: $gray;
         }
+    }
 
-        .nc-card-close {
-            min-width: 18px;
-            min-height: 18px;
-            padding: 2px;
+    .mp-controls {
+        .mp-ctl {
+            font-size: 18px;
+            color: $gray;
+            min-width: 36px;
+            min-height: 36px;
+            border-radius: 18px;
 
-            image {
-                -gtk-icon-size: 12px;
+            &:hover {
+                background-color: rgba($fg, 0.1);
+                color: $fg;
             }
         }
 
-        .nc-card-actions {
-            margin-top: 8px;
+        .mp-play {
+            font-size: 24px;
+            color: $base-dark;
+            background-color: $accent;
+            min-width: 50px;
+            min-height: 50px;
+            border-radius: 25px;
+            margin: 0 12px;
+        }
+    }
+}
 
-            .nc-action {
-                margin: 0 4px;
-                padding: 4px 8px;
-                border-radius: 6px;
-                background-color: $bg;
-                color: $fg;
+.weather {
+    padding: 0 10px;
+
+    .weather-icon {
+        font-size: 18px;
+        color: $yellow;
+        margin-right: 8px;
+    }
+
+    .weather-temp {
+        font-size: 13px;
+        font-weight: 700;
+        color: $fg;
+    }
+
+    .weather-city {
+        font-size: 9.5px;
+        font-weight: 500;
+        color: $gray;
+    }
+}
+
+.weather-popover {
+    background-color: $base-dark;
+    border: 1px solid rgba($subtext0, 0.18);
+    border-radius: 18px;
+    padding: 18px;
+    min-width: 320px;
+
+    .wx-header {
+        margin-bottom: 14px;
+
+        .wx-city {
+            font-size: 14px;
+            font-weight: 800;
+            color: $fg;
+        }
+
+        .wx-cond {
+            font-size: 11px;
+            color: $gray;
+        }
+
+        .wx-big-icon {
+            font-size: 38px;
+            color: $yellow;
+            margin-right: 8px;
+        }
+
+        .wx-big-temp {
+            font-size: 34px;
+            font-weight: 800;
+            color: $fg;
+        }
+    }
+
+    .wx-tiles {
+        margin-bottom: 14px;
+
+        .wx-tile {
+            padding: 9px 10px;
+            margin: 0 3px;
+            background-color: rgba($fg, 0.05);
+            border-radius: 11px;
+
+            .wx-tile-label {
+                font-size: 9px;
+                font-weight: 700;
+                letter-spacing: 1px;
+                color: $surface2;
+            }
+
+            .wx-tile-value {
+                font-size: 13px;
+                font-weight: 700;
+                color: $fg2;
+            }
+        }
+    }
+
+    .wx-next-label {
+        font-size: 9.5px;
+        letter-spacing: 1.5px;
+        color: $surface2;
+        margin-bottom: 8px;
+    }
+
+    .wx-forecast {
+        .wx-slot-hour {
+            font-size: 10.5px;
+            color: $gray;
+        }
+
+        .wx-slot-icon {
+            font-size: 18px;
+            color: $fg2;
+        }
+
+        .wx-slot-temp {
+            font-size: 12px;
+            font-weight: 700;
+            color: $fg;
+        }
+    }
+}
+
+.system-stats {
+    padding: 0 8px;
+
+    .stat {
+        margin: 0 7px;
+
+        .stat-icon {
+            font-size: 15px;
+            margin-right: 7px;
+        }
+
+        .stat-value {
+            font-size: 11px;
+            font-weight: 700;
+            color: $fg;
+        }
+
+        .stat-bar {
+            min-height: 3px;
+            min-width: 34px;
+
+            trough {
+                min-height: 3px;
+                border-radius: 2px;
+                background-color: rgba($subtext0, 0.2);
+            }
+
+            block.filled {
+                border-radius: 2px;
+            }
+
+            block.empty {
+                background: none;
+            }
+        }
+    }
+
+    .stat-cpu {
+        .stat-icon {
+            color: $aqua;
+        }
+
+        .stat-bar block.filled {
+            background-color: $aqua;
+        }
+    }
+
+    .stat-ram {
+        .stat-icon {
+            color: $purple;
+        }
+
+        .stat-bar block.filled {
+            background-color: $purple;
+        }
+    }
+
+    .stat-temp-icon {
+        color: $red;
+    }
+}
+
+.tray image {
+    color: $subtext0;
+}
+
+.tray menubutton:hover image {
+    color: $accent;
+}
+
+.power {
+    min-width: 40px;
+    min-height: 34px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+
+    &.asg-pow {
+        background-color: rgba($red, 0.14);
+        border-radius: 8px;
+
+        &:hover {
+            background-color: rgba($red, 0.22);
+        }
+    }
+}
+
+.power-icon {
+    color: $red;
+    font-size: 18px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.power-menu {
+    min-width: 220px;
+    padding: 4px;
+}
+
+.pm-row {
+    border-radius: 11px;
+    padding: 11px 13px;
+
+    &:hover {
+        background-color: rgba($fg, 0.07);
+    }
+}
+
+.pm-icon {
+    font-size: 18px;
+    min-width: 22px;
+    margin-right: 13px;
+}
+
+.pm-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $fg;
+}
+
+.pm-lock .pm-icon {
+    color: $blue;
+}
+
+.pm-suspend .pm-icon {
+    color: $aqua;
+}
+
+.pm-logout .pm-icon {
+    color: $purple;
+}
+
+.pm-reboot .pm-icon {
+    color: $yellow;
+}
+
+.pm-shutdown .pm-icon {
+    color: $red;
+}
+
+.qc-icon {
+    font-size: 16px;
+    margin: 0 4px;
+}
+
+.qc-brightness {
+    color: $yellow;
+}
+
+.qc-volume {
+    color: $aqua;
+}
+
+.qc-wifi {
+    color: $blue;
+}
+
+.qc-bt {
+    color: $blue;
+}
+
+.qc-battery {
+    margin-left: 4px;
+}
+
+.qc-bat-icon {
+    font-size: 16px;
+}
+
+.qc-bat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: $fg;
+    margin-left: 4px;
+}
+
+.bat-good .qc-bat-icon {
+    color: $aqua;
+}
+
+.bat-ok .qc-bat-icon {
+    color: $green;
+}
+
+.bat-mid .qc-bat-icon {
+    color: $yellow;
+}
+
+.bat-low .qc-bat-icon {
+    color: $orange;
+}
+
+.bat-crit .qc-bat-icon {
+    color: $red;
+}
+
+.notifications {
+    min-width: 40px;
+    min-height: 34px;
+}
+
+.notif-bell {
+    color: $fg2;
+    font-size: 17px;
+    margin-right: 10px;
+}
+
+.notif-badge {
+    background-color: $red;
+    color: $base-dark;
+    font-size: 9px;
+    font-weight: 800;
+    border-radius: 8px;
+    min-width: 15px;
+    min-height: 15px;
+    padding: 0 4px;
+    margin: 2px;
+    border: 2px solid rgba($base-dark, 0.9);
+}
+
+.control-center {
+    min-width: 340px;
+    padding: 18px;
+    background-color: $base-dark;
+    border: 1px solid rgba($subtext0, 0.18);
+    border-radius: 18px;
+}
+
+.cc-header {
+    margin-bottom: 12px;
+}
+
+.cc-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: $fg;
+}
+
+.cc-bat-icon {
+    font-size: 16px;
+}
+
+.cc-bat-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: $fg;
+    margin-left: 4px;
+}
+
+.cc-bat.bat-good .cc-bat-icon {
+    color: $aqua;
+}
+
+.cc-bat.bat-ok .cc-bat-icon {
+    color: $green;
+}
+
+.cc-bat.bat-mid .cc-bat-icon {
+    color: $yellow;
+}
+
+.cc-bat.bat-low .cc-bat-icon {
+    color: $orange;
+}
+
+.cc-bat.bat-crit .cc-bat-icon {
+    color: $red;
+}
+
+.cc-tile {
+    padding: 12px;
+    margin: 4px;
+    border-radius: 13px;
+    border: 1px solid transparent;
+
+    &.on {
+        border-color: rgba($accent, 0.35);
+        background-color: rgba($accent, 0.16);
+        color: $accent;
+    }
+
+    &.off {
+        border-color: rgba($subtext0, 0.14);
+        background-color: rgba($subtext0, 0.06);
+        color: $gray;
+    }
+}
+
+.cc-tile-icon {
+    font-size: 19px;
+    margin-right: 9px;
+}
+
+.cc-tile-name {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.cc-tile-sub {
+    font-size: 9px;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+.cc-sliders {
+    margin-top: 12px;
+}
+
+.cc-slider-row {
+    margin: 6px 0;
+}
+
+.cc-slider-icon {
+    margin-right: 11px;
+    background: none;
+    border: none;
+    padding: 0;
+    min-height: 0;
+}
+
+.cc-vol-icon label {
+    color: $aqua;
+    font-size: 19px;
+}
+
+.cc-bright-icon {
+    color: $yellow;
+    font-size: 19px;
+}
+
+.cc-slider-val {
+    font-size: 11px;
+    font-weight: 700;
+    color: $subtext0;
+    min-width: 30px;
+    margin-left: 8px;
+}
+
+.cc-vol {
+    trough {
+        min-height: 7px;
+        border-radius: 4px;
+        background-color: rgba($subtext0, 0.2);
+    }
+
+    highlight {
+        background-color: $aqua;
+        border-radius: 4px;
+    }
+
+    slider {
+        min-width: 14px;
+        min-height: 14px;
+        border-radius: 7px;
+        background-color: $fg;
+    }
+}
+
+.cc-bright {
+    trough {
+        min-height: 7px;
+        border-radius: 4px;
+        background-color: rgba($subtext0, 0.2);
+    }
+
+    highlight {
+        background-color: $yellow;
+        border-radius: 4px;
+    }
+
+    slider {
+        min-width: 14px;
+        min-height: 14px;
+        border-radius: 7px;
+        background-color: $fg;
+    }
+}
+
+.cc-profile {
+    margin-top: 12px;
+}
+
+.cc-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: $surface2;
+    margin-bottom: 6px;
+}
+
+.cc-segments {
+    background-color: rgba($subtext0, 0.1);
+    padding: 4px;
+    border-radius: 11px;
+}
+
+.cc-segment {
+    border-radius: 8px;
+    padding: 9px 4px;
+    margin: 0 3px;
+    color: $gray;
+
+    &.active {
+        background-color: $accent;
+        color: $base-dark;
+    }
+}
+
+.cc-segment-icon {
+    font-size: 14px;
+}
+
+.cc-segment-label {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.notifications-popover {
+    background-color: $base-dark;
+    border: 1px solid rgba($subtext0, 0.18);
+    border-radius: 18px;
+    padding: 18px;
+    min-width: 360px;
+    min-height: 150px;
+
+    .np-header {
+        margin-bottom: 12px;
+
+        .np-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: $fg;
+        }
+
+        .np-clear {
+            font-size: 11px;
+            font-weight: 600;
+            color: $accent;
+            padding: 2px 6px;
+            border-radius: 7px;
+
+            &:hover {
+                background-color: rgba($fg, 0.08);
+            }
+        }
+    }
+
+    .np-empty {
+        padding: 34px 0;
+
+        .np-empty-icon {
+            font-size: 34px;
+            color: $surface2;
+            margin-bottom: 8px;
+        }
+
+        .np-empty-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: $surface2;
+        }
+    }
+
+    .np-list {
+        .np-card {
+            padding: 12px;
+            margin-bottom: 9px;
+            background-color: rgba($fg, 0.04);
+            border: 1px solid rgba($subtext0, 0.10);
+            border-radius: 12px;
+
+            .np-card-chip {
+                min-width: 34px;
+                min-height: 34px;
+                border-radius: 9px;
+                background-color: rgba($subtext0, 0.10);
+                margin-right: 11px;
+
+                .np-card-icon {
+                    -gtk-icon-size: 16px;
+                    margin-left: 10px;
+                }
+            }
+
+            .np-card-line {
+                .np-card-title {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: $fg;
+                }
+
+                .np-card-time {
+                    font-size: 10px;
+                    color: $surface2;
+                    margin: 0 6px;
+                }
+
+                .np-card-close {
+                    padding: 0;
+
+                    image {
+                        -gtk-icon-size: 13px;
+                        color: $gray;
+                    }
+
+                    &:hover image {
+                        color: $red;
+                    }
+                }
+            }
+
+            .np-card-body {
+                font-size: 11.5px;
+                color: $subtext0;
+                margin-top: 2px;
+            }
+
+            .np-actions {
+                margin-top: 8px;
+
+                .np-action {
+                    padding: 5px 10px;
+                    border-radius: 8px;
+                    background-color: rgba($subtext0, 0.10);
+                    margin-right: 6px;
+                    color: $fg;
+
+                    &:hover {
+                        background-color: rgba($accent, 0.20);
+                        color: $accent;
+                    }
+                }
             }
         }
     }
@@ -423,6 +1310,9 @@ window.osd {
     .osd-content {
         padding: 14px 20px;
         min-width: 280px;
+        background-color: $base-dark;
+        border: 1px solid $island-border;
+        border-radius: $island-radius;
     }
 
     .osd-icon {
@@ -469,119 +1359,4 @@ window.osd {
             margin-left: 14px;
         }
     }
-}
-
-.quicksettings {
-  > button {
-    color: $fg;
-  }
-  .StatusIcon {
-    padding: 0 2px;
-    color: $fg;
-  }
-}
-
-.quicksettingspanel {
-  padding: 12px;
-  min-width: 300px;
-
-  .ToggleRow {
-    margin-bottom: 8px;
-
-    .Toggle {
-      border-radius: 12px;
-      padding: 8px 4px;
-      margin: 0 4px;
-      background: #{"alpha(@theme_fg_color, 0.06)"};
-
-      &:checked {
-        background: #{"alpha(@accent_bg_color, 0.3)"};
-      }
-
-      image {
-        -gtk-icon-size: 20px;
-        margin-bottom: 4px;
-      }
-
-      label {
-        font-size: 0.8em;
-        font-weight: normal;
-      }
-    }
-  }
-
-  .VolumeSliders {
-    padding: 4px 0;
-
-    .VolumeRow {
-      padding: 4px 0;
-
-      image {
-        -gtk-icon-size: 16px;
-        margin-right: 8px;
-      }
-
-      slider {
-        min-height: 16px;
-        min-width: 16px;
-        border-radius: 50%;
-      }
-
-      trough {
-        min-height: 6px;
-        border-radius: 3px;
-      }
-    }
-  }
-
-  .StatusRow {
-    padding: 6px 0;
-
-    image {
-      -gtk-icon-size: 16px;
-      margin-right: 8px;
-    }
-
-    label {
-      font-weight: normal;
-      font-size: 0.9em;
-    }
-
-    .ActionSmall {
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 0.8em;
-      font-weight: normal;
-      background: #{"alpha(@theme_fg_color, 0.08)"};
-
-      &:hover {
-        background: #{"alpha(@theme_fg_color, 0.14)"};
-      }
-    }
-  }
-
-  .ActionButtons {
-    margin-top: 8px;
-
-    .ActionButton {
-      border-radius: 12px;
-      padding: 8px 4px;
-      margin: 0 4px;
-      background: #{"alpha(@theme_fg_color, 0.06)"};
-
-      &:hover {
-        background: #{"alpha(@theme_fg_color, 0.12)"};
-      }
-
-      image {
-        -gtk-icon-size: 20px;
-        margin-bottom: 4px;
-      }
-
-      label {
-        font-size: 0.8em;
-        font-weight: normal;
-      }
-    }
-  }
 }

@@ -1,7 +1,8 @@
 # ags-bar Specification
 
 ## Purpose
-TBD - created by archiving change ags-desktop-foundation. Update Purpose after archive.
+Defines the AGS top bar layout, island styling, workspace behavior, and top-level bar module composition.
+
 ## Requirements
 ### Requirement: Bar window properties
 The bar SHALL be an `Astal.Window` with:
@@ -15,52 +16,60 @@ The bar SHALL be an `Astal.Window` with:
 - **WHEN** the shell starts
 - **THEN** a floating bar window appears at the top of the screen with margins on top, left, and right edges
 
-### Requirement: Bar uses split-pill layout
-The bar SHALL NOT use a single container. Instead, it SHALL render three separate capsule-shaped containers ("pills") within the bar window:
-- **Left pill**: Workspaces
-- **Center pill**: Clock + Media
-- **Right pill**: System tray, Bluetooth, WiFi, Volume, CPU, Notification bell, Battery
+### Requirement: Bar uses three-island layout
+The bar SHALL render three separate rounded-rectangle containers ("islands") within the transparent bar window, positioned with a `<centerbox>` and visible gaps between them:
+- **Left island**: app launcher button | workspaces | active-window widget
+- **Center island**: clock face
+- **Right island**: media widget | weather | system stats | system tray | quick-controls cluster | notifications bell | power button
 
-The three pills are positioned using a `<centerbox>` with each pill as a child. There SHALL be visible gaps between the pills (they are separate visual containers, not one continuous bar).
+Sections within an island SHALL be separated by 1px vertical dividers. The individual section widgets are specified by their own capabilities (`ags-active-window`, `ags-media`, `ags-weather`, `ags-system-stats`, `ags-control-center`, `ags-power-menu`, `ags-calendar`).
 
-Implementation note: Gnim JSX uses `class` for CSS class names. List rendering for workspace dots and tray icons SHALL use `<For>` to render items from Accessors. Scroll handling on the volume module SHALL use `Gtk.EventControllerScroll` (Gtk.Box has no `scroll` signal).
+Implementation note: Gnim JSX uses `class` for CSS class names. List rendering for workspace dots and tray icons SHALL use `<For>` to render items from Accessors.
 
-#### Scenario: Three separate pills visible
+#### Scenario: Three separate islands visible
 - **WHEN** the bar is rendered
-- **THEN** three distinct capsule-shaped containers are visible with gaps between them
+- **THEN** three distinct rounded-rectangle islands are visible with gaps between them
 
-### Requirement: Pill capsule styling
-Each pill SHALL have:
-- Fully rounded capsule shape (border-radius equal to half the pill height)
-- Solid opaque background using the theme's background color (no transparency, no blur)
-- No visible border
-- Consistent vertical padding within each pill
+#### Scenario: Island composition
+- **WHEN** the bar is rendered
+- **THEN** the left island shows the launcher, workspaces, and active-window; the center shows the clock; the right shows media, weather, system stats, tray, quick-controls, the notifications bell, and the power button
 
-#### Scenario: Pill appearance
-- **WHEN** the bar is rendered on a desktop with a wallpaper
-- **THEN** the pills are solid-colored capsules floating above the wallpaper, with wallpaper visible in the gaps between pills
+### Requirement: Island styling
+Each island SHALL have:
+- A rounded-rectangle shape (border-radius ~14px, not a full capsule)
+- A translucent dark fill derived from a `$base-dark` base16 variable (no hardcoded colour literals)
+- A 1px border and a drop shadow
+- No backdrop blur (not expressible in GTK4); the translucent fill plus border and shadow stand in for the design's frosted glass
 
-### Requirement: Workspaces module (left pill)
-The workspaces module SHALL use `astal-hyprland` to always display workspaces 1 through 10 (the 10th labelled `0` to match the `SUPER, 0` keybind), each as a roomy rectangular cell containing the workspace's **representative app icon** (its last-focused client's class, shown only when the workspace exists and has a client) followed by its **id label**, with a short (~50% width, ~2.5px) **centered** underline in the accent colour of the monitor the workspace is bound to:
-- **Active** workspace (focused): highlighted number with a subtle rounded background
-- **Occupied** workspace (exists, not active): normal number
-- **Empty** workspace (does not currently exist): still rendered, dimmed, with no app icon and an underline coloured by its persistent workspace-rule monitor (`hyprctl workspacerules -j`), falling back to the focused monitor
-- **Left-click** a workspace SHALL switch to it (creating it if it does not exist)
+Interactive sections SHALL show a subtle hover background.
 
-The left pill SHALL contain only this workspaces module. The previous standalone app-icon "clients" row is removed; the per-app icon is instead folded into each workspace cell.
+#### Scenario: Island appearance
+- **WHEN** the bar is rendered over a wallpaper
+- **THEN** the islands are translucent dark rounded rectangles with a border and shadow, with wallpaper visible in the gaps
 
-#### Scenario: All ten workspaces always shown
-- **WHEN** only workspaces 1, 2 and 5 currently exist
-- **THEN** all of 1–10 are rendered
-- **AND** 3, 4, 6, 7, 8, 9 and 0 appear dimmed (empty), while 1, 2 and 5 appear normal
+#### Scenario: Hover feedback
+- **WHEN** the pointer is over an interactive section
+- **THEN** that section shows a subtle hover background
 
-#### Scenario: Workspace cells reflect state, app, and bound monitor
-- **WHEN** workspace 3 is active and bound to monitor `DP-1`, and workspace 2 has a terminal as its last client
-- **THEN** 3 is shown highlighted, 2 shows a terminal icon before its number
-- **AND** each existing workspace has a short centered underline coloured by its bound monitor's accent
+### Requirement: Workspaces module (left island)
+The workspaces module SHALL use `astal-hyprland` to render the currently existing workspaces only (not a fixed 1..10 set), each as a pill-shaped cell containing the workspace's representative app icon (current themed-icon approach) and its id number, with a centered underline (~62% width, ~2px) coloured by the monitor the workspace is bound to:
+- **Focused** workspace: monitor-tinted background + monitor-coloured number + a glowing underline
+- **Occupied** workspace (exists, not focused): faint background + dimmer underline
+- **Empty/absent** workspace: dim number, no underline
+- **Left-click** a workspace SHALL switch to it
+
+The right-click screen picker is not part of this module.
+
+#### Scenario: Only existing workspaces shown
+- **WHEN** workspaces 1, 2 and 5 exist
+- **THEN** only 1, 2 and 5 are rendered (no fixed 3,4,6..10 cells)
+
+#### Scenario: Focused/occupied/empty styling
+- **WHEN** workspace 2 is focused and workspace 5 is occupied
+- **THEN** 2 shows the monitor-tinted background, monitor-coloured number, and glowing underline, while 5 shows a faint background and dimmer underline
 
 #### Scenario: Left-click switches workspace
-- **WHEN** the user left-clicks a workspace number
+- **WHEN** the user left-clicks a workspace
 - **THEN** Hyprland switches to that workspace
 
 ### Requirement: Workspace monitor accent colours
@@ -75,120 +84,53 @@ Each workspace underline colour SHALL be derived from the base16 palette and SHA
 - **WHEN** workspaces are spread across different monitors
 - **THEN** workspaces on different monitors use different base16 accent slots (up to the pool size)
 
-### Requirement: Workspace screen picker
-Right-clicking a workspace SHALL open a popover listing each connected display with a symbolic device icon (a laptop icon when the connector matches `eDP*`, a monitor icon otherwise), its model, resolution, refresh rate, and connector name. Display specs SHALL be read from `hyprctl monitors -j`. Selecting a display SHALL run `hyprctl dispatch moveworkspacetomonitor <workspace-id> <monitor-name>`.
+### Requirement: Clock face (center island)
+The center island SHALL show a clock face composed of a calendar glyph, the current time, a 1px divider, and the current date. Clicking the clock SHALL open the calendar popover (specified by `ags-calendar`).
 
-#### Scenario: Open the screen picker
-- **WHEN** the user right-clicks a workspace
-- **THEN** a popover lists each connected monitor with its icon, model, resolution, refresh rate, and connector
+#### Scenario: Clock shows time and date
+- **WHEN** it is Monday 25 June, 14:32
+- **THEN** the clock shows the calendar glyph, "14:32", a divider, and the date
 
-#### Scenario: Move a workspace to a monitor
-- **GIVEN** the screen picker is open for workspace 6
-- **WHEN** the user selects the `DP-1` display
-- **THEN** `hyprctl dispatch moveworkspacetomonitor 6 DP-1` is run
-- **AND** workspace 6's underline updates to `DP-1`'s accent colour
+#### Scenario: Clock opens the calendar
+- **WHEN** the user clicks the clock
+- **THEN** the calendar popover opens
 
-### Requirement: Clock module (center pill)
-The clock SHALL display the current time with a short day prefix, updated every second. Format: `"Mon HH:mm"` (three-letter day abbreviation + 24-hour time).
+### Requirement: System tray module (right island)
+The system tray SHALL use `astal-tray` to display tray items as a row of monochrome glyphs within the right island; hovering an item SHALL tint it with the accent colour.
 
-#### Scenario: Clock shows current time with day
-- **WHEN** it is Monday at 14:32
-- **THEN** the clock displays "Mon 14:32"
+#### Scenario: Tray items visible
+- **WHEN** applications register tray items
+- **THEN** their icons appear in the tray section of the right island
 
-### Requirement: Media module (center pill)
-The media module SHALL use `astal-mpris` to display the currently playing track in the center pill, next to the clock. It SHALL show:
-- Track title and artist when media is playing (compact format: "Artist - Title")
-- A separator between clock and media text
-- Nothing (hidden) when no media is active — the center pill only shows the clock
+#### Scenario: Hover tint
+- **WHEN** the pointer hovers a tray item
+- **THEN** that item is tinted with the accent colour
 
-#### Scenario: Media playing
-- **WHEN** a media player (e.g. Spotify) is playing "Song Title" by "Artist Name"
-- **THEN** the center pill displays "Mon 14:32  Artist Name - Song Title" (or separated by a visual divider)
+### Requirement: Island dividers
+Sections within an island SHALL be separated by subtle 1px vertical dividers at low opacity (no hardcoded colour literals). The previous right-pill left-border separator scheme is replaced by these dividers.
 
-#### Scenario: No media playing
-- **WHEN** no MPRIS-compatible player is active
-- **THEN** the center pill only shows the clock
+#### Scenario: Dividers between sections
+- **WHEN** an island with multiple sections is rendered
+- **THEN** thin vertical dividers separate the sections
 
-### Requirement: Battery module (right pill)
-The battery module SHALL use `astal-battery` to display:
-- Battery percentage
-- A battery icon reflecting charge level
-- Charging indicator when plugged in
+### Requirement: App launcher button
+The left island SHALL begin with an app launcher button showing the NixOS glyph. Clicking it SHALL `exec` `walker` (matching the `SUPER, SPACE` Hyprland keybind).
 
-#### Scenario: Battery discharging
-- **WHEN** battery is at 65% and discharging
-- **THEN** the module shows a battery icon and "65%"
+#### Scenario: Launch the app launcher
+- **WHEN** the user clicks the launcher button
+- **THEN** `walker` is launched
 
-#### Scenario: Battery charging
-- **WHEN** battery is charging
-- **THEN** the module shows a charging icon variant
+### Requirement: Quick-controls cluster (right island)
+The right island SHALL include a quick-controls cluster of status glyphs — brightness, volume, Wi-Fi, Bluetooth — plus a battery icon and percentage. The battery icon and colour SHALL reflect charge level and charging state, and the volume glyph SHALL reflect level/mute. Clicking the cluster SHALL open the control-center popover (specified by `ags-control-center`).
 
-### Requirement: WiFi module (right pill)
-The WiFi module SHALL use `astal-network` to display:
-- A WiFi signal strength icon when connected
-- A disconnected icon when not connected
-- The SSID in a tooltip
+#### Scenario: Cluster opens the control center
+- **WHEN** the user clicks the quick-controls cluster
+- **THEN** the control-center popover opens
 
-#### Scenario: Connected to WiFi
-- **WHEN** connected to network "HomeWiFi" with good signal
-- **THEN** a strong signal icon is shown, tooltip displays "HomeWiFi"
+#### Scenario: Battery indication
+- **WHEN** the battery is at 65% and discharging
+- **THEN** the cluster shows a battery icon for that level and "65%"
 
-#### Scenario: Disconnected
-- **WHEN** no WiFi connection
-- **THEN** a disconnected icon is shown
-
-### Requirement: Bluetooth module (right pill)
-The Bluetooth module SHALL use `astal-bluetooth` to display:
-- A Bluetooth icon when the adapter is powered on
-- A disabled icon when powered off
-- Connected device count in tooltip
-
-#### Scenario: Bluetooth on with connected device
-- **WHEN** Bluetooth adapter is on and 1 device is connected
-- **THEN** a Bluetooth connected icon is shown, tooltip shows "1 device connected"
-
-### Requirement: Volume module (right pill)
-The volume module SHALL use `astal-wireplumber` to display:
-- A volume icon reflecting the current level (muted, low, medium, high)
-- Scroll to adjust volume
-
-#### Scenario: Volume at 50%
-- **WHEN** default audio output is at 50%
-- **THEN** a medium volume icon is shown
-
-#### Scenario: Scroll adjusts volume
-- **WHEN** user scrolls up on the volume module
-- **THEN** volume increases by a step (5%)
-
-#### Scenario: Muted
+#### Scenario: Volume glyph reflects state
 - **WHEN** audio is muted
-- **THEN** a muted icon is shown
-
-### Requirement: CPU module (right pill)
-The CPU module SHALL display current CPU usage percentage, polled at a regular interval (every 2-5 seconds). It SHALL read from `/proc/stat` or use a polling command.
-
-#### Scenario: CPU usage displayed
-- **WHEN** CPU usage is 23%
-- **THEN** the module displays "23%" (or "CPU 23%")
-
-### Requirement: System tray module (right pill)
-The system tray SHALL use `astal-tray` to display tray icons from running applications.
-
-#### Scenario: Tray icons visible
-- **WHEN** applications register system tray items
-- **THEN** their icons appear in the tray section of the right pill
-
-### Requirement: Notification bell placeholder (right pill)
-The bar SHALL display a bell icon as a placeholder for the notification system. It SHALL be non-functional in Phase 1 (no click action, no counter). It establishes the visual position for Phase 5 (notification center sidebar).
-
-#### Scenario: Bell icon visible
-- **WHEN** the bar is rendered
-- **THEN** a bell icon is visible in the right pill between CPU and battery
-
-### Requirement: Right pill separators
-Modules within the right pill SHALL have subtle visual separators between them. The separators SHALL be implemented as a left border (1px solid line at low opacity) with padding and margin, applied to all modules except the first one (system tray).
-
-#### Scenario: Separators between right pill modules
-- **WHEN** the right pill is rendered
-- **THEN** thin vertical lines separate the individual status modules
-
+- **THEN** the cluster shows a muted volume glyph

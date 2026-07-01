@@ -26,6 +26,7 @@ Besides updating status and openspec-link, you are NOT ALLOWED to modify the con
 
 ## Git/jj
 - We use jj
+    - IF JJ is not initialized, ask the user if the repo should be initialized with jj.
 - I don't want Claude to appear as committer or coworker in the git-history
 
 ## OpenSpec Archive triggers

@@ -2,6 +2,11 @@
 
 ## 2026-07-01
 
+- **Float bar popovers** — Popovers float below the bar with no shadow
+  - Added `margin-top` (10px) to the shared `.popover-wrap > contents` rule in `ags/style.scss`, so all six bar popovers float a measured gap below the bar; kept `box-shadow: none`.
+  - Added the `ags-bar` "Popover float gap" requirement.
+  - See [proposal](changes/archive/2026-07-01-float-bar-popovers/proposal.md).
+
 - **Flatten bar islands** — Solid island fill, drop shadow removed
   - Changed `$island-fill` to a solid `$base-dark` (no translucency) and dropped the island `box-shadow` in `ags/style.scss`.
   - Updated the `ags-bar` "Island styling" spec to require an opaque fill and no drop shadow.

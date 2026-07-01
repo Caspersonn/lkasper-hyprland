@@ -170,6 +170,8 @@ window.bar .clock {
     border: none;
     box-shadow: none;
     padding: 0;
+    // Float the popover a measured gap below the bar (no shadow; the gap alone separates it)
+    margin-top: 10px;
 }
 
 .calendar-popover {

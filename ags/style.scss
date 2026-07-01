@@ -24,8 +24,7 @@ $accent: $orange;
 $island-radius: 14px;
 $island-height: 42px;
 $island-border: rgba($subtext0, 0.24);
-$island-fill: rgba($base-dark, 0.8);
-$island-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+$island-fill: $base-dark;
 $divider: rgba($subtext0, 0.18);
 $hover-bg: rgba($fg, 0.1);
 
@@ -61,7 +60,6 @@ window.bar {
     background-color: $island-fill;
     border: 1px solid $island-border;
     border-radius: $island-radius;
-    box-shadow: $island-shadow;
     min-height: $island-height;
     padding: 0 5px;
     color: $fg;

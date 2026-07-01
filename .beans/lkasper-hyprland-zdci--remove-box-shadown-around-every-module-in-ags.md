@@ -1,11 +1,12 @@
 ---
 # lkasper-hyprland-zdci
 title: Changes to box-shadow and see through islands
-status: in-progress
+status: completed
 type: task
 priority: normal
 created_at: 2026-06-27T18:24:29Z
-updated_at: 2026-06-28T00:00:00Z
+updated_at: 2026-07-01T00:00:00Z
+openspec-link: openspec/changes/archive/2026-07-01-flatten-bar-islands
 ---
 
 # Box shadow

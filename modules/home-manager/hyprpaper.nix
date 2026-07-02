@@ -3,7 +3,7 @@
   flake.homeManagerModules.lkh-hyprpaper =
     { config, pkgs, ... }:
     let
-      selected_wallpaper_path = (import ../../lib/selected-wallpaper.nix config).wallpaper_path;
+      selected_wallpaper_path = "~/Pictures/Wallpapers/gruvbox/3-cosy-retreat-sunset.png";
     in
     {
       home.file = {

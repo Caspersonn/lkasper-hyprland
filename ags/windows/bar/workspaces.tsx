@@ -30,15 +30,16 @@ function WorkspaceButton(ws: AstalHyprland.Workspace) {
         (fw, cs) => fw?.id === ws.id || cs.length > 0,
     )
 
+    const underlineWidth = createComputed([clients], (cs) => {
+        const n = Math.max(1, Math.min(cs.length, 3))
+        return n * 20
+    })
+
     const appIcons = createComputed([clients], (cs) => {
-        const seen = new Set<string>()
-        const out: string[] = []
+        const out: { key: string; cls: string }[] = []
         for (const c of cs) {
             const cls = (c.class ?? "").toLowerCase()
-            if (cls && !seen.has(cls)) {
-                seen.add(cls)
-                out.push(cls)
-            }
+            if (cls) out.push({ key: c.address, cls })
         }
         return out.slice(0, 3)
     })
@@ -54,13 +55,20 @@ function WorkspaceButton(ws: AstalHyprland.Workspace) {
             <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER}>
                 <box class="ws-row" halign={Gtk.Align.CENTER}>
                     <box class="ws-icons">
-                        <For each={appIcons}>
-                            {(cls: string) => <image class="ws-icon" iconName={cls} />}
+                        <For each={appIcons} id={(item) => item.key}>
+                            {(item: { key: string; cls: string }) => (
+                                <image class="ws-icon" iconName={item.cls} />
+                            )}
                         </For>
                     </box>
                     <label class="ws-num" label={`${ws.id}`} />
                 </box>
-                <box class="ws-underline" halign={Gtk.Align.CENTER} visible={underlineVisible} />
+                <box
+                    class="ws-underline"
+                    halign={Gtk.Align.CENTER}
+                    widthRequest={underlineWidth}
+                    visible={underlineVisible}
+                />
             </box>
         </button>
     )

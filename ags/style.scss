@@ -1359,3 +1359,143 @@ window.osd {
         }
     }
 }
+
+// Keybind cheatsheet overlay (SUPER, slash)
+.shortcuts {
+    background-color: transparent;
+
+    .sc-backdrop {
+        background-color: rgba($base-dark, 0.55);
+    }
+
+    .sc-modal {
+        background-color: $base-dark;
+        border: 1px solid rgba($subtext0, 0.18);
+        border-radius: 18px;
+        padding: 24px 28px;
+        font-family: "JetBrainsMono Nerd Font", monospace;
+    }
+
+    .sc-title {
+        color: $fg;
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .sc-columns {
+        .sc-column {
+            min-width: 320px;
+
+            &:not(:first-child) {
+                margin-left: 32px;
+            }
+        }
+    }
+
+    .sc-group {
+        margin-bottom: 16px;
+
+        .sc-group-title {
+            color: $accent;
+            font-size: 0.85em;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+    }
+
+    .sc-row {
+        padding: 3px 0;
+
+        .sc-row-label {
+            color: $fg;
+        }
+
+        .sc-chips {
+            .sc-key {
+                background-color: $surface0;
+                color: $fg2;
+                border: 1px solid rgba($subtext0, 0.18);
+                border-radius: 6px;
+                padding: 2px 8px;
+                font-size: 0.85em;
+
+                &:not(:first-child) {
+                    margin-left: 4px;
+                }
+            }
+        }
+    }
+}
+
+// Keybind cheatsheet overlay (SUPER, slash)
+.shortcuts {
+    background-color: transparent;
+
+    .sc-backdrop {
+        background-color: rgba($base-dark, 0.55);
+    }
+
+    .sc-modal {
+        background-color: $base-dark;
+        border: 1px solid rgba($subtext0, 0.18);
+        border-radius: 18px;
+        padding: 24px 28px;
+        min-width: 720px;
+    }
+
+    .sc-title {
+        color: $fg;
+        font-weight: 700;
+        font-size: 1.3em;
+        margin-bottom: 18px;
+    }
+
+    .sc-columns {
+        // Gap between the two balanced columns.
+    }
+
+    .sc-column {
+        min-width: 320px;
+
+        &:not(:last-child) {
+            margin-right: 32px;
+        }
+    }
+
+    .sc-group {
+        margin-bottom: 18px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .sc-group-title {
+        color: $accent;
+        font-weight: 700;
+        font-size: 0.85em;
+        margin-bottom: 6px;
+    }
+
+    .sc-row {
+        padding: 3px 0;
+
+        .sc-row-label {
+            color: $fg-dim;
+        }
+
+        .sc-chips {
+            .sc-key {
+                background-color: $surface0;
+                color: $fg2;
+                border: 1px solid rgba($subtext0, 0.18);
+                border-radius: 6px;
+                padding: 1px 8px;
+                margin-left: 6px;
+                font-size: 0.85em;
+                font-weight: 700;
+            }
+        }
+    }
+}

@@ -1,5 +1,14 @@
 # OpenSpec Changelog
 
+## 2026-07-03
+
+- **Keybind cheatsheet overlay** — SUPER, slash opens a keybind modal
+  - Migrated meaningful Hyprland binds to `bindd` with `[Group] Label` descriptions in `modules/home-manager/_hyprland/bindings.nix`, and added `SUPER, slash` → `ags request toggle-shortcuts`.
+  - Added `ags/windows/shortcuts/index.tsx`: a layer-shell overlay that reads `hyprctl binds -j`, groups by `[Group]`, renders modifier+key keycap chips, collapses workspace digit binds into a `1 – 0` range row, and dismisses on ESC or backdrop click.
+  - Wired `toggle-shortcuts` into `ags/app.ts` and added `.shortcuts`/`.sc-*` styles in `ags/style.scss` using existing palette variables.
+  - Added the `keybind-cheatsheet` spec and `hyprland-config` bindd/overlay requirements.
+  - See [proposal](changes/archive/2026-07-03-keybind-cheatsheet/proposal.md).
+
 ## 2026-07-02
 
 - **Dynamic workspace underline** — Underline width scales with app count

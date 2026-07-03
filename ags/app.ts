@@ -6,6 +6,8 @@ import { initOsd, triggerMedia } from "./windows/osd/controller"
 import NotificationPopups from "./windows/notifications"
 import { initPopups } from "./windows/notifications/popups"
 import { initCenter, toggleCenter, toggleDnd } from "./windows/notifications/center"
+import { initShortcuts, toggleShortcuts } from "./windows/shortcuts"
+import { initShortcuts, toggleShortcuts } from "./windows/shortcuts"
 
 App.start({
     css: style,
@@ -34,6 +36,16 @@ App.start({
             res("ok")
             return
         }
+        if (argv.includes("toggle-shortcuts")) {
+            toggleShortcuts()
+            res("ok")
+            return
+        }
+        if (argv.includes("toggle-shortcuts")) {
+            toggleShortcuts()
+            res("ok")
+            return
+        }
         res(`unknown request: ${argv.join(" ")}`)
     },
     main() {
@@ -43,5 +55,6 @@ App.start({
         initOsd()
         NotificationPopups()
         initPopups()
+        initShortcuts()
     },
 })

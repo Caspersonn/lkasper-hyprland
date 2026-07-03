@@ -21,7 +21,8 @@ in
     # The description carries no commas; the leading [Group] tag drives grouping.
     bindd = [
       # Launcher
-      "SUPER, SPACE, [Launcher] App launcher, exec, walker"
+      "SUPER, SPACE, [Launcher] App launcher, exec, ags request toggle-launcher"
+      "SUPER CTRL, SPACE, [Launcher] Walker fallback, exec, walker"
       "CTRL SUPER, V, [Launcher] Clipboard history, exec, foot --title=clipse clipse"
       "CTRL SUPER, N, [Launcher] Network manager, exec, foot --title=nmtui nmtui"
 

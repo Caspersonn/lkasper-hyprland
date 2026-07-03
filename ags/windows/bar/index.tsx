@@ -21,7 +21,7 @@ function Divider({ wide = false }: { wide?: boolean }) {
 
 function Launcher() {
     return (
-        <button class="launcher island-btn" onClicked={() => execAsync(["walker"])}>
+        <button class="launcher island-btn" onClicked={() => execAsync(["ags", "request", "toggle-launcher"])}>
             <label class="launcher-icon" halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} label={"\uf313"} />
         </button>
     )

@@ -7,7 +7,7 @@ import NotificationPopups from "./windows/notifications"
 import { initPopups } from "./windows/notifications/popups"
 import { initCenter, toggleCenter, toggleDnd } from "./windows/notifications/center"
 import { initShortcuts, toggleShortcuts } from "./windows/shortcuts"
-import { initShortcuts, toggleShortcuts } from "./windows/shortcuts"
+import { initLauncher, toggleLauncher } from "./windows/launcher"
 
 App.start({
     css: style,
@@ -41,8 +41,8 @@ App.start({
             res("ok")
             return
         }
-        if (argv.includes("toggle-shortcuts")) {
-            toggleShortcuts()
+        if (argv.includes("toggle-launcher")) {
+            toggleLauncher()
             res("ok")
             return
         }
@@ -56,5 +56,6 @@ App.start({
         NotificationPopups()
         initPopups()
         initShortcuts()
+        initLauncher()
     },
 })

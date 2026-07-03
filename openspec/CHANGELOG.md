@@ -2,6 +2,12 @@
 
 ## 2026-07-03
 
+- **Custom launcher** — SUPER, SPACE opens an AGS app launcher
+  - Added the `app-launcher` capability and `ags/windows/launcher/index.tsx`: a gruvbox layer-shell overlay using `AstalApps` (added `apps` to `astalLibs` in `ags/flake.nix`) with fuzzy search, full keyboard navigation (stable-key selection, hover-to-select, scroll-into-view), and plain `.launch()`.
+  - Rebound `SUPER, SPACE` to `ags request toggle-launcher`, moved walker to a `SUPER CTRL, SPACE` backup, and pointed the bar launcher button at the AGS launcher.
+  - Wired `toggle-launcher` into `ags/app.ts` and added `window.launcher` styles in `ags/style.scss` using existing palette variables.
+  - See [proposal](changes/archive/2026-07-03-custom-launcher/proposal.md).
+
 - **Keybind cheatsheet overlay** — SUPER, slash opens a keybind modal
   - Migrated meaningful Hyprland binds to `bindd` with `[Group] Label` descriptions in `modules/home-manager/_hyprland/bindings.nix`, and added `SUPER, slash` → `ags request toggle-shortcuts`.
   - Added `ags/windows/shortcuts/index.tsx`: a layer-shell overlay that reads `hyprctl binds -j`, groups by `[Group]`, renders modifier+key keycap chips, collapses workspace digit binds into a `1 – 0` range row, and dismisses on ESC or backdrop click.

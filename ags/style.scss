@@ -1428,6 +1428,68 @@ window.osd {
     }
 }
 
+window.launcher {
+    background-color: transparent;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    color: $fg;
+
+    .launcher-backdrop {
+        background-color: rgba($base-dark, 0.58);
+    }
+
+    .launcher-modal {
+        min-width: 560px;
+        background-color: $base-dark;
+        border: 1px solid rgba($subtext0, 0.18);
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .launcher-search {
+        min-height: 42px;
+        margin-bottom: 12px;
+        padding: 0 14px;
+        background-color: $surface0;
+        color: $fg;
+        border: 1px solid rgba($subtext0, 0.18);
+        border-radius: 12px;
+        font-size: 1.05em;
+    }
+
+    .launcher-empty {
+        color: $fg-dim;
+        padding: 14px;
+    }
+
+    .launcher-row {
+        min-height: 46px;
+        padding: 0 12px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        box-shadow: none;
+        color: $fg;
+
+        // Selection follows both keyboard and hover, so a single `.selected`
+        // rule is the only highlight (hover sets the selection in code).
+        &.selected {
+            background-color: $surface0;
+            border-color: rgba($subtext0, 0.18);
+        }
+    }
+
+    .launcher-app-icon {
+        -gtk-icon-size: 24px;
+        margin-right: 12px;
+    }
+
+    .launcher-app-name {
+        color: $fg2;
+        font-size: 1em;
+        font-weight: 700;
+    }
+}
+
 // Keybind cheatsheet overlay (SUPER, slash)
 .shortcuts {
     background-color: transparent;

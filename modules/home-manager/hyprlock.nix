@@ -11,12 +11,9 @@
       palette = config.colorScheme.palette;
       convert = inputs.nix-colors.lib.conversions.hexToRGBString;
 
-      backgroundRgb = "rgba(${convert ", " palette.base00}, 0.8)";
       surfaceRgb = "rgb(${convert ", " palette.base02})";
       foregroundRgb = "rgb(${convert ", " palette.base05})";
       foregroundMutedRgb = "rgb(${convert ", " palette.base04})";
-
-      selected_wallpaper_path = (import ../../lib/selected-wallpaper.nix config).wallpaper_path;
     in
     {
       programs.hyprlock = {

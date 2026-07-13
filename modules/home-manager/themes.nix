@@ -8,14 +8,8 @@
       ...
     }:
     let
-      cfg = config."lkasper-hyprland";
       themes = import ../_themes.nix;
       declarativeTheme = themes."gruvbox";
-
-      packages = import ../_packages.nix {
-        inherit pkgs lib;
-        exclude_packages = cfg.exclude_packages;
-      };
 
       fixedThemeNames = builtins.filter (name: builtins.hasAttr "base16-theme" themes.${name}) (
         builtins.attrNames themes
@@ -34,36 +28,11 @@
         ) fixedThemeNames
       );
 
-      defaultWallpapers = {
-        "gruvbox" = "gruvbox";
-        "gruvbox-light" = "gruvbox";
-      };
-
-      wallpaperFilesForTheme =
-        themeName:
-        let
-          wallpaperDir = ../../config/themes/wallpapers/${themeName};
-          entries = builtins.readDir wallpaperDir;
-          fileNames = builtins.filter (n: entries.${n} == "regular") (builtins.attrNames entries);
-        in
-        builtins.listToAttrs (
-          map (fileName: {
-            name = ".local/share/lkasper-hyprland/themes/${themeName}/backgrounds/${fileName}";
-            value = {
-              source = ../../config/themes/wallpapers/${themeName}/${fileName};
-            };
-          }) fileNames
-        );
-
       runtimeThemeFiles = builtins.foldl' (
         acc: name:
         let
           theme = runtimeThemes.${name};
           palette = theme.palette;
-          wallpaperDirName =
-            if builtins.hasAttr name defaultWallpapers then defaultWallpapers.${name} else null;
-          hasWallpaperDir =
-            wallpaperDirName != null && builtins.pathExists ../../config/themes/wallpapers/${wallpaperDirName};
         in
         acc
         // {
@@ -91,7 +60,6 @@
             accent = "#${palette.base0D}";
           };
         }
-        // (if hasWallpaperDir then wallpaperFilesForTheme wallpaperDirName else { })
       ) { } fixedThemeNames;
     in
     {
@@ -110,7 +78,7 @@
           };
         };
 
-        home.packages = packages.homePackages ++ [ pkgs.libadwaita ];
+        home.packages = [ pkgs.libadwaita ];
 
         home.file = {
           ".config/opencode/themes/opencode.json".text = ''

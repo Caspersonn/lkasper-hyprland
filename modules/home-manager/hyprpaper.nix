@@ -6,12 +6,6 @@
       selected_wallpaper_path = "~/Pictures/Wallpapers/gruvbox/3-cosy-retreat-sunset.png";
     in
     {
-      home.file = {
-        "Pictures/Wallpapers" = {
-          source = ../../config/themes/wallpapers;
-          recursive = true;
-        };
-      };
       services.hyprpaper = {
         enable = true;
         settings = {

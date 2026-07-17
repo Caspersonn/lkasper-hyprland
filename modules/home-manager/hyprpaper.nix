@@ -3,7 +3,7 @@
   flake.homeManagerModules.lkh-hyprpaper =
     { config, pkgs, ... }:
     let
-      selected_wallpaper_path = "~/Pictures/Wallpapers/gruvbox/3-cosy-retreat-sunset.png";
+      selected_wallpaper_path = "~/lkasper-flake/wallpapers/Wood Dark.png";
     in
     {
       services.hyprpaper = {

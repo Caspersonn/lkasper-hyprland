@@ -15,13 +15,26 @@ const PROFILES = [
     { id: "performance", label: "Turbo", icon: glyph.rocketLaunch },
 ]
 
-function batInfo(pct: number, charging: boolean): { icon: string; cls: string } {
-    if (charging) return { icon: glyph.batteryCharging, cls: "bat-good" }
-    if (pct > 0.8) return { icon: glyph.battery, cls: "bat-good" }
-    if (pct > 0.6) return { icon: glyph.battery80, cls: "bat-ok" }
-    if (pct > 0.4) return { icon: glyph.battery60, cls: "bat-mid" }
-    if (pct > 0.2) return { icon: glyph.battery40, cls: "bat-low" }
-    return { icon: glyph.battery20, cls: "bat-crit" }
+const BATTERY_LEVELS: [number, string, string, string][] = [
+    [100, glyph.battery, glyph.batteryCharging100, "bat-good"],
+    [90, glyph.battery90, glyph.batteryCharging90, "bat-good"],
+    [80, glyph.battery80, glyph.batteryCharging80, "bat-good"],
+    [70, glyph.battery70, glyph.batteryCharging70, "bat-ok"],
+    [60, glyph.battery60, glyph.batteryCharging60, "bat-ok"],
+    [50, glyph.battery50, glyph.batteryCharging50, "bat-mid"],
+    [40, glyph.battery40, glyph.batteryCharging40, "bat-mid"],
+    [30, glyph.battery30, glyph.batteryCharging30, "bat-low"],
+    [20, glyph.battery20, glyph.batteryCharging20, "bat-low"],
+    [10, glyph.battery10, glyph.batteryCharging10, "bat-crit"],
+]
+
+export function batInfo(pct: number, charging: boolean): { icon: string; cls: string } {
+    const level = Math.round(pct * 100)
+    for (const [min, icon, chargingIcon, cls] of BATTERY_LEVELS) {
+        if (level >= min)
+            return { icon: charging ? chargingIcon : icon, cls: charging ? "bat-good" : cls }
+    }
+    return { icon: charging ? glyph.batteryCharging10 : glyph.battery10, cls: charging ? "bat-good" : "bat-crit" }
 }
 
 function Tile(props: {

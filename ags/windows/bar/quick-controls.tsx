@@ -4,22 +4,13 @@ import AstalNetwork from "gi://AstalNetwork"
 import AstalBluetooth from "gi://AstalBluetooth"
 import { createBinding, createComputed } from "ags"
 import { glyph } from "./glyphs"
-import ControlCenter from "./control-center"
+import ControlCenter, { batInfo } from "./control-center"
 
 function volGlyph(mute: boolean, vol: number): string {
     if (mute) return glyph.volumeMute
     if (vol > 0.55) return glyph.volumeHigh
     if (vol > 0) return glyph.volumeMedium
     return glyph.volumeLow
-}
-
-function batInfo(pct: number, charging: boolean): { icon: string; cls: string } {
-    if (charging) return { icon: glyph.batteryCharging, cls: "bat-good" }
-    if (pct > 0.8) return { icon: glyph.battery, cls: "bat-good" }
-    if (pct > 0.6) return { icon: glyph.battery80, cls: "bat-ok" }
-    if (pct > 0.4) return { icon: glyph.battery60, cls: "bat-mid" }
-    if (pct > 0.2) return { icon: glyph.battery40, cls: "bat-low" }
-    return { icon: glyph.battery20, cls: "bat-crit" }
 }
 
 export default function QuickControls() {

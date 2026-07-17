@@ -18,6 +18,9 @@ let
     adwaita-icon-theme
     gruvbox-plus-icons
     hicolor-icon-theme
+
+    clipse # Clipboard manager
+    wl-clipboard # Command-line copy/paste utilities for Wayland
   ];
 
 in

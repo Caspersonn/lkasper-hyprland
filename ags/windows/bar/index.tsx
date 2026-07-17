@@ -5,6 +5,7 @@ import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 
 import Workspaces from "./workspaces"
+import { Launcher } from "./../launcher"
 import ActiveWindow from "./active-window"
 import Clock from "./clock"
 import Media from "./media"
@@ -17,14 +18,6 @@ import PowerButton from "./power"
 
 function Divider({ wide = false }: { wide?: boolean }) {
     return <box class={wide ? "island-divider wide" : "island-divider"} valign={Gtk.Align.CENTER} />
-}
-
-function Launcher() {
-    return (
-        <button class="launcher island-btn" onClicked={() => execAsync(["ags", "request", "toggle-launcher"])}>
-            <label class="launcher-icon" halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} label={"\uf313"} />
-        </button>
-    )
 }
 
 function Bar(gdkmonitor: Gdk.Monitor, name: string) {

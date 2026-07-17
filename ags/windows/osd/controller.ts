@@ -154,7 +154,7 @@ export function triggerMedia(action: string) {
       console.log("Next")
       setMedia({
         title: player.title || "",
-        artist: "test",
+        artist: player.artist || "",
         icon: iconForAction(action, player),
         entry: player.entry || "audio-x-generic-symbolic",
       })

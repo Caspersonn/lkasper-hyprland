@@ -280,6 +280,14 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
     </window>
 }
 
+export function Launcher() {
+    return (
+        <button class="launcher island-btn" onClicked={() => execAsync(["ags", "request", "toggle-launcher"])}>
+            <label class="launcher-icon" halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} label={"\uf313"} />
+        </button>
+    )
+}
+
 export function initLauncher() {
     const monitors = createBinding(App, "monitors")
     return (
@@ -288,3 +296,4 @@ export function initLauncher() {
         </For>
     )
 }
+

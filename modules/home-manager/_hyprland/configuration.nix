@@ -25,7 +25,7 @@ in
     # The Hyprland float rule in windows.nix matches this "yazi" title.
     "$fileManager" = lib.mkDefault "foot -o main.locked-title=yes --title=yazi yazi";
     "$browser" = lib.mkDefault "firefox";
-    "$music" = lib.mkDefault "feishin";
+    "$music" = lib.mkDefault "Aonsoku";
     "$passwordManager" = lib.mkDefault "bitwarden";
     "$messenger" = lib.mkDefault "signal-desktop";
 

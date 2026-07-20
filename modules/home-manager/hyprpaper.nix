@@ -3,7 +3,9 @@
   flake.homeManagerModules.lkh-hyprpaper =
     { config, pkgs, ... }:
     let
-      selected_wallpaper_path = "~/lkasper-flake/wallpapers/Wood Dark.png";
+      # Default wallpaper, now colocated in-repo (slugified name). The runtime
+      # wallpaper picker overrides this live via hyprpaper IPC.
+      selected_wallpaper_path = "${../../wallpapers/wood-dark.png}";
     in
     {
       services.hyprpaper = {

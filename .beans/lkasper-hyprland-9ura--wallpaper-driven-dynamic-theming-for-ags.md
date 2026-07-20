@@ -5,7 +5,7 @@ status: in-progress
 type: feature
 priority: normal
 created_at: 2026-07-20T12:39:57Z
-updated_at: 2026-07-20T13:18:58Z
+updated_at: 2026-07-20T14:06:14Z
 ---
 
 The whole AGS shell (bar, overlays: launcher/soltty/shortcuts, notification center, all popups) derives every colour from the CURRENT wallpaper. Changing the wallpaper recolours the shell. No hardcoded hex anywhere. Supersedes the gruvbox vars and the static w- Wood Dark tokens from the bar redesign; overlaps de2q (colouring standard).
@@ -33,3 +33,7 @@ Decisions: approach C (committed per-wallpaper base16 via wallust) - whole-deskt
 - [x] group 1 wallust base16 generator committed; palettes/*.json for 6 wallpapers (16 slots, bare hex)
 - Note: lchansi+dark16 scrambles hue→slot (base08 not red etc.); use palette 'darkansi' for ANSI-faithful semantics — tuning in guardrail spike 6.2.
 - Next: group 2 (nix pipeline: colorScheme from active wallpaper, whole-desktop), group 3 (AGS runtime recolor spike).
+
+
+- [x] group 2 nix pipeline: themes.nix reads committed wallpaper palettes; colorScheme = active wallpaper (wood-dark) so whole desktop derives from it; runtime themes/<name>/colors.json emitted; config evaluates. (fixed hyprpaper path->string)
+- Next: group 3 (AGS runtime recolor spike), 4-6 (switch/picker/guardrails) — need live desktop.

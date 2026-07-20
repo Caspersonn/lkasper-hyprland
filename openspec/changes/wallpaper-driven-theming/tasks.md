@@ -12,10 +12,10 @@
 
 ## 2. Nix colour pipeline (whole desktop)
 
-- [ ] 2.1 Rework `_themes.nix` / `themes.nix` to register one theme per wallpaper, sourced from its committed palette (drop the hardcoded `"gruvbox"` pick)
-- [ ] 2.2 Wire `config.colorScheme` to the active wallpaper's palette (default = current wallpaper); confirm foot / btop / hyprlock / Hyprland borders / ghostty / starship / opencode still derive from it
-- [ ] 2.3 Emit runtime `themes/<name>/colors.json` for every wallpaper and keep the `current/theme.name` pointer
-- [ ] 2.4 Build the home configuration and verify all base16 consumers evaluate
+- [x] 2.1 Rework `_themes.nix` / `themes.nix` to register one theme per wallpaper, sourced from its committed palette (drop the hardcoded `"gruvbox"` pick)
+- [x] 2.2 Wire `config.colorScheme` to the active wallpaper's palette (default = current wallpaper); confirm foot / btop / hyprlock / Hyprland borders / ghostty / starship / opencode still derive from it
+- [x] 2.3 Emit runtime `themes/<name>/colors.json` for every wallpaper and keep the `current/theme.name` pointer
+- [x] 2.4 Build the home configuration and verify all base16 consumers evaluate
 
 ## 3. AGS runtime colour layer
 

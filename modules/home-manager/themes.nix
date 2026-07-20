@@ -8,59 +8,49 @@
       ...
     }:
     let
-      themes = import ../_themes.nix;
-      declarativeTheme = themes."gruvbox";
-
-      fixedThemeNames = builtins.filter (name: builtins.hasAttr "base16-theme" themes.${name}) (
-        builtins.attrNames themes
+      # Palettes are generated from each wallpaper by
+      # wallpapers/regenerate-palettes.sh and committed as base16 JSON
+      # (base00-base0F, bare hex). No static theme is picked any more.
+      paletteDir = ../../wallpapers/palettes;
+      paletteNames = map (n: lib.removeSuffix ".json" n) (
+        builtins.filter (n: lib.hasSuffix ".json" n) (builtins.attrNames (builtins.readDir paletteDir))
+      );
+      palettes = builtins.listToAttrs (
+        map (name: {
+          inherit name;
+          value = builtins.fromJSON (builtins.readFile (paletteDir + "/${name}.json"));
+        }) paletteNames
       );
 
-      runtimeThemes = builtins.listToAttrs (
-        map (
-          name:
-          let
-            palette = inputs.nix-colors.colorSchemes.${themes.${name}.base16-theme}.palette;
-          in
-          {
-            name = name;
-            value = { inherit palette; };
-          }
-        ) fixedThemeNames
-      );
+      # Default active wallpaper; the runtime picker overrides current/theme.name.
+      activeWallpaper = "wood-dark";
+      activePalette = palettes.${activeWallpaper};
+
+      # A nix-colors-shaped colorScheme built from a wallpaper palette.
+      mkColorScheme = name: palette: {
+        slug = name;
+        name = name;
+        author = "wallust (wallpaper-derived)";
+        inherit palette;
+      };
 
       runtimeThemeFiles = builtins.foldl' (
         acc: name:
         let
-          theme = runtimeThemes.${name};
-          palette = theme.palette;
+          palette = palettes.${name};
         in
         acc
         // {
-          ".local/share/lkasper-hyprland/themes/${name}/colors.json".text = builtins.toJSON {
-            inherit (palette)
-              base00
-              base01
-              base02
-              base03
-              base04
-              base05
-              base06
-              base07
-              base08
-              base09
-              base0A
-              base0B
-              base0C
-              base0D
-              base0E
-              base0F
-              ;
-            background = "#${palette.base00}";
-            foreground = "#${palette.base05}";
-            accent = "#${palette.base0D}";
-          };
+          ".local/share/lkasper-hyprland/themes/${name}/colors.json".text = builtins.toJSON (
+            palette
+            // {
+              background = "#${palette.base00}";
+              foreground = "#${palette.base05}";
+              accent = "#${palette.base0D}";
+            }
+          );
         }
-      ) { } fixedThemeNames;
+      ) { } paletteNames;
     in
     {
       options."lkasper-hyprland" = (import ../../config.nix lib).lkasperHyprlandOptions;
@@ -68,7 +58,7 @@
       imports = [ inputs.nix-colors.homeManagerModules.default ];
 
       config = {
-        colorScheme = inputs.nix-colors.colorSchemes.${declarativeTheme.base16-theme};
+        colorScheme = mkColorScheme activeWallpaper activePalette;
 
         gtk = {
           enable = true;
@@ -139,7 +129,7 @@
             }
           '';
           ".config/lkasper-hyprland/current/theme.name".text = ''
-            gruvbox
+            wood-dark
           '';
         }
         // runtimeThemeFiles;

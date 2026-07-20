@@ -19,17 +19,17 @@
 
 ## 3. AGS runtime colour layer
 
-- [ ] 3.1 Spike: confirm GTK `@define-color` + `App.apply_css` vs regenerated-CSS fallback (design D4)
-- [ ] 3.2 Split AGS styles — structure stays compiled, the colour layer becomes a runtime-injected palette provider
-- [ ] 3.3 Load the active `colors.json` at startup and apply the colour provider
-- [ ] 3.4 Recolour live on change (watch `current` / `colors.json`, re-apply) with no shell restart
-- [ ] 3.5 Remove the gruvbox `$…` and `$w-*` vars from `style.scss`; map every colour, including semantics (base0B/base0A/base08), to the palette
+- [x] 3.1 Spike: confirm GTK `@define-color` + `App.apply_css` vs regenerated-CSS fallback (design D4)
+- [x] 3.2 Split AGS styles — structure stays compiled, the colour layer becomes a runtime-injected palette provider
+- [x] 3.3 Load the active `colors.json` at startup and apply the colour provider
+- [x] 3.4 Recolour live on change (watch `current` / `colors.json`, re-apply) with no shell restart
+- [x] 3.5 Remove the gruvbox `$…` and `$w-*` vars from `style.scss`; map every colour, including semantics (base0B/base0A/base08), to the palette
 - [ ] 3.6 Verify the running shell recolours live on a manual palette change
 
 ## 4. Switch orchestration
 
-- [ ] 4.1 Implement `theme-switch <wallpaper>`: set wallpaper via hyprpaper IPC, repoint `current/theme.name`, reload apps
-- [ ] 4.2 Reload matrix: `hyprctl` (borders), AGS `apply_css`, terminals/btop via their reload path
+- [x] 4.1 Implement `theme-switch <wallpaper>`: set wallpaper via hyprpaper IPC, repoint `current/theme.name`, reload apps
+- [x] 4.2 Reload matrix: `hyprctl` (borders), AGS `apply_css`, terminals/btop via their reload path
 - [ ] 4.3 Verify a switch recolours Hyprland + AGS immediately and completes without error
 
 ## 5. Wallpaper picker overlay

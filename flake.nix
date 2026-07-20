@@ -7,7 +7,14 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     hyprland.url = "github:hyprwm/Hyprland";
     nix-colors.url = "github:misterio77/nix-colors";
-    ags.url = "github:aylur/ags";
+    ags = {
+      url = "github:aylur/ags";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    soltty = {
+      url = "github:torreirow/soltty";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     walker = {
       url = "github:abenz1267/walker";
       inputs.elephant.follows = "elephant";

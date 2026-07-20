@@ -31,6 +31,7 @@ in
       "SUPER SHIFT, SPACE, [System] Toggle bars, exec, ags request toggle-bars"
       "SUPER, N, [System] Notification center, exec, ags request toggle-notifications"
       "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
+      "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
 
       # Windows
       "SUPER, I, [Windows] Pin window, exec, hyprctl dispatch pin"

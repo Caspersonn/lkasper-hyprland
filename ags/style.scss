@@ -1,32 +1,43 @@
-$base: #282828;
-$surface0: #3c3836;
-$surface1: #504945;
-$subtext0: #a89984;
-$text: #ebdbb2;
-$green: #b8bb26;
-$yellow: #fabd2f;
-$red: #fb4934;
-$orange: #fe8019;
-$purple: #d3869b;
-$blue: #83a598;
-$aqua: #8ec07c;
-$surface2: #665c54;
-$fg2: #d5c4a1;
-$gray: #928374;
-$nixos-blue: #7eb8e8;
-$base-dark: #1d2021;
+// Colours are wallpaper-driven at runtime: each resolves to a GTK named colour
+// (@base00..@base0F) supplied by a runtime @define-color provider (ags/theme.ts)
+// read from the active wallpaper's palette. No static colour values remain.
+// `c` emits @baseNN; `ca` emits alpha(@baseNN, a) for translucency.
+@function c($n) {
+    @return unquote("@#{$n}");
+}
+@function ca($n, $a) {
+    @return unquote("alpha(@#{$n}, #{$a})");
+}
+
+$base: c(base00);
+$surface0: c(base01);
+$surface1: c(base02);
+$surface2: c(base03);
+$subtext0: ca(base05, 0.72);
+$text: c(base05);
+$green: c(base0B);
+$yellow: c(base0A);
+$red: c(base08);
+$orange: c(base09);
+$purple: c(base0E);
+$blue: c(base0D);
+$aqua: c(base0C);
+$fg2: c(base06);
+$gray: ca(base05, 0.6);
+$nixos-blue: c(accent);
+$base-dark: c(base00);
 
 $bg: $base;
 $fg: $text;
 $fg-dim: $subtext0;
-$accent: $orange;
+$accent: c(accent);
 
 $island-radius: 14px;
 $island-height: 42px;
-$island-border: rgba($subtext0, 0.24);
+$island-border: ca(base04, 0.24);
 $island-fill: $base-dark;
-$divider: rgba($subtext0, 0.18);
-$hover-bg: rgba($fg, 0.1);
+$divider: ca(base04, 0.18);
+$hover-bg: ca(base05, 0.1);
 
 $bar-margin: 8px;
 $pill-padding-h: 12px;
@@ -36,10 +47,33 @@ $module-spacing: 6px;
 $dot-size: 8px;
 $dot-active-width: 20px;
 
+// — "Wood Dark" wallpaper palette + single-bar tokens —
+$w-bg: ca(base00, 0.72);
+$w-hover: ca(base05, 0.07);
+$w-line: ca(base05, 0.09);
+$w-text: c(base05);
+// Secondary/faint text as alpha ramps of the real foreground. The wallust
+// palette collapses base04≈base05 (no dimming -> washed out) and base03 is too
+// dark (dark-on-dark icons); ramping the fg keeps a legible hierarchy on every
+// wallpaper while still tracking its colour.
+$w-dim: ca(base05, 0.75);
+$w-faint: ca(base05, 0.5);
+$w-accent: c(accent);
+$w-accent-soft: ca(accent, 0.16);
+$w-teal: c(base0C);
+$w-ok: c(base0B);
+$w-warn: c(base0A);
+$w-crit: c(base08);
+$w-bar-radius: 14px;
+
 window.bar {
-    background-color: transparent;
+    background-color: $w-bg;
+    border: 1px solid $w-line;
+    border-radius: $w-bar-radius;
+    box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    color: $w-text;
     font-family: "JetBrainsMono Nerd Font", monospace;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
 
     button {
@@ -56,29 +90,33 @@ window.bar {
     }
 }
 
+// Single continuous bar: the groups no longer have their own panel; they just
+// cluster content to the left / center / right of the one bar background.
 .island {
-    background-color: $island-fill;
-    border: 1px solid $island-border;
-    border-radius: $island-radius;
-    min-height: $island-height;
-    padding: 0 5px;
-    color: $fg;
+    background-color: transparent;
+    border: none;
+    min-height: 0;
+    padding: 0;
+    color: $w-text;
 }
 
 .island-divider {
     min-width: 1px;
-    min-height: 22px;
-    background-color: $divider;
-    margin: 10px 3px;
+    min-height: 18px;
+    background-color: $w-line;
+    margin: 0 6px;
 
     &.wide {
-        margin: 10px 14px;
+        margin: 0 12px;
     }
 }
 
 .island-btn {
     border-radius: 8px;
     padding: 0 6px;
+    // Even inset on all sides so the hover pill doesn't stretch to the island's
+    // full height (buttons default to valign:fill); matches .power / .island-sub.
+    margin: 4px;
 
     &:hover {
         background-color: $hover-bg;
@@ -86,7 +124,7 @@ window.bar {
 }
 
 .bar-inner {
-    padding: 10px 14px;
+    padding: 5px 8px;
 }
 
 .left-island {
@@ -107,9 +145,8 @@ window.bar {
 
 .launcher-icon {
     min-width: 20px;
-    margin-right: 5px;
-    font-size: 19px;
-    color: $nixos-blue;
+    font-size: 18px;
+    color: $w-accent;
 }
 
 .active-window {
@@ -121,48 +158,49 @@ window.bar {
     }
 
     .active-window-title {
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 600;
-        color: $fg;
+        color: $w-dim;
     }
 }
 
 window.bar .clock {
-    background-color: $island-fill;
-    border: 1px solid $island-border;
-    border-radius: 13px;
-    min-height: $island-height;
-    padding: 0 16px;
+    background-color: transparent;
+    border: none;
+    border-radius: 9px;
+    min-height: 30px;
+    padding: 0 12px;
+    margin: 4px;
 
     &:hover {
-        background-color: $base;
+        background-color: $w-hover;
     }
 }
 
 .clock-cal-icon {
-    font-size: 16px;
-    color: $yellow;
-    margin-right: 10px;
+    font-size: 15px;
+    color: $w-dim;
+    margin-right: 9px;
 }
 
 .clock-time {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
-    color: $fg;
-    letter-spacing: 0.5px;
+    color: $w-text;
+    letter-spacing: 0.3px;
 }
 
 .clock-divider {
     min-width: 1px;
-    min-height: 22px;
-    background-color: rgba($subtext0, 0.28);
-    margin: 0 10px;
+    min-height: 15px;
+    background-color: $w-line;
+    margin: 0 9px;
 }
 
 .clock-date {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: $fg2;
+    font-size: 12px;
+    font-weight: 500;
+    color: $w-dim;
 }
 
 .popover-wrap > contents {
@@ -179,7 +217,7 @@ window.bar .clock {
     padding: 18px;
     border-radius: 18px;
     background-color: $base-dark;
-    border: 1px solid rgba($subtext0, 0.18);
+    border: 1px solid ca(base04, 0.18);
 
     .cal-header {
         margin-bottom: 14px;
@@ -253,14 +291,12 @@ window.bar .clock {
     }
 }
 
-$mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
-
 .workspaces {
     .asg-ws {
         min-width: 0;
         min-height: 30px;
         padding: 0 10px;
-        margin: 0 2px;
+        margin: 4px 2px;
         border-radius: 9px;
         transition: background-color 200ms ease;
 
@@ -275,7 +311,7 @@ $mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
         .ws-num {
             font-size: 13px;
             font-weight: 700;
-            color: $surface2;
+            color: $w-faint;
         }
 
         .ws-underline {
@@ -285,42 +321,35 @@ $mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
             background-color: transparent;
         }
 
+        // Occupied: dim. Focused: the one amber accent. No per-monitor rainbow.
         &.occupied {
-            background-color: rgba($fg, 0.07);
-
             .ws-num {
-                color: $fg;
+                color: $w-dim;
+            }
+
+            .ws-underline {
+                background-color: $w-dim;
+                opacity: 0.55;
             }
         }
-    }
 
-    @for $i from 0 through 4 {
-        .asg-ws.mon-#{$i} {
+        &.focused {
+            background-color: $w-accent-soft;
+
+            .ws-num {
+                color: $w-accent;
+            }
+
             .ws-underline {
-                background-color: nth($mon-accents, $i + 1);
-            }
-
-            &.occupied .ws-underline {
-                opacity: 0.8;
-            }
-
-            &.focused {
-                background-color: rgba(nth($mon-accents, $i + 1), 0.18);
-
-                .ws-num {
-                    color: nth($mon-accents, $i + 1);
-                }
-
-                .ws-underline {
-                    background-color: nth($mon-accents, $i + 1);
-                }
+                background-color: $w-accent;
+                opacity: 1;
             }
         }
     }
 }
 
 .tray-separator {
-    border-left: 1px solid rgba($fg, 0.12);
+    border-left: 1px solid $w-line;
     padding-left: 6px;
     margin-left: 6px;
 }
@@ -334,7 +363,7 @@ $mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
 }
 
 .separator {
-    border-left: 1px solid rgba($text, 0.12);
+    border-left: 1px solid ca(base05, 0.12);
     padding-left: $module-spacing;
     margin-left: $module-spacing;
 }
@@ -382,13 +411,13 @@ $mon-accents: ($orange, $aqua, $blue, $purple, $yellow);
 
 .notification-bell {
     font-size: 14px;
-    color: $fg;
+    color: $w-dim;
 }
 
 .nc-badge {
     font-size: 11px;
     font-weight: 700;
-    color: $accent;
+    color: $w-accent;
     margin-left: 4px;
 }
 
@@ -397,16 +426,17 @@ tooltip {
     color: $fg;
     border-radius: 8px;
     padding: 6px 10px;
-    border: 1px solid rgba($text, 0.08);
+    border: 1px solid ca(base05, 0.08);
 }
 
 .island-sub {
     border-radius: 10px;
     padding: 0 10px;
     min-height: 34px;
+    margin: 4px;
 
     &:hover {
-        background-color: rgba($fg, 0.1);
+        background-color: ca(base05, 0.1);
     }
 }
 
@@ -424,7 +454,7 @@ tooltip {
     .media-art-icon {
         margin-left: 7px;
         font-size: 14px;
-        color: rgba($base-dark, 0.85);
+        color: ca(base00, 0.85);
     }
 
     .media-title {
@@ -485,7 +515,7 @@ tooltip {
 
 .media-popover {
     background-color: $base-dark;
-    border: 1px solid rgba($subtext0, 0.18);
+    border: 1px solid ca(base04, 0.18);
     border-radius: 18px;
     padding: 18px;
     min-width: 330px;
@@ -504,7 +534,7 @@ tooltip {
         .mp-art-icon {
             margin-left: 20px;
             font-size: 30px;
-            color: rgba($base-dark, 0.85);
+            color: ca(base00, 0.85);
         }
 
         .mp-now {
@@ -537,7 +567,7 @@ tooltip {
         trough {
             min-height: 5px;
             border-radius: 3px;
-            background-color: rgba($subtext0, 0.2);
+            background-color: ca(base04, 0.2);
         }
 
         highlight {
@@ -575,7 +605,7 @@ tooltip {
             border-radius: 18px;
 
             &:hover {
-                background-color: rgba($fg, 0.1);
+                background-color: ca(base05, 0.1);
                 color: $fg;
             }
         }
@@ -596,27 +626,27 @@ tooltip {
     padding: 0 10px;
 
     .weather-icon {
-        font-size: 18px;
-        color: $yellow;
-        margin-right: 8px;
+        font-size: 16px;
+        color: $w-dim;
+        margin-right: 7px;
     }
 
     .weather-temp {
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
-        color: $fg;
+        color: $w-text;
     }
 
     .weather-city {
         font-size: 9.5px;
         font-weight: 500;
-        color: $gray;
+        color: $w-faint;
     }
 }
 
 .weather-popover {
     background-color: $base-dark;
-    border: 1px solid rgba($subtext0, 0.18);
+    border: 1px solid ca(base04, 0.18);
     border-radius: 18px;
     padding: 18px;
     min-width: 320px;
@@ -654,7 +684,7 @@ tooltip {
         .wx-tile {
             padding: 9px 10px;
             margin: 0 3px;
-            background-color: rgba($fg, 0.05);
+            background-color: ca(base05, 0.05);
             border-radius: 11px;
 
             .wx-tile-label {
@@ -712,7 +742,7 @@ tooltip {
         .stat-value {
             font-size: 11px;
             font-weight: 700;
-            color: $fg;
+            color: $w-dim;
         }
 
         .stat-bar {
@@ -722,7 +752,7 @@ tooltip {
             trough {
                 min-height: 3px;
                 border-radius: 2px;
-                background-color: rgba($subtext0, 0.2);
+                background-color: ca(base05, 0.1);
             }
 
             block.filled {
@@ -737,31 +767,31 @@ tooltip {
 
     .stat-cpu {
         .stat-icon {
-            color: $aqua;
+            color: $w-faint;
         }
 
         .stat-bar block.filled {
-            background-color: $aqua;
+            background-color: $w-teal;
         }
     }
 
     .stat-ram {
         .stat-icon {
-            color: $purple;
+            color: $w-faint;
         }
 
         .stat-bar block.filled {
-            background-color: $purple;
+            background-color: $w-teal;
         }
     }
 
     .stat-temp-icon {
-        color: $red;
+        color: $w-faint;
     }
 }
 
 .tray image {
-    color: $subtext0;
+    color: $w-dim;
 }
 
 .tray menubutton:hover image {
@@ -777,20 +807,20 @@ tooltip {
     margin-bottom: 4px;
 
     &.asg-pow {
-        background-color: rgba($red, 0.14);
+        background-color: transparent;
         border-radius: 8px;
 
         &:hover {
-            background-color: rgba($red, 0.22);
+            background-color: ca(base08, 0.18);
         }
     }
 }
 
 .power-icon {
-    color: $red;
-    font-size: 18px;
-    padding-left: 12px;
-    padding-right: 12px;
+    color: $w-dim;
+    font-size: 16px;
+    padding-left: 11px;
+    padding-right: 11px;
 }
 
 .power-menu {
@@ -803,7 +833,7 @@ tooltip {
     padding: 11px 13px;
 
     &:hover {
-        background-color: rgba($fg, 0.07);
+        background-color: ca(base05, 0.07);
     }
 }
 
@@ -845,19 +875,19 @@ tooltip {
 }
 
 .qc-brightness {
-    color: $yellow;
+    color: $w-dim;
 }
 
 .qc-volume {
-    color: $aqua;
+    color: $w-dim;
 }
 
 .qc-wifi {
-    color: $blue;
+    color: $w-dim;
 }
 
 .qc-bt {
-    color: $blue;
+    color: $w-dim;
 }
 
 .qc-battery {
@@ -871,24 +901,24 @@ tooltip {
 .qc-bat-label {
     font-size: 12px;
     font-weight: 700;
-    color: $fg;
+    color: $w-text;
     margin-left: 4px;
 }
 
 .bat-good .qc-bat-icon {
-    color: $aqua;
+    color: $w-ok;
 }
 
 .bat-ok .qc-bat-icon {
-    color: $green;
+    color: $w-ok;
 }
 
 .bat-mid .qc-bat-icon {
-    color: $yellow;
+    color: $w-warn;
 }
 
 .bat-low .qc-bat-icon {
-    color: $orange;
+    color: $w-crit;
 }
 
 .bat-crit .qc-bat-icon {
@@ -901,13 +931,12 @@ tooltip {
 }
 
 .notif-bell {
-    color: $fg2;
+    color: $w-dim;
     font-size: 17px;
-    margin-right: 10px;
 }
 
 .notif-badge {
-    background-color: $red;
+    background-color: $w-crit;
     color: $base-dark;
     font-size: 9px;
     font-weight: 800;
@@ -916,14 +945,14 @@ tooltip {
     min-height: 15px;
     padding: 0 4px;
     margin: 2px;
-    border: 2px solid rgba($base-dark, 0.9);
+    border: 2px solid ca(base00, 0.9);
 }
 
 .control-center {
     min-width: 340px;
     padding: 18px;
     background-color: $base-dark;
-    border: 1px solid rgba($subtext0, 0.18);
+    border: 1px solid ca(base04, 0.18);
     border-radius: 18px;
 }
 
@@ -975,14 +1004,14 @@ tooltip {
     border: 1px solid transparent;
 
     &.on {
-        border-color: rgba($accent, 0.35);
-        background-color: rgba($accent, 0.16);
+        border-color: ca(accent, 0.35);
+        background-color: ca(accent, 0.16);
         color: $accent;
     }
 
     &.off {
-        border-color: rgba($subtext0, 0.14);
-        background-color: rgba($subtext0, 0.06);
+        border-color: ca(base04, 0.14);
+        background-color: ca(base04, 0.06);
         color: $gray;
     }
 }
@@ -1041,7 +1070,7 @@ tooltip {
     trough {
         min-height: 7px;
         border-radius: 4px;
-        background-color: rgba($subtext0, 0.2);
+        background-color: ca(base04, 0.2);
     }
 
     highlight {
@@ -1061,7 +1090,7 @@ tooltip {
     trough {
         min-height: 7px;
         border-radius: 4px;
-        background-color: rgba($subtext0, 0.2);
+        background-color: ca(base04, 0.2);
     }
 
     highlight {
@@ -1090,7 +1119,7 @@ tooltip {
 }
 
 .cc-segments {
-    background-color: rgba($subtext0, 0.1);
+    background-color: ca(base04, 0.1);
     padding: 4px;
     border-radius: 11px;
 }
@@ -1118,7 +1147,7 @@ tooltip {
 
 .notifications-popover {
     background-color: $base-dark;
-    border: 1px solid rgba($subtext0, 0.18);
+    border: 1px solid ca(base04, 0.18);
     border-radius: 18px;
     padding: 18px;
     min-width: 360px;
@@ -1141,7 +1170,7 @@ tooltip {
             border-radius: 7px;
 
             &:hover {
-                background-color: rgba($fg, 0.08);
+                background-color: ca(base05, 0.08);
             }
         }
     }
@@ -1166,15 +1195,15 @@ tooltip {
         .np-card {
             padding: 12px;
             margin-bottom: 9px;
-            background-color: rgba($fg, 0.04);
-            border: 1px solid rgba($subtext0, 0.10);
+            background-color: ca(base05, 0.04);
+            border: 1px solid ca(base04, 0.10);
             border-radius: 12px;
 
             .np-card-chip {
                 min-width: 34px;
                 min-height: 34px;
                 border-radius: 9px;
-                background-color: rgba($subtext0, 0.10);
+                background-color: ca(base04, 0.10);
                 margin-right: 11px;
 
                 .np-card-icon {
@@ -1222,12 +1251,12 @@ tooltip {
                 .np-action {
                     padding: 5px 10px;
                     border-radius: 8px;
-                    background-color: rgba($subtext0, 0.10);
+                    background-color: ca(base04, 0.10);
                     margin-right: 6px;
                     color: $fg;
 
                     &:hover {
-                        background-color: rgba($accent, 0.20);
+                        background-color: ca(accent, 0.20);
                         color: $accent;
                     }
                 }
@@ -1327,7 +1356,7 @@ window.osd {
             trough {
                 min-height: 8px;
                 border-radius: 999px;
-                background-color: rgba($fg, 0.15);
+                background-color: ca(base05, 0.15);
             }
 
             block.filled {
@@ -1365,12 +1394,12 @@ window.osd {
     background-color: transparent;
 
     .sc-backdrop {
-        background-color: rgba($base-dark, 0.55);
+        background-color: ca(base00, 0.55);
     }
 
     .sc-modal {
         background-color: $base-dark;
-        border: 1px solid rgba($subtext0, 0.18);
+        border: 1px solid ca(base04, 0.18);
         border-radius: 18px;
         padding: 24px 28px;
         font-family: "JetBrainsMono Nerd Font", monospace;
@@ -1415,7 +1444,7 @@ window.osd {
             .sc-key {
                 background-color: $surface0;
                 color: $fg2;
-                border: 1px solid rgba($subtext0, 0.18);
+                border: 1px solid ca(base04, 0.18);
                 border-radius: 6px;
                 padding: 2px 8px;
                 font-size: 0.85em;
@@ -1434,13 +1463,13 @@ window.launcher {
     color: $fg;
 
     .launcher-backdrop {
-        background-color: rgba($base-dark, 0.58);
+        background-color: ca(base00, 0.58);
     }
 
     .launcher-modal {
         min-width: 560px;
         background-color: $base-dark;
-        border: 1px solid rgba($subtext0, 0.18);
+        border: 1px solid ca(base04, 0.18);
         border-radius: 18px;
         padding: 18px;
     }
@@ -1451,7 +1480,7 @@ window.launcher {
         padding: 0 14px;
         background-color: $surface0;
         color: $fg;
-        border: 1px solid rgba($subtext0, 0.18);
+        border: 1px solid ca(base04, 0.18);
         border-radius: 12px;
         font-size: 1.05em;
     }
@@ -1474,7 +1503,7 @@ window.launcher {
         // rule is the only highlight (hover sets the selection in code).
         &.selected {
             background-color: $surface0;
-            border-color: rgba($subtext0, 0.18);
+            border-color: ca(base04, 0.18);
         }
     }
 
@@ -1495,12 +1524,12 @@ window.launcher {
     background-color: transparent;
 
     .sc-backdrop {
-        background-color: rgba($base-dark, 0.55);
+        background-color: ca(base00, 0.55);
     }
 
     .sc-modal {
         background-color: $base-dark;
-        border: 1px solid rgba($subtext0, 0.18);
+        border: 1px solid ca(base04, 0.18);
         border-radius: 18px;
         padding: 24px 28px;
         min-width: 720px;
@@ -1551,7 +1580,7 @@ window.launcher {
             .sc-key {
                 background-color: $surface0;
                 color: $fg2;
-                border: 1px solid rgba($subtext0, 0.18);
+                border: 1px solid ca(base04, 0.18);
                 border-radius: 6px;
                 padding: 1px 8px;
                 margin-left: 6px;
@@ -1560,4 +1589,408 @@ window.launcher {
             }
         }
     }
+}
+
+// ── Soltty time-tracker overlay ─────────────────────────────────────────────
+// Warm dark theme from the design handoff; reuses the shell's Nerd Font.
+// (GTK CSS has no backdrop-filter, so the panel is a solid translucent fill.)
+$so-panel: ca(base00, 0.96);
+$so-field: c(base01);
+$so-field-hi: c(base02);
+$so-menu: c(base01);
+$so-amber: c(accent);
+$so-amber-br: c(base0A);
+$so-green: c(base0B);
+$so-green-tx: c(base0B);
+$so-red: c(base08);
+$so-red-tx: c(base08);
+$so-t1: c(base05);
+$so-t2: c(base04);
+$so-t3: c(base04);
+$so-t4: c(base03);
+$so-t5: c(base03);
+$so-line: ca(base05, 0.08);
+
+@keyframes soltty-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+
+window.soltty {
+    background-color: transparent;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    color: $so-t1;
+
+    .soltty-backdrop {
+        background-color: ca(base00, 0.5);
+    }
+
+    .soltty-card {
+        min-width: 540px;
+        background-color: $so-panel;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 18px;
+        padding: 22px 24px 20px;
+        box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.75);
+    }
+
+    // Header
+    .soltty-header {
+        margin-bottom: 18px;
+    }
+
+    .soltty-logo {
+        min-width: 22px;
+        min-height: 22px;
+        background-color: $so-amber;
+        color: c(base00);
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 13px;
+        margin-right: 11px;
+    }
+
+    .soltty-word {
+        color: $so-t1;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.3px;
+    }
+
+    .soltty-conn-dot {
+        min-width: 6px;
+        min-height: 6px;
+        border-radius: 50%;
+
+        &.ok {
+            background-color: $so-green;
+        }
+
+        &.bad {
+            background-color: $so-red;
+        }
+    }
+
+    .soltty-conn-text {
+        color: $so-t3;
+        font-size: 12px;
+        margin-left: 8px;
+    }
+
+    // Section headers
+    .soltty-sec {
+        margin-bottom: 12px;
+    }
+
+    .soltty-sec-label {
+        color: $so-amber;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        margin-right: 10px;
+    }
+
+    .soltty-sec-rule {
+        min-height: 1px;
+        background-color: ca(accent, 0.18);
+    }
+
+    .soltty-sec-caption {
+        color: $so-t5;
+        font-size: 11px;
+        margin-left: 10px;
+    }
+
+    // Timer status block
+    .soltty-status {
+        padding: 14px 16px;
+        border-radius: 13px;
+        margin-bottom: 18px;
+        border: 1px solid transparent;
+
+        .soltty-status-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: $so-t3;
+        }
+
+        .soltty-status-sub {
+            font-size: 11px;
+            color: $so-t4;
+        }
+
+        &.idle {
+            background-color: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        &.running {
+            background-color: ca(base0B, 0.08);
+            border-color: ca(base0B, 0.3);
+
+            .soltty-status-label {
+                color: $so-green-tx;
+            }
+        }
+    }
+
+    .soltty-status-dot {
+        min-width: 10px;
+        min-height: 10px;
+        border-radius: 50%;
+        margin-right: 12px;
+        background-color: c(base03);
+
+        &.running {
+            background-color: $so-green;
+            box-shadow: 0 0 12px ca(base0B, 0.6);
+            animation: soltty-pulse 1.6s ease-in-out infinite;
+        }
+    }
+
+    .soltty-elapsed {
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: c(base03);
+
+        &.running {
+            color: $so-amber-br;
+        }
+    }
+
+    // Fields
+    .soltty-flabel {
+        color: $so-t3;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        margin-bottom: 7px;
+        margin-top: 4px;
+    }
+
+    .soltty-input {
+        min-height: 44px;
+        padding: 0 14px;
+        margin-bottom: 16px;
+        background-color: $so-field;
+        color: $so-t1;
+        border: 1px solid $so-line;
+        border-radius: 11px;
+        font-size: 14px;
+
+        &:focus {
+            border-color: ca(accent, 0.55);
+            background-color: $so-field-hi;
+        }
+    }
+
+    // Project selector
+    .soltty-proj-field {
+        margin-bottom: 20px;
+    }
+
+    .soltty-proj-trigger {
+        min-height: 44px;
+        padding: 0 14px;
+        background-color: $so-field;
+        border: 1px solid $so-line;
+        border-radius: 11px;
+
+        &:hover {
+            background-color: $so-field-hi;
+        }
+    }
+
+    .soltty-proj-panel {
+        margin-top: 6px;
+        padding: 6px;
+        background-color: $so-menu;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+    }
+
+    .soltty-proj-search {
+        min-height: 34px;
+        padding: 0 10px;
+        margin-bottom: 6px;
+        background-color: $so-field;
+        color: $so-t1;
+        border: 1px solid $so-line;
+        border-radius: 8px;
+        font-size: 13px;
+
+        &:focus {
+            border-color: ca(accent, 0.55);
+            background-color: $so-field-hi;
+        }
+    }
+
+    .soltty-proj-name {
+        color: $so-t1;
+        font-size: 14px;
+    }
+
+    .soltty-proj-caret {
+        color: $so-t3;
+        font-size: 13px;
+    }
+
+    .soltty-dot {
+        min-width: 9px;
+        min-height: 9px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    // Actions
+    .soltty-actions {
+        margin-bottom: 20px;
+    }
+
+    .soltty-primary {
+        padding: 13px;
+        border-radius: 12px;
+        margin-right: 10px;
+
+        &.start {
+            background-color: ca(base0B, 0.16);
+            border: 1px solid ca(base0B, 0.5);
+            color: $so-green-tx;
+
+            &:hover {
+                background-color: ca(base0B, 0.24);
+            }
+        }
+
+        &.stop {
+            background-color: ca(base08, 0.14);
+            border: 1px solid ca(base08, 0.5);
+            color: $so-red-tx;
+
+            &:hover {
+                background-color: ca(base08, 0.22);
+            }
+        }
+    }
+
+    .soltty-primary-glyph {
+        font-size: 13px;
+        margin-right: 9px;
+    }
+
+    .soltty-primary-label {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .soltty-key {
+        min-height: 26px;
+        padding: 0 9px;
+        border-radius: 7px;
+        background-color: c(base01);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: c(base04);
+        font-size: 12px;
+        margin-left: 5px;
+    }
+
+    // Recent
+    .soltty-recent-row {
+        padding: 7px 6px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .soltty-recent-start {
+        color: $so-t4;
+        margin-right: 10px;
+    }
+
+    .soltty-recent-dur {
+        color: $so-t3;
+        min-width: 52px;
+        margin-right: 10px;
+    }
+
+    .soltty-recent-desc {
+        color: $so-t2;
+        margin-right: 10px;
+    }
+
+    .soltty-recent-id {
+        color: $so-t5;
+        font-size: 11px;
+    }
+}
+
+// Inline project dropdown list (rendered inside the card, not a popover, so it
+// works under the overlay's exclusive keyboard grab).
+.soltty-menu {
+    min-width: 260px;
+
+    .soltty-menu-item {
+        padding: 9px 10px;
+        border-radius: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    }
+
+    .soltty-dot {
+        min-width: 9px;
+        min-height: 9px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .soltty-menu-name {
+        color: $so-t2;
+        font-size: 13px;
+    }
+
+    .soltty-menu-client {
+        color: $so-t5;
+        font-size: 11px;
+        margin-left: 10px;
+    }
+}
+
+// Bar indicator button — match .island-sub metrics so the hover highlight is a
+// centered pill around the icon. island-btn alone has no min-height, so the
+// highlight hugged the glyph and sat off-centre.
+.soltty-bar-btn {
+    min-height: 34px;
+    padding: 0 8px;
+    border-radius: 10px;
+}
+
+.soltty-bar-icon {
+    font-size: 16px;
+    color: $w-accent;
+}
+
+.soltty-bar-btn.running .soltty-bar-icon {
+    color: $w-accent;
+}
+
+.soltty-bar-time {
+    font-size: 13px;
+    font-weight: 600;
+    color: $w-accent;
+    margin-left: 5px;
+    margin-right: 2px;
+    font-feature-settings: "tnum";
+}
+
+.soltty-bar-btn.running .soltty-bar-time {
+    color: $w-accent;
 }

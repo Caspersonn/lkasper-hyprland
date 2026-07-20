@@ -34,6 +34,68 @@
         inherit palette;
       };
 
+      # Wallpaper images exposed at a runtime path, so the picker + theme-switch
+      # can find them by slug (filename without extension).
+      wallpaperImages = builtins.filter (
+        n: lib.hasSuffix ".png" n || lib.hasSuffix ".jpg" n || lib.hasSuffix ".jpeg" n
+      ) (builtins.attrNames (builtins.readDir ../../wallpapers));
+      wallpaperFiles = builtins.listToAttrs (
+        map (f: {
+          name = ".local/share/lkasper-hyprland/wallpapers/${f}";
+          value = {
+            source = ../../wallpapers + "/${f}";
+          };
+        }) wallpaperImages
+      );
+
+      # Runtime wallpaper + theme switcher (invoked by the picker and a keybind).
+      # Sets the wallpaper, repoints the active-theme pointer (AGS watches it and
+      # recolours live), and recolours Hyprland borders from the new palette.
+      theme-switch = pkgs.writeShellApplication {
+        name = "theme-switch";
+        runtimeInputs = [
+          pkgs.jq
+          pkgs.coreutils
+        ];
+        text = ''
+          name="''${1:-}"
+          if [ -z "$name" ]; then
+            echo "usage: theme-switch <wallpaper>" >&2
+            exit 1
+          fi
+          share="$HOME/.local/share/lkasper-hyprland"
+          wp=""
+          for f in "$share/wallpapers/$name".*; do
+            if [ -e "$f" ]; then wp="$f"; break; fi
+          done
+          if [ -z "$wp" ]; then
+            echo "theme-switch: unknown wallpaper '$name'" >&2
+            exit 1
+          fi
+          pal="$share/themes/$name/colors.json"
+
+          # wallpaper (hyprpaper IPC)
+          hyprctl hyprpaper preload "$wp" >/dev/null 2>&1 || true
+          hyprctl hyprpaper wallpaper ",$wp" >/dev/null 2>&1 || true
+
+          # active-theme pointer -> AGS recolours via its file monitor
+          mkdir -p "$HOME/.config/lkasper-hyprland/current"
+          printf '%s\n' "$name" > "$HOME/.config/lkasper-hyprland/current/theme.name"
+
+          # Hyprland borders from the new palette (active = wallpaper accent)
+          if [ -f "$pal" ]; then
+            ab="$(jq -r '.accent // .base0D // empty' "$pal")"
+            ib="$(jq -r '.base09 // empty' "$pal")"
+            if [ -n "$ab" ]; then
+              hyprctl keyword general:col.active_border "rgba(''${ab}ee)" >/dev/null 2>&1 || true
+            fi
+            if [ -n "$ib" ]; then
+              hyprctl keyword general:col.inactive_border "rgba(''${ib}aa)" >/dev/null 2>&1 || true
+            fi
+          fi
+        '';
+      };
+
       runtimeThemeFiles = builtins.foldl' (
         acc: name:
         let
@@ -46,7 +108,19 @@
             // {
               background = "#${palette.base00}";
               foreground = "#${palette.base05}";
-              accent = "#${palette.base0D}";
+              # Wallpaper-derived accent (bare hex), decoupled from the fixed
+              # ANSI base0D so the bar/borders visibly track the wallpaper.
+              accent = palette.accent or palette.base0D;
+              # Fully wallpaper-driven AGS UI: replace the ANSI-anchored accent
+              # slots (identical across wallpapers) with the per-wallpaper accent
+              # triple. Only colors.json (read by AGS) is remapped; the terminal
+              # keeps faithful base16 via colorScheme, so red=red etc. in shells.
+              base0A = palette.accent2 or palette.base0A;
+              base0B = palette.accent3 or palette.base0B;
+              base0C = palette.accent2 or palette.base0C;
+              base0D = palette.accent or palette.base0D;
+              base0E = palette.accent3 or palette.base0E;
+              base0F = palette.accent or palette.base0F;
             }
           );
         }
@@ -68,7 +142,10 @@
           };
         };
 
-        home.packages = [ pkgs.libadwaita ];
+        home.packages = [
+          pkgs.libadwaita
+          theme-switch
+        ];
 
         home.file = {
           ".config/opencode/themes/opencode.json".text = ''
@@ -128,14 +205,18 @@
               }
             }
           '';
-          ".config/lkasper-hyprland/current/theme.name".text = ''
-            wood-dark
-          '';
         }
-        // runtimeThemeFiles;
+        // runtimeThemeFiles
+        // wallpaperFiles;
 
         home.activation.writeThemeDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
           mkdir -p "$HOME/.config/lkasper-hyprland/current"
+
+          # Writable default (not a read-only symlink) so theme-switch can
+          # repoint it at runtime; AGS watches it and recolours live.
+          if [ ! -f "$HOME/.config/lkasper-hyprland/current/theme.name" ]; then
+            echo "wood-dark" > "$HOME/.config/lkasper-hyprland/current/theme.name"
+          fi
           mkdir -p "$HOME/.config/hypr"
           mkdir -p "$HOME/.config/btop/themes"
           mkdir -p "$HOME/.config/ghostty/themes"
@@ -143,12 +224,12 @@
           if [ ! -f "$HOME/.config/hypr/theme.conf" ]; then
             cat > "$HOME/.config/hypr/theme.conf" << 'HYPREOF'
           general {
-            col.active_border = rgba(${config.colorScheme.palette.base0D}aa)
+            col.active_border = rgba(${config.colorScheme.palette.accent or config.colorScheme.palette.base0D}aa)
             col.inactive_border = rgba(${config.colorScheme.palette.base09}aa)
           }
 
           group {
-            col.border_active = rgba(${config.colorScheme.palette.base0D}aa)
+            col.border_active = rgba(${config.colorScheme.palette.accent or config.colorScheme.palette.base0D}aa)
             col.border_inactive = rgba(${config.colorScheme.palette.base09}aa)
           }
           HYPREOF

@@ -1,15 +1,19 @@
 import Pango from "gi://Pango"
 import AstalNotifd from "gi://AstalNotifd"
+import AstalHyprland from "gi://AstalHyprland"
 import { For, createBinding, createComputed } from "ags"
 import { Gtk } from "ags/gtk4"
 import { glyph } from "../bar/glyphs"
 
 let notifd: AstalNotifd.Notifd
+let hypr: AstalHyprland.Hyprland
 const restoredIds = new Set<number>()
-const popovers: Gtk.Popover[] = []
+// One popover per monitor, keyed by connector (== Hyprland monitor name).
+const popovers = new Map<string, Gtk.Popover>()
 
 export function initCenter() {
     notifd = AstalNotifd.get_default()
+    hypr = AstalHyprland.get_default()
     for (const n of notifd.get_notifications()) restoredIds.add(n.id)
 }
 
@@ -18,10 +22,18 @@ export function toggleDnd() {
 }
 
 export function toggleCenter() {
-    const pop = popovers[0]
+    // Open on the focused monitor's bar, not always the first one.
+    const focused = hypr?.focusedMonitor?.name
+    const pop =
+        (focused ? popovers.get(focused) : undefined) ?? popovers.values().next().value
     if (!pop) return
-    if (pop.get_visible()) pop.popdown()
-    else pop.popup()
+    if (pop.get_visible()) {
+        pop.popdown()
+        return
+    }
+    // Don't leave another monitor's centre open behind this one.
+    for (const p of popovers.values()) if (p !== pop && p.get_visible()) p.popdown()
+    pop.popup()
 }
 
 function relTime(unixSeconds: number): string {
@@ -82,7 +94,7 @@ function HistoryCard(n: AstalNotifd.Notification) {
     </box>
 }
 
-export function NotificationPopover(): Gtk.Popover {
+export function NotificationPopover(connector: string): Gtk.Popover {
     const notifications = createBinding(notifd, "notifications")
     const sorted = createComputed(() => [...notifications()].sort((a, b) => b.time - a.time))
     const isEmpty = createComputed(() => notifications().length === 0)
@@ -102,7 +114,12 @@ export function NotificationPopover(): Gtk.Popover {
             </box>
             <Gtk.ScrolledWindow
                 class="np-scroll"
-                vexpand
+                // Grow to fit the cards, but floor so it isn't tiny and cap so a
+                // long list scrolls instead of running off-screen. (A bare
+                // ScrolledWindow in a popover collapses to ~1 card.)
+                propagateNaturalHeight
+                minContentHeight={140}
+                maxContentHeight={520}
                 hscrollbarPolicy={Gtk.PolicyType.NEVER}
                 visible={hasItems}
             >
@@ -119,6 +136,6 @@ export function NotificationPopover(): Gtk.Popover {
     pop.set_has_arrow(false)
     pop.add_css_class("popover-wrap")
     pop.set_child(content)
-    popovers.push(pop)
+    popovers.set(connector, pop)
     return pop
 }

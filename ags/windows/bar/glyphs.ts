@@ -10,6 +10,8 @@ export const glyph = {
     skipNext: "\u{f04ad}",
     play: "\u{f040a}",
     pause: "\u{f03e4}",
+    stop: "\u{f04db}",
+    clock: "\u{f0150}",
     repeat: "\u{f0456}",
     cpu: "\u{f0ee0}",
     memory: "\u{f035b}",

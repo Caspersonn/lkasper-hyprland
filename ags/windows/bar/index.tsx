@@ -15,6 +15,7 @@ import Tray from "./tray"
 import QuickControls from "./quick-controls"
 import NotificationBell from "./notifications"
 import PowerButton from "./power"
+import { SolttyIndicator } from "./../soltty"
 
 function Divider({ wide = false }: { wide?: boolean }) {
     return <box class={wide ? "island-divider wide" : "island-divider"} valign={Gtk.Align.CENTER} />
@@ -29,6 +30,9 @@ function Bar(gdkmonitor: Gdk.Monitor, name: string) {
         class="bar"
         anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}
         exclusivity={Astal.Exclusivity.EXCLUSIVE}
+        marginTop={8}
+        marginLeft={8}
+        marginRight={8}
         visible
     >
         <centerbox class="bar-inner">
@@ -46,17 +50,17 @@ function Bar(gdkmonitor: Gdk.Monitor, name: string) {
             </box>
             <box $type="end">
                 <box class="island right-island">
-                    <Media />
-                    <Divider />
                     <Weather />
                     <Divider />
                     <SystemStats />
+                    <Divider />
+                    <SolttyIndicator />
                     <Divider />
                     <Tray />
                     <Divider />
                     <QuickControls />
                     <Divider wide />
-                    <NotificationBell />
+                    <NotificationBell connector={gdkmonitor.get_connector() ?? "unknown"} />
                     <Divider />
                     <PowerButton />
                 </box>

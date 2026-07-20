@@ -5,6 +5,7 @@ import AstalHyprland from "gi://AstalHyprland"
 import App from "ags/gtk4/app"
 import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
+import { execAsync } from "ags/process"
 
 interface LauncherItem {
     key: string

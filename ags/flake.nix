@@ -84,7 +84,7 @@
             buildInputs = [
               pkgs.pnpm
               (inputs.ags.packages.${system}.default.override {
-                extraPackages = [ ];
+                extraPackages = [ inputs.astal.packages.${pkgs.system}.apps ];
               })
             ];
           };

@@ -14,5 +14,8 @@
   "base0C": "00B7BF",
   "base0D": "3A7DCE",
   "base0E": "CE3A91",
-  "base0F": "FF0096"
+  "base0F": "FF0096",
+  "accent": "FF614B",
+  "accent2": "683ACC",
+  "accent3": "F5AEE1"
 }

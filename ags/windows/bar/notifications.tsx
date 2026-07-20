@@ -4,11 +4,11 @@ import { Gtk } from "ags/gtk4"
 import { NotificationPopover } from "../notifications/center"
 import { glyph } from "./glyphs"
 
-export default function NotificationBell() {
+export default function NotificationBell({ connector }: { connector: string }) {
     const notifd = AstalNotifd.get_default()
     const dnd = createBinding(notifd, "dontDisturb")
     const count = createBinding(notifd, "notifications").as(n => n.length)
-    const pop = NotificationPopover()
+    const pop = NotificationPopover(connector)
     return <button
         class="notifications island-sub"
         onClicked={() => (pop.get_visible() ? pop.popdown() : pop.popup())}

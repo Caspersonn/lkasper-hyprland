@@ -34,6 +34,9 @@
       "stay_focused on, match:title ^(yazi)$"
     ];
 
-    layerrule = [ "blur on, match:namespace wofi" ];
+    layerrule = [
+      "blur on, match:namespace wofi"
+      "blur on, match:namespace bar"
+    ];
   };
 }

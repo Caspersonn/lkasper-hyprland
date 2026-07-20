@@ -12,6 +12,7 @@ For every implemented change, link the corrosponding openspec change to the bean
 ## JJ
 Use `jj` for commiting changes
 Please don't use git directly
+Never commit changes under claude ONLY ON THE USER
 
 ## TypeScript Standards
 - Target: ES2022, strict mode enabled

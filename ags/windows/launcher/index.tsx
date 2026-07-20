@@ -67,11 +67,27 @@ function close() {
     setVisible(false)
 }
 
+// Launch an app detached from the AGS shell. A plain Gio launch (app.launch())
+// spawns the app inside the shell service's systemd cgroup, so it gets killed
+// when the bar restarts/crashes. Instead dispatch through Hyprland (over its IPC
+// socket, independent of the shell service's stripped PATH) and start it with
+// `uwsm app`, which places the app in its own systemd scope.
+function launchApp(app: AstalApps.Application): void {
+    const entry = app.get_entry()
+    if (entry) {
+        hypr.dispatch("exec", `uwsm app -- ${entry}`)
+        // Preserve the frequency ranking that app.launch() would have bumped.
+        app.frequency += 1
+    } else {
+        app.launch()
+    }
+}
+
 function launchSelected() {
     const items = results()
     const item = items.find((it) => it.key === selectedKey()) ?? items[0]
     if (!item) return
-    item.app.launch()
+    launchApp(item.app)
     close()
 }
 
@@ -253,7 +269,7 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
                                     <button
                                         cssClasses={rowClasses}
                                         onClicked={() => {
-                                            item.app.launch()
+                                            launchApp(item.app)
                                             close()
                                         }}
                                         $={(self) => {

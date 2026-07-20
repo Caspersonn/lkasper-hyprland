@@ -100,14 +100,31 @@ function hhmm(s: string): string {
     return s.slice(0, 5)
 }
 
-function fmtDur(raw: unknown): string {
-    if (typeof raw === "string") return raw
-    if (typeof raw === "number") {
-        const h = Math.floor(raw / 3600)
-        const m = Math.floor((raw % 3600) / 60)
-        return `${h}h ${String(m).padStart(2, "0")}m`
+// Duration in seconds for a list entry. soltty reports duration=0 (end=null)
+// for the still-running entry, so fall back to start->end, or start->now while
+// it's still running, so every recent row shows a real duration.
+function entrySeconds(e: any): number {
+    const raw = e?.duration ?? e?.dur ?? e?.elapsed
+    if (typeof raw === "number" && raw > 0) return raw
+    if (typeof raw === "string") {
+        const n = Number(raw)
+        if (Number.isFinite(n) && n > 0) return n
     }
-    return ""
+    const start = Date.parse(pickStr(e, ["start_time", "start", "started_at"]))
+    if (Number.isNaN(start)) return 0
+    const endStr = pickStr(e, ["end_time", "end", "ended_at", "stop"])
+    const end = endStr ? Date.parse(endStr) : Date.now()
+    if (Number.isNaN(end) || end <= start) return 0
+    return Math.floor((end - start) / 1000)
+}
+
+function fmtDur(sec: number): string {
+    if (!Number.isFinite(sec) || sec <= 0) return "–"
+    const h = Math.floor(sec / 3600)
+    const m = Math.floor((sec % 3600) / 60)
+    if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m`
+    if (m > 0) return `${m}m`
+    return "<1m"
 }
 
 // ---- refreshers -----------------------------------------------------------
@@ -177,7 +194,7 @@ export async function refreshRecent(): Promise<void> {
                     // Non-empty + unique: <For> dedupes rows by id.
                     id: rawId ? rawId.slice(0, 8) : `e${i}`,
                     start: hhmm(pickStr(e, ["start_time", "start", "started_at"])),
-                    dur: fmtDur(e?.duration ?? e?.dur ?? e?.elapsed),
+                    dur: fmtDur(entrySeconds(e)),
                     color: pickStr(e, ["color", "colour"]) || byName.get(proj) || dotColor(proj, i),
                     desc: pickStr(e, ["description", "desc"], "(no description)"),
                 }

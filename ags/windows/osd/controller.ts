@@ -71,8 +71,6 @@ function present(v: OsdView) {
     armTimer()
 }
 
-// --- Volume trigger (reactive on WirePlumber) -----------------------------
-
 const wp = AstalWp.get_default()
 
 function speakerData(speaker: AstalWp.Endpoint): VolumeData {
@@ -98,8 +96,6 @@ function watchDefaultSpeaker() {
         present("volume")
     })
 }
-
-// --- Media trigger (IPC-driven, per-action icons) -------------------------
 
 const mpris = AstalMpris.get_default()
 const PLAYING = AstalMpris.PlaybackStatus.PLAYING

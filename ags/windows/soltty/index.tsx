@@ -21,8 +21,6 @@ import {
 
 const hypr = AstalHyprland.get_default()
 
-// ---- overlay + form state (module-level, like the launcher) ---------------
-
 const [visible, setVisible] = createState(false)
 const [connector, setConnector] = createState<string | null>(null)
 const [desc, setDesc] = createState("")
@@ -30,11 +28,9 @@ const [selectedProject, setSelectedProject] = createState<string | null>(null)
 const [projectMenuOpen, setProjectMenuOpen] = createState(false)
 const [projectQuery, setProjectQuery] = createState("")
 
-// Per-monitor entry widgets (text is driven imperatively, like the launcher).
 const descEntries = new Map<string, Gtk.Entry>()
 const searchEntries = new Map<string, Gtk.Entry>()
 
-// Projects filtered by the inline search box (case-insensitive substring).
 const filteredProjects = createComputed(
     [solttyState.projects, projectQuery],
     (list, q) => {
@@ -48,8 +44,6 @@ const filteredProjects = createComputed(
     },
 )
 
-// Elapsed seconds derived from the service's startedAt + 1s tick, formatted
-// HH:MM:SS. Stays correct even if the timer was started elsewhere.
 const elapsedText = createComputed(
     [solttyState.running, solttyState.startedAt, solttyState.tick],
     (running, started) => {
@@ -62,16 +56,11 @@ const elapsedText = createComputed(
     },
 )
 
-// ---- helpers --------------------------------------------------------------
-
-// GTK4 has no inline styles; paint a project color dot via a per-widget
-// CssProvider. Returns the provider so reactive dots can re-load on change.
 function paintDot(w: Gtk.Widget, color: string): Gtk.CssProvider {
     const p = new Gtk.CssProvider()
     try {
         p.load_from_string(`* { background-color: ${color}; }`)
     } catch {
-        // Older GTK binding without load_from_string: dot stays unpainted.
     }
     w.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     return p
@@ -81,7 +70,6 @@ function repaintDot(p: Gtk.CssProvider, color: string): void {
     try {
         p.load_from_string(`* { background-color: ${color}; }`)
     } catch {
-        // no-op
     }
 }
 
@@ -93,7 +81,6 @@ function focusWidget(map: Map<string, Gtk.Entry>, name: string | null): void {
     })
 }
 
-// Set both the description state and the (uncontrolled) entry widget's text.
 function applyDesc(name: string | null, text: string): void {
     setDesc(text)
     const e = name ? descEntries.get(name) : null
@@ -113,8 +100,6 @@ function primaryAction(): void {
         startTimer(desc(), selectedProject())
     }
 }
-
-// ---- inline project dropdown ----------------------------------------------
 
 function openProjectMenu(name: string | null): void {
     setProjectQuery("")
@@ -140,7 +125,6 @@ function toggleProjectMenu(name: string | null): void {
 function pickProject(name: string | null, projName: string): void {
     setSelectedProject(projName)
     closeProjectMenu(name)
-    // Live-update the running entry's project immediately.
     updateRunningProject(projName)
 }
 
@@ -160,9 +144,6 @@ export function toggleSoltty(): void {
     setConnector(name)
     setProjectMenuOpen(false)
     setProjectQuery("")
-    // Prefill from the currently running timer (issue: reopening should show
-    // the running description). Use known state immediately, then top up once
-    // a fresh poll lands — but never clobber what the user has started typing.
     const initDesc = solttyState.running() ? solttyState.runningDesc() : ""
     applyDesc(name, initDesc)
     if (solttyState.running()) setSelectedProject(solttyState.runningProject())
@@ -177,8 +158,6 @@ export function toggleSoltty(): void {
         }
     })
 }
-
-// ---- overlay window (one per monitor) -------------------------------------
 
 function SolttyWindow(gdkmonitor: Gdk.Monitor) {
     const myConnector = gdkmonitor.get_connector() ?? "unknown"
@@ -228,9 +207,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
     const primaryGlyph = createComputed([solttyState.running], (r) => (r ? glyph.stop : glyph.play))
     const actionKey = createComputed([solttyState.running], (r) => (r ? "S" : "Enter"))
 
-    // CAPTURE-phase keys: Enter runs the primary action (or picks the first
-    // filtered project when the dropdown is open); Escape closes the dropdown
-    // if open, else the overlay.
     const keys = new Gtk.EventControllerKey()
     keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
     keys.connect("key-pressed", (_c, keyval) => {
@@ -296,7 +272,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                 widthRequest={540}
                 $={(self) => (modalBox = self)}
             >
-                {/* Header */}
                 <box class="soltty-header" valign={Gtk.Align.CENTER}>
                     <label class="soltty-logo" label="s" valign={Gtk.Align.CENTER} />
                     <label class="soltty-word" label="soltty" valign={Gtk.Align.CENTER} />
@@ -307,7 +282,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     </box>
                 </box>
 
-                {/* Timer section */}
                 <box class="soltty-sec" valign={Gtk.Align.CENTER}>
                     <label class="soltty-sec-label" label="TIMER" />
                     <box class="soltty-sec-rule" hexpand valign={Gtk.Align.CENTER} />
@@ -324,7 +298,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     <label cssClasses={elapsedClasses} label={elapsedText} valign={Gtk.Align.CENTER} />
                 </box>
 
-                {/* Description */}
                 <label class="soltty-flabel" xalign={0} label="DESCRIPTION" />
                 <entry
                     class="soltty-input"
@@ -334,7 +307,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                         let debounce = 0
                         self.connect("notify::text", () => {
                             setDesc(self.text)
-                            // Live-update the running entry after a short pause.
                             if (debounce) GLib.source_remove(debounce)
                             debounce = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 600, () => {
                                 debounce = 0
@@ -345,7 +317,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     }}
                 />
 
-                {/* Project (inline searchable dropdown) */}
                 <box class="soltty-proj-field" orientation={Gtk.Orientation.VERTICAL}>
                     <label class="soltty-flabel" xalign={0} label="PROJECT" />
                     <button
@@ -404,7 +375,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     </box>
                 </box>
 
-                {/* Actions */}
                 <box class="soltty-actions" valign={Gtk.Align.CENTER}>
                     <button
                         cssClasses={primaryClasses}
@@ -422,7 +392,6 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     </box>
                 </box>
 
-                {/* Recent */}
                 <box class="soltty-sec" valign={Gtk.Align.CENTER}>
                     <label class="soltty-sec-label" label="RECENT" />
                     <box class="soltty-sec-rule" hexpand valign={Gtk.Align.CENTER} />
@@ -446,19 +415,15 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
     </window>
 }
 
-// ---- bar indicator button -------------------------------------------------
-
 export function SolttyIndicator() {
     const cls = createComputed([solttyState.running], (r) =>
         r ? ["soltty-bar-btn", "island-btn", "running"] : ["soltty-bar-btn", "island-btn"],
     )
-    // Play/stop glyph tracks the timer state (running vs stopped).
     const icon = createComputed([solttyState.running], (r) => (r ? "󱫡" : "󱫟"))
     return (
         <button cssClasses={cls} onClicked={() => execAsync(["ags", "request", "toggle-soltty"])}>
             <box valign={Gtk.Align.CENTER}>
                 <label class="soltty-bar-icon" valign={Gtk.Align.CENTER} label={icon} />
-                {/* Always show the elapsed time (00:00:00 when idle). */}
                 <label class="soltty-bar-time" valign={Gtk.Align.CENTER} label={elapsedText} />
             </box>
         </button>

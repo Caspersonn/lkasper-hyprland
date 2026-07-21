@@ -16,7 +16,6 @@ type WeatherData = {
     hourly: Array<{ time: string; temp: string; code: number }>
 }
 
-// The wttr.in hourly slots we read (3-hourly steps in `weather[0].hourly`).
 type WttrHour = { time: string; tempC: string; weatherCode: string }
 
 function codeToGlyph(code: number): string {
@@ -73,7 +72,6 @@ const raw = createPoll("", 15 * 60 * 1000, async (prev: string) => {
 
 const data = createComputed([raw], (r) => parse(r))
 
-// Shared between the bar button and the popover header.
 const icon = data((d) => (d ? codeToGlyph(d.code) : glyph.weatherPartlyCloudy))
 const temp = data((d) => (d ? `${d.temp}°` : "—"))
 

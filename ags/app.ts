@@ -13,8 +13,6 @@ import { initWallpaperPicker, toggleWallpaperPicker } from "./windows/wallpaper-
 import { themedCss, watchTheme } from "./theme"
 
 App.start({
-    // Full themed stylesheet (wallpaper palette @define-colors + rules); rebuilt
-    // live on a wallpaper switch by watchTheme().
     css: themedCss(),
     requestHandler(argv, res) {
         if (argv.includes("toggle-bars")) {

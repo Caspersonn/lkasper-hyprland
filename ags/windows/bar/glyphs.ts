@@ -60,7 +60,6 @@ export const glyph = {
     weatherLightning: "\u{f0593}",
 }
 
-// Volume glyph for a mute state + 0..1 level (bar + control-center slider).
 export function volumeGlyph(mute: boolean, vol: number): string {
     if (mute) return glyph.volumeMute
     if (vol > 0.55) return glyph.volumeHigh

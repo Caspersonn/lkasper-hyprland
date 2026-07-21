@@ -22,8 +22,6 @@ const [pConnector, setPConnector] = createState<string | null>(null)
 const [selectedSlug, setSelectedSlug] = createState("")
 const [activeSlug, setActiveSlug] = createState("")
 
-// Available wallpapers (those shipped with a committed palette) are fixed per
-// build, so list them once from the runtime wallpaper dir.
 function listWallpapers(): Wallpaper[] {
     const out: Wallpaper[] = []
     try {
@@ -35,7 +33,6 @@ function listWallpapers(): Wallpaper[] {
         }
         dir.close()
     } catch {
-        // dir missing -> no wallpapers
     }
     return out.sort((a, b) => a.slug.localeCompare(b.slug))
 }
@@ -68,8 +65,6 @@ function move(delta: number) {
     setSelectedSlug(WALLPAPERS[next].slug)
 }
 
-// Switch wallpaper and close. theme-switch is on the user PATH, but the shell
-// service PATH is stripped, so dispatch it through Hyprland (session PATH).
 function selectSlug(slug: string) {
     if (slug) hypr.dispatch("exec", `theme-switch ${slug}`)
     close()
@@ -90,7 +85,6 @@ export function toggleWallpaperPicker() {
     setPVisible(true)
 }
 
-// A Picture inside an overflow-clipped box gives a rounded, cover-fit thumbnail.
 function paintThumb(self: Gtk.Box, path: string) {
     self.set_overflow(Gtk.Overflow.HIDDEN)
     const pic = Gtk.Picture.new_for_filename(path)
@@ -137,7 +131,6 @@ function PickerWindow(gdkmonitor: Gdk.Monitor) {
     let modalBox: Gtk.Widget | null = null
     let backdropBox: Gtk.Widget | null = null
 
-    // Arrow keys navigate the grid; Enter switches; Escape dismisses.
     const keys = new Gtk.EventControllerKey()
     keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
     keys.connect("key-pressed", (_c, keyval) => {
@@ -165,7 +158,6 @@ function PickerWindow(gdkmonitor: Gdk.Monitor) {
         return false
     })
 
-    // Close only when the press lands outside the modal card.
     const backdropClick = new Gtk.GestureClick()
     backdropClick.connect("pressed", (_g, _n, x, y) => {
         const picked = backdropBox?.pick(x, y, Gtk.PickFlags.DEFAULT) ?? null

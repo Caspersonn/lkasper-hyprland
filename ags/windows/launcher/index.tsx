@@ -19,9 +19,6 @@ interface LauncherItem {
 const [visible, setVisible] = createState(false)
 const [connector, setConnector] = createState<string | null>(null)
 const [query, setQuery] = createState("")
-// Selection is tracked by the item's stable key (app entry id), never by a
-// positional index: <For> reuses row widgets across query changes, so a
-// captured index goes stale and highlights the wrong row.
 const [selectedKey, setSelectedKey] = createState("")
 
 const hypr = AstalHyprland.get_default()
@@ -50,12 +47,10 @@ function queryApps(text: string): LauncherItem[] {
 const results = createComputed([query], queryApps)
 const emptyVisible = createComputed([results], (items) => items.length === 0)
 
-// Select the first result (top match), used on open and on every query change.
 function selectFirst() {
     setSelectedKey(results()[0]?.key ?? "")
 }
 
-// Move selection by `delta` within the current (fresh) result ordering.
 function move(delta: number) {
     const items = results()
     if (items.length === 0) return
@@ -69,16 +64,10 @@ function close() {
     setVisible(false)
 }
 
-// Launch an app detached from the AGS shell. A plain Gio launch (app.launch())
-// spawns the app inside the shell service's systemd cgroup, so it gets killed
-// when the bar restarts/crashes. Instead dispatch through Hyprland (over its IPC
-// socket, independent of the shell service's stripped PATH) and start it with
-// `uwsm app`, which places the app in its own systemd scope.
 function launchApp(app: AstalApps.Application): void {
     const entry = app.get_entry()
     if (entry) {
         hypr.dispatch("exec", `uwsm app -- ${entry}`)
-        // Preserve the frequency ranking that app.launch() would have bumped.
         app.frequency += 1
     } else {
         app.launch()
@@ -125,7 +114,6 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
         () => visible() && connector() === myConnector,
     )
 
-    // Per-window widget refs (keyed by stable item key) for scroll-into-view.
     const rowWidgets = new Map<string, Gtk.Widget>()
     let scrolledWin: Gtk.ScrolledWindow | null = null
     let modalBox: Gtk.Widget | null = null
@@ -148,9 +136,6 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
     }
     selectedKey.subscribe(scrollToSelected)
 
-    // Keyboard handling lives on the window (CAPTURE phase) so Up/Down/Return/
-    // Escape are intercepted before the focused entry acts on them; other keys
-    // fall through to the entry for normal typing.
     const keys = new Gtk.EventControllerKey()
     keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
     keys.connect("key-pressed", (_c, keyval) => {
@@ -173,9 +158,6 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
         return false
     })
 
-    // Close only when the press lands outside the modal card. We pick the
-    // widget under the pointer instead of claiming the sequence, so row
-    // buttons keep receiving their own clicks.
     const backdropClick = new Gtk.GestureClick()
     backdropClick.connect("pressed", (_g, _n, x, y) => {
         const picked = backdropBox?.pick(x, y, Gtk.PickFlags.DEFAULT) ?? null

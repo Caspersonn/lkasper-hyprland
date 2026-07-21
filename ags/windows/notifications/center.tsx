@@ -9,7 +9,6 @@ import { styledPopover } from "../utils"
 let notifd: AstalNotifd.Notifd
 let hypr: AstalHyprland.Hyprland
 const restoredIds = new Set<number>()
-// One popover per monitor, keyed by connector (== Hyprland monitor name).
 const popovers = new Map<string, Gtk.Popover>()
 
 export function initCenter() {
@@ -23,7 +22,6 @@ export function toggleDnd() {
 }
 
 export function toggleCenter() {
-    // Open on the focused monitor's bar, not always the first one.
     const focused = hypr?.focusedMonitor?.name
     const pop =
         (focused ? popovers.get(focused) : undefined) ?? popovers.values().next().value
@@ -32,7 +30,6 @@ export function toggleCenter() {
         pop.popdown()
         return
     }
-    // Don't leave another monitor's centre open behind this one.
     for (const p of popovers.values()) if (p !== pop && p.get_visible()) p.popdown()
     pop.popup()
 }
@@ -115,9 +112,6 @@ export function NotificationPopover(connector: string): Gtk.Popover {
             </box>
             <Gtk.ScrolledWindow
                 class="np-scroll"
-                // Grow to fit the cards, but floor so it isn't tiny and cap so a
-                // long list scrolls instead of running off-screen. (A bare
-                // ScrolledWindow in a popover collapses to ~1 card.)
                 propagateNaturalHeight
                 minContentHeight={140}
                 maxContentHeight={520}

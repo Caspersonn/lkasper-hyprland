@@ -5,7 +5,6 @@ import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 
-// Raw shape returned by `hyprctl binds -j`.
 interface HyprBind {
     modmask: number
     key: string
@@ -37,7 +36,6 @@ const [columns, setColumns] = createState<Column[]>([])
 
 const hypr = AstalHyprland.get_default()
 
-// Modifier bitmask decode, rendered in this order.
 const MOD_CHIPS: [number, string][] = [
     [64, "Super"],
     [4, "Ctrl"],
@@ -45,7 +43,6 @@ const MOD_CHIPS: [number, string][] = [
     [1, "Shift"],
 ]
 
-// Raw keysym → display glyph. Single unmapped chars are upper-cased.
 const KEY_MAP: Record<string, string> = {
     slash: "/",
     Return: "⏎",
@@ -78,8 +75,6 @@ function parseDesc(desc: string): { group: string; label: string } {
     return { group: "Other", label: desc }
 }
 
-// Group described binds, collapsing runs of consecutive-digit binds that share
-// group + modmask + dispatcher + label into a single range row (e.g. `1 – 0`).
 function buildGroups(binds: HyprBind[]): Group[] {
     const described = binds.filter((b) => b.has_description && b.description)
 
@@ -143,7 +138,6 @@ function buildGroups(binds: HyprBind[]): Group[] {
     })
 }
 
-// Balance groups across N columns by cumulative row count.
 function toColumns(groups: Group[], n = 2): Column[] {
     const cols = Array.from({ length: n }, (_, i) => ({
         id: i,
@@ -196,8 +190,6 @@ function ShortcutsWindow(gdkmonitor: Gdk.Monitor) {
         return false
     })
 
-    // Click on the dimmed backdrop closes; clicks on the card are claimed so
-    // they never bubble up to this gesture.
     const backdropClick = new Gtk.GestureClick()
     backdropClick.connect("pressed", () => setVisible(false))
     const cardClick = new Gtk.GestureClick()

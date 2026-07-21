@@ -3,6 +3,7 @@ import { createComputed } from "ags"
 import { execAsync } from "ags/process"
 import { Gtk } from "ags/gtk4"
 import { glyph } from "./glyphs"
+import { styledPopover } from "../utils"
 
 type WeatherData = {
     temp: string
@@ -14,6 +15,9 @@ type WeatherData = {
     desc: string
     hourly: Array<{ time: string; temp: string; code: number }>
 }
+
+// The wttr.in hourly slots we read (3-hourly steps in `weather[0].hourly`).
+type WttrHour = { time: string; tempC: string; weatherCode: string }
 
 function codeToGlyph(code: number): string {
     if (code === 113) return glyph.weatherSunny
@@ -37,7 +41,7 @@ function parse(raw: string): WeatherData | null {
         const j = JSON.parse(raw)
         const cur = j.current_condition[0]
         const area = j.nearest_area[0]
-        const hours = j.weather[0].hourly as Array<any>
+        const hours = j.weather[0].hourly as WttrHour[]
         const picks = [2, 3, 4, 5, 6].map((i) => hours[i] ?? hours[hours.length - 1])
         return {
             temp: cur.temp_C,
@@ -69,11 +73,13 @@ const raw = createPoll("", 15 * 60 * 1000, async (prev: string) => {
 
 const data = createComputed([raw], (r) => parse(r))
 
+// Shared between the bar button and the popover header.
+const icon = data((d) => (d ? codeToGlyph(d.code) : glyph.weatherPartlyCloudy))
+const temp = data((d) => (d ? `${d.temp}°` : "—"))
+
 function WeatherPopover(): Gtk.Popover {
     const city = data((d) => d?.city ?? "—")
     const desc = data((d) => d?.desc ?? "")
-    const temp = data((d) => (d ? `${d.temp}°` : "—"))
-    const icon = data((d) => (d ? codeToGlyph(d.code) : glyph.weatherPartlyCloudy))
     const feels = data((d) => (d ? `${d.feels}°` : "—"))
     const humidity = data((d) => (d ? `${d.humidity}%` : "—"))
     const wind = data((d) => (d ? `${d.wind} km/h` : "—"))
@@ -123,17 +129,11 @@ function WeatherPopover(): Gtk.Popover {
         </box>
     ) as Gtk.Widget
 
-    const pop = new Gtk.Popover()
-    pop.set_has_arrow(false)
-    pop.add_css_class("popover-wrap")
-    pop.set_child(content)
-    return pop
+    return styledPopover(content)
 }
 
 export default function Weather() {
     const pop = WeatherPopover()
-    const icon = data((d) => (d ? codeToGlyph(d.code) : glyph.weatherPartlyCloudy))
-    const temp = data((d) => (d ? `${d.temp}°` : "—"))
     const city = data((d) => d?.city ?? "")
 
     return (

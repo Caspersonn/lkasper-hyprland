@@ -4,10 +4,11 @@ import App from "ags/gtk4/app"
 import AstalHyprland from "gi://AstalHyprland"
 import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
+import { isInside } from "../utils"
+import { CURRENT, read } from "../../theme"
 
 const HOME = GLib.get_home_dir()
 const WALLPAPER_DIR = `${HOME}/.local/share/lkasper-hyprland/wallpapers`
-const CURRENT = `${HOME}/.config/lkasper-hyprland/current/theme.name`
 const COLS = 3
 
 interface Wallpaper {
@@ -42,13 +43,7 @@ function listWallpapers(): Wallpaper[] {
 const WALLPAPERS = listWallpapers()
 
 function readActive(): string {
-    try {
-        const [ok, bytes] = GLib.file_get_contents(CURRENT)
-        if (ok) return new TextDecoder().decode(bytes).trim()
-    } catch {
-        // ignore
-    }
-    return ""
+    return (read(CURRENT) ?? "").trim()
 }
 
 function prettyName(slug: string): string {
@@ -93,15 +88,6 @@ export function toggleWallpaperPicker() {
     const fm = hypr.focusedMonitor
     setPConnector(fm ? fm.name : null)
     setPVisible(true)
-}
-
-function isInside(widget: Gtk.Widget | null, ancestor: Gtk.Widget | null): boolean {
-    let w = widget
-    while (w) {
-        if (w === ancestor) return true
-        w = w.get_parent()
-    }
-    return false
 }
 
 // A Picture inside an overflow-clipped box gives a rounded, cover-fit thumbnail.

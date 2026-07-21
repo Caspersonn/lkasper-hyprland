@@ -1,11 +1,11 @@
 ---
 # lkasper-hyprland-jjo9
 title: CleanUp all unnused in ags directory
-status: todo
+status: completed
 type: bug
 priority: critical
 created_at: 2026-06-26T12:40:43Z
-updated_at: 2026-06-26T12:45:47Z
+updated_at: 2026-07-21T11:51:32Z
 ---
 
 We should clean up the `ags/` directory of things that are not being used.

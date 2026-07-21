@@ -3,15 +3,8 @@ import AstalBattery from "gi://AstalBattery"
 import AstalNetwork from "gi://AstalNetwork"
 import AstalBluetooth from "gi://AstalBluetooth"
 import { createBinding, createComputed } from "ags"
-import { glyph } from "./glyphs"
+import { glyph, volumeGlyph } from "./glyphs"
 import ControlCenter, { batInfo } from "./control-center"
-
-function volGlyph(mute: boolean, vol: number): string {
-    if (mute) return glyph.volumeMute
-    if (vol > 0.55) return glyph.volumeHigh
-    if (vol > 0) return glyph.volumeMedium
-    return glyph.volumeLow
-}
 
 export default function QuickControls() {
     const pop = ControlCenter()
@@ -25,7 +18,7 @@ export default function QuickControls() {
     const volIcon = speaker
         ? createComputed(
               [createBinding(speaker, "mute"), createBinding(speaker, "volume")],
-              (m: boolean, v: number) => volGlyph(m, v),
+              (m: boolean, v: number) => volumeGlyph(m, v),
           )
         : null
 

@@ -2,6 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { createPoll } from "ags/time"
 import { glyph } from "./glyphs"
 import Calendar from "./calendar"
+import { pad } from "../utils"
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const MONTHS = [
@@ -18,8 +19,6 @@ const MONTHS = [
     "Nov",
     "Dec",
 ]
-
-const pad = (n: number) => String(n).padStart(2, "0")
 
 const timeLabel = createPoll("", 1000, () => {
     const now = new Date()

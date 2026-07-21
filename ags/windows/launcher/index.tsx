@@ -6,6 +6,8 @@ import App from "ags/gtk4/app"
 import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
+import { glyph } from "../bar/glyphs"
+import { isInside } from "../utils"
 
 interface LauncherItem {
     key: string
@@ -101,16 +103,6 @@ function focusEntry(name: string | null) {
         }
         return GLib.SOURCE_REMOVE
     })
-}
-
-// True if `widget` is `ancestor` or nested somewhere beneath it.
-function isInside(widget: Gtk.Widget | null, ancestor: Gtk.Widget | null): boolean {
-    let w = widget
-    while (w) {
-        if (w === ancestor) return true
-        w = w.get_parent()
-    }
-    return false
 }
 
 export function toggleLauncher() {
@@ -300,7 +292,7 @@ function LauncherWindow(gdkmonitor: Gdk.Monitor) {
 export function Launcher() {
     return (
         <button class="launcher island-btn" onClicked={() => execAsync(["ags", "request", "toggle-launcher"])}>
-            <label class="launcher-icon" halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} label={"\uf313"} />
+            <label class="launcher-icon" halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} label={glyph.nixos} />
         </button>
     )
 }
@@ -313,4 +305,3 @@ export function initLauncher() {
         </For>
     )
 }
-

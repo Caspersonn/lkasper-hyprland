@@ -1,6 +1,7 @@
 import { execAsync } from "ags/process"
 import { Gtk } from "ags/gtk4"
 import { glyph } from "./glyphs"
+import { styledPopover } from "../utils"
 
 type Action = { icon: string; cls: string; label: string; cmd: string[] }
 
@@ -13,9 +14,7 @@ const ACTIONS: Action[] = [
 ]
 
 function PowerMenu(): Gtk.Popover {
-    const pop = new Gtk.Popover()
-    pop.set_has_arrow(false)
-    pop.add_css_class("popover-wrap")
+    let pop!: Gtk.Popover
 
     const content = (
         <box class="power-menu" orientation={Gtk.Orientation.VERTICAL}>
@@ -36,7 +35,7 @@ function PowerMenu(): Gtk.Popover {
         </box>
     ) as Gtk.Widget
 
-    pop.set_child(content)
+    pop = styledPopover(content)
     return pop
 }
 

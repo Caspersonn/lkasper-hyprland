@@ -30,3 +30,8 @@ Never commit changes under claude ONLY ON THE USER
 - Validation: zod 3.x (always generate zod schemas alongside types)
 - HTTP client: ky (not axios or fetch directly)
 - Date handling: date-fns 3.x (not luxon or dayjs)
+
+# Important
+NEVER ADD COMMENTS TO CODE
+REMOVE EXSISTING COMMENTS WHEN FOUND
+

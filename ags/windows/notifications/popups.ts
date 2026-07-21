@@ -52,13 +52,13 @@ function addPopup(n: AstalNotifd.Notification) {
 export function initPopups() {
     notifd = AstalNotifd.get_default()
 
-    notifd.connect("notified", (_: any, id: number) => {
+    notifd.connect("notified", (_: AstalNotifd.Notifd, id: number) => {
         if (notifd!.dontDisturb) return
         const n = notifd!.get_notification(id)
         if (n) addPopup(n)
     })
 
-    notifd.connect("resolved", (_: any, id: number) => {
+    notifd.connect("resolved", (_: AstalNotifd.Notifd, id: number) => {
         removePopup(id)
     })
 }

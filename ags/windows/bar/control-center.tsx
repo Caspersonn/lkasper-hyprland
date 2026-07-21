@@ -3,11 +3,12 @@ import AstalWp from "gi://AstalWp"
 import AstalBluetooth from "gi://AstalBluetooth"
 import AstalNotifd from "gi://AstalNotifd"
 import AstalBattery from "gi://AstalBattery"
-import { createBinding, createComputed, createState, With } from "ags"
+import { Accessor, createBinding, createComputed, createState, With } from "ags"
 import { createPoll } from "ags/time"
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
-import { glyph } from "./glyphs"
+import { glyph, volumeGlyph } from "./glyphs"
+import { styledPopover } from "../utils"
 
 const PROFILES = [
     { id: "power-saver", label: "Saver", icon: glyph.leaf },
@@ -38,10 +39,10 @@ export function batInfo(pct: number, charging: boolean): { icon: string; cls: st
 }
 
 function Tile(props: {
-    active: ReturnType<typeof createComputed<boolean>> | any
-    icon: any
+    active: Accessor<boolean>
+    icon: string | Accessor<string>
     name: string
-    sub?: any
+    sub?: string | Accessor<string>
     onClicked: () => void
 }) {
     const cssClasses = props.active.as((a: boolean) => ["cc-tile", a ? "on" : "off"])
@@ -95,7 +96,7 @@ function Toggles() {
     const btActive = createBinding(bt, "isPowered")
     const btSub = createComputed(
         [createBinding(bt, "isPowered"), createBinding(bt, "devices")],
-        (on: boolean, devices: any[]) => {
+        (on: boolean, devices: AstalBluetooth.Device[]) => {
             if (!on) return "Off"
             const connected = devices.filter((d) => d.connected)
             return connected.length ? connected[0].name : "On"
@@ -198,14 +199,7 @@ function Sliders() {
                         <label
                             label={createComputed(
                                 [createBinding(speaker, "mute"), createBinding(speaker, "volume")],
-                                (m: boolean, v: number) =>
-                                    m
-                                        ? glyph.volumeMute
-                                        : v > 0.55
-                                          ? glyph.volumeHigh
-                                          : v > 0
-                                            ? glyph.volumeMedium
-                                            : glyph.volumeLow,
+                                (m: boolean, v: number) => volumeGlyph(m, v),
                             )}
                         />
                     </button>
@@ -285,18 +279,14 @@ function PowerProfile() {
 }
 
 export default function ControlCenter(): Gtk.Popover {
-    const content = (
-        <box orientation={Gtk.Orientation.VERTICAL} class="control-center">
-            <Header />
-            <Toggles />
-            <Sliders />
-            <PowerProfile />
-        </box>
-    ) as Gtk.Widget
-
-    const pop = new Gtk.Popover()
-    pop.set_has_arrow(false)
-    pop.add_css_class("popover-wrap")
-    pop.set_child(content)
-    return pop
+    return styledPopover(
+        (
+            <box orientation={Gtk.Orientation.VERTICAL} class="control-center">
+                <Header />
+                <Toggles />
+                <Sliders />
+                <PowerProfile />
+            </box>
+        ) as Gtk.Widget,
+    )
 }

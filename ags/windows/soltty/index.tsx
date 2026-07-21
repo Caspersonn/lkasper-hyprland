@@ -6,6 +6,7 @@ import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { glyph } from "../bar/glyphs"
+import { isInside } from "../utils"
 import {
     solttyState,
     setSolttyActive,
@@ -97,15 +98,6 @@ function applyDesc(name: string | null, text: string): void {
     setDesc(text)
     const e = name ? descEntries.get(name) : null
     if (e && e.text !== text) e.text = text
-}
-
-function isInside(widget: Gtk.Widget | null, ancestor: Gtk.Widget | null): boolean {
-    let w = widget
-    while (w) {
-        if (w === ancestor) return true
-        w = w.get_parent()
-    }
-    return false
 }
 
 function close(): void {

@@ -1,18 +1,10 @@
 export const glyph = {
     nixos: "\u{f313}",
-    neovim: "\u{e6ae}",
     calendar: "\u{f0e17}",
     chevronLeft: "\u{f0141}",
     chevronRight: "\u{f0142}",
-    music: "\u{f075a}",
-    shuffle: "\u{f049d}",
-    skipPrevious: "\u{f04ae}",
-    skipNext: "\u{f04ad}",
     play: "\u{f040a}",
-    pause: "\u{f03e4}",
     stop: "\u{f04db}",
-    clock: "\u{f0150}",
-    repeat: "\u{f0456}",
     cpu: "\u{f0ee0}",
     memory: "\u{f035b}",
     thermometer: "\u{f050f}",
@@ -46,10 +38,7 @@ export const glyph = {
     batteryCharging30: "\u{f0087}",
     batteryCharging20: "\u{f0086}",
     batteryCharging10: "\u{f089c}",
-    batteryCharging: "\u{f008a}",
-    batteryAlert: "\u{f0083}",
     bell: "\u{f009a}",
-    bellOutline: "\u{f009c}",
     bellOff: "\u{f009b}",
     bellSleepOutline: "\u{f0a93}",
     power: "\u{f0425}",
@@ -69,8 +58,12 @@ export const glyph = {
     weatherSnowy: "\u{f0598}",
     weatherFog: "\u{f0591}",
     weatherLightning: "\u{f0593}",
-    weatherNightPartlyCloudy: "\u{f0f31}",
-    thermometerLines: "\u{f0510}",
-    waterPercent: "\u{f058e}",
-    weatherWindy: "\u{f059d}",
+}
+
+// Volume glyph for a mute state + 0..1 level (bar + control-center slider).
+export function volumeGlyph(mute: boolean, vol: number): string {
+    if (mute) return glyph.volumeMute
+    if (vol > 0.55) return glyph.volumeHigh
+    if (vol > 0) return glyph.volumeMedium
+    return glyph.volumeLow
 }

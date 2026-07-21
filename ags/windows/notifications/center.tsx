@@ -4,6 +4,7 @@ import AstalHyprland from "gi://AstalHyprland"
 import { For, createBinding, createComputed } from "ags"
 import { Gtk } from "ags/gtk4"
 import { glyph } from "../bar/glyphs"
+import { styledPopover } from "../utils"
 
 let notifd: AstalNotifd.Notifd
 let hypr: AstalHyprland.Hyprland
@@ -97,8 +98,8 @@ function HistoryCard(n: AstalNotifd.Notification) {
 export function NotificationPopover(connector: string): Gtk.Popover {
     const notifications = createBinding(notifd, "notifications")
     const sorted = createComputed(() => [...notifications()].sort((a, b) => b.time - a.time))
-    const isEmpty = createComputed(() => notifications().length === 0)
     const hasItems = createComputed(() => notifications().length > 0)
+    const isEmpty = hasItems.as((h) => !h)
 
     const content = (
         <box class="notifications-popover" orientation={Gtk.Orientation.VERTICAL}>
@@ -132,10 +133,7 @@ export function NotificationPopover(connector: string): Gtk.Popover {
         </box>
     ) as Gtk.Widget
 
-    const pop = new Gtk.Popover()
-    pop.set_has_arrow(false)
-    pop.add_css_class("popover-wrap")
-    pop.set_child(content)
+    const pop = styledPopover(content)
     popovers.set(connector, pop)
     return pop
 }

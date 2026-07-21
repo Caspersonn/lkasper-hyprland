@@ -57,19 +57,22 @@ export const solttyState = {
     tick,
 }
 
-export function dotColor(name: string, idx: number): string {
+function dotColor(idx: number): string {
     return DOT_PALETTE[idx % DOT_PALETTE.length]
 }
 
 // ---- soltty invocation + parsing ------------------------------------------
 
+// JSON object from soltty output, probed defensively (shape isn't documented).
+type Json = Record<string, unknown>
+
 function run(args: string[]): Promise<string> {
     return execAsync([BIN, ...args])
 }
 
-function parseJson(out: string): any {
+function parseJson(out: string): unknown {
     try {
-        return JSON.parse(out)
+        return JSON.parse(out) as unknown
     } catch {
         return null
     }
@@ -77,7 +80,7 @@ function parseJson(out: string): any {
 
 // First non-empty string value among candidate keys (soltty's exact JSON key
 // casing isn't documented for list output, so we accept common variants).
-function pickStr(obj: any, keys: string[], fallback = ""): string {
+function pickStr(obj: Json | null, keys: string[], fallback = ""): string {
     for (const k of keys) {
         const v = obj?.[k]
         if (typeof v === "string" && v.length) return v
@@ -85,9 +88,14 @@ function pickStr(obj: any, keys: string[], fallback = ""): string {
     return fallback
 }
 
-function toArray(data: any): any[] {
-    if (Array.isArray(data)) return data
-    return data?.projects ?? data?.entries ?? data?.data ?? []
+function toArray(data: unknown): Json[] {
+    if (Array.isArray(data)) return data as Json[]
+    const o = data as Json | null
+    for (const k of ["projects", "entries", "data"]) {
+        const v = o?.[k]
+        if (Array.isArray(v)) return v as Json[]
+    }
+    return []
 }
 
 function hhmm(s: string): string {
@@ -103,7 +111,7 @@ function hhmm(s: string): string {
 // Duration in seconds for a list entry. soltty reports duration=0 (end=null)
 // for the still-running entry, so fall back to start->end, or start->now while
 // it's still running, so every recent row shows a real duration.
-function entrySeconds(e: any): number {
+function entrySeconds(e: Json): number {
     const raw = e?.duration ?? e?.dur ?? e?.elapsed
     if (typeof raw === "number" && raw > 0) return raw
     if (typeof raw === "string") {
@@ -131,7 +139,7 @@ function fmtDur(sec: number): string {
 
 export async function refreshCurrent(): Promise<void> {
     try {
-        const data = parseJson(await run(["current", "--json"]))
+        const data = parseJson(await run(["current", "--json"])) as Json | null
         // soltty exits 0 even when unconfigured or erroring (message goes to
         // stderr / non-JSON stdout), so a valid `running` boolean — not the exit
         // code — is the real connectivity signal. On invalid output, mark
@@ -167,15 +175,12 @@ export async function refreshProjects(): Promise<void> {
     try {
         const arr = toArray(parseJson(await run(["list", "projects", "--json"])))
         setProjects(
-            arr.map((p: any, i: number) => {
-                const name = pickStr(p, ["name", "project", "title"], "(unnamed)")
-                return {
-                    id: pickStr(p, ["id", "project_id"]),
-                    name,
-                    color: pickStr(p, ["color", "colour"]) || dotColor(name, i),
-                    client: pickStr(p, ["client", "client_name", "clientName"]) || null,
-                }
-            }),
+            arr.map((p, i) => ({
+                id: pickStr(p, ["id", "project_id"]),
+                name: pickStr(p, ["name", "project", "title"], "(unnamed)"),
+                color: pickStr(p, ["color", "colour"]) || dotColor(i),
+                client: pickStr(p, ["client", "client_name", "clientName"]) || null,
+            })),
         )
     } catch {
         // Keep the previous list; connection state is owned by refreshCurrent.
@@ -187,7 +192,7 @@ export async function refreshRecent(): Promise<void> {
         const arr = toArray(parseJson(await run(["list", "--json", "--limit", "4"])))
         const byName = new Map(projects().map((p) => [p.name, p.color]))
         setRecent(
-            arr.map((e: any, i: number) => {
+            arr.map((e, i) => {
                 const proj = pickStr(e, ["project", "project_name"])
                 const rawId = pickStr(e, ["id", "short_id", "shortId"])
                 return {
@@ -195,7 +200,7 @@ export async function refreshRecent(): Promise<void> {
                     id: rawId ? rawId.slice(0, 8) : `e${i}`,
                     start: hhmm(pickStr(e, ["start_time", "start", "started_at"])),
                     dur: fmtDur(entrySeconds(e)),
-                    color: pickStr(e, ["color", "colour"]) || byName.get(proj) || dotColor(proj, i),
+                    color: pickStr(e, ["color", "colour"]) || byName.get(proj) || dotColor(i),
                     desc: pickStr(e, ["description", "desc"], "(no description)"),
                 }
             }),
@@ -255,7 +260,7 @@ function readSolttyConfig(): SolttyConfig | null {
         try {
             const [ok, bytes] = GLib.file_get_contents(path)
             if (!ok) continue
-            const c = JSON.parse(new TextDecoder().decode(bytes))
+            const c = JSON.parse(new TextDecoder().decode(bytes)) as Json
             if (c?.api_token && c?.base_url && c?.workspace_id) {
                 return {
                     api_token: String(c.api_token),

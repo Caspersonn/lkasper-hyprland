@@ -2,6 +2,7 @@ import { Gtk } from "ags/gtk4"
 import { createState, createComputed, For } from "ags"
 import { createPoll } from "ags/time"
 import { glyph } from "./glyphs"
+import { pad, styledPopover } from "../utils"
 
 const MONTHS = [
     "January",
@@ -19,8 +20,6 @@ const MONTHS = [
 ]
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-
-const pad = (n: number) => String(n).padStart(2, "0")
 
 const bigTime = createPoll("", 1000, () => {
     const now = new Date()
@@ -111,9 +110,5 @@ export default function Calendar(): Gtk.Popover {
         </box>
     ) as Gtk.Widget
 
-    const popover = new Gtk.Popover()
-    popover.set_has_arrow(false)
-    popover.add_css_class("popover-wrap")
-    popover.set_child(content)
-    return popover
+    return styledPopover(content)
 }

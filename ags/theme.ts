@@ -8,7 +8,8 @@ import style from "./style.scss"
 // shell recolours live without a rebuild or restart.
 
 const HOME = GLib.get_home_dir()
-const CURRENT = `${HOME}/.config/lkasper-hyprland/current/theme.name`
+// Pointer file naming the active wallpaper/theme (shared with the picker).
+export const CURRENT = `${HOME}/.config/lkasper-hyprland/current/theme.name`
 const THEMES = `${HOME}/.local/share/lkasper-hyprland/themes`
 const FALLBACK = "wood-dark"
 
@@ -28,7 +29,7 @@ const FALLBACK_PALETTE: Record<string, string> = {
     accent: "61afef",
 }
 
-function read(path: string): string | null {
+export function read(path: string): string | null {
     try {
         const [ok, bytes] = GLib.file_get_contents(path)
         if (ok) return new TextDecoder().decode(bytes)

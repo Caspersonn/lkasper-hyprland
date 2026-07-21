@@ -75,7 +75,7 @@ function present(v: OsdView) {
 
 const wp = AstalWp.get_default()
 
-function speakerData(speaker: any): VolumeData {
+function speakerData(speaker: AstalWp.Endpoint): VolumeData {
     return {
         percent: Math.round((speaker.volume ?? 0) * 100),
         mute: speaker.mute ?? false,
@@ -83,7 +83,7 @@ function speakerData(speaker: any): VolumeData {
     }
 }
 
-let watchedSpeaker: any = null
+let watchedSpeaker: AstalWp.Endpoint | null = null
 
 function watchDefaultSpeaker() {
     const speaker = wp?.audio?.defaultSpeaker
@@ -150,25 +150,13 @@ export function triggerMedia(action: string) {
 
     lastAction = action === "next" || action === "prev" ? action : "playpause"
 
-    if (action === "next" || "prev") {
-      console.log("Next")
-      setMedia({
+    setMedia({
         title: player.title || "",
         artist: player.artist || "",
         icon: iconForAction(action, player),
         entry: player.entry || "audio-x-generic-symbolic",
-      })
+    })
     present("media")
-    }
-    else {
-      setMedia({
-        title: player.title || "",
-        artist: player.artist || "",
-        icon: iconForAction(action, player),
-        entry: player.entry || "audio-x-generic-symbolic",
-      })
-    present("media")
-    }
 }
 
 export function initOsd() {
@@ -178,10 +166,10 @@ export function initOsd() {
     for (const p of mpris.get_players()) {
         if (isRelevant(p)) watchPlayer(p)
     }
-    mpris.connect("player-added", (_: any, player: AstalMpris.Player) => {
+    mpris.connect("player-added", (_: AstalMpris.Mpris, player: AstalMpris.Player) => {
         if (isRelevant(player)) watchPlayer(player)
     })
-    mpris.connect("player-closed", (_: any, player: AstalMpris.Player) => {
+    mpris.connect("player-closed", (_: AstalMpris.Mpris, player: AstalMpris.Player) => {
         if (player === activePlayer) activePlayer = pickBest()
     })
     activePlayer = pickBest()

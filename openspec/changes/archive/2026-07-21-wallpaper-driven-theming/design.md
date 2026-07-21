@@ -63,7 +63,7 @@ Reuse the launcher/soltty overlay pattern: a per-monitor `Astal` window with a t
 
 ## Open Questions
 
-- **Light/dark policy**: force dark, or choose per wallpaper luminance? (Leaning force-dark for legibility; wallust can do both.)
-- **Contrast clamp**: needed, and at what threshold? Decide during the spike once real wallpaper palettes are visible.
+- **Light/dark policy** — RESOLVED: **force dark.** The generator uses `ansidark16`, which always yields a near-black `base00`, and the AGS UI is authored as a dark surface with light text (foreground alpha-ramps for the dim/faint hierarchy). No light-mode variant. The built-in fallback palette is dark too, so the policy holds even when a wallpaper has no palette.
+- **Contrast clamp** — RESOLVED: two layers. (1) wallust `check_contrast = true` already enforces fg/bg contrast for `base00–base0F`. (2) The wallpaper-derived accent triple (`accent`/`accent2`/`accent3`) is *not* covered by that check, so the generator clamps each accent to a minimum HSV brightness (`v ≥ 0.55`) so accent-coloured text/fills stay readable on the near-black bar. Threshold chosen from the real palettes: it leaves every current accent essentially unchanged and only lifts genuinely-dark future ones.
 - **Boot source of truth**: at login, does the desktop read `current/theme.name` (runtime) or the Nix default? Define precedence so a rebuild doesn't stomp a runtime selection (or accept that a rebuild resets to default).
 - **Terminal live-reload**: attempt foot/ghostty live reload, or accept next-window only?

@@ -9,6 +9,7 @@ import { initShortcuts, toggleShortcuts } from "./windows/shortcuts"
 import { initLauncher, toggleLauncher } from "./windows/launcher"
 import { initSoltty, toggleSoltty } from "./windows/soltty"
 import { initSolttyService } from "./windows/soltty/service"
+import { initWallpaperPicker, toggleWallpaperPicker } from "./windows/wallpaper-picker"
 import { themedCss, watchTheme } from "./theme"
 
 App.start({
@@ -55,6 +56,11 @@ App.start({
             res("ok")
             return
         }
+        if (argv.includes("toggle-wallpaper-picker")) {
+            toggleWallpaperPicker()
+            res("ok")
+            return
+        }
         res(`unknown request: ${argv.join(" ")}`)
     },
     main() {
@@ -69,5 +75,6 @@ App.start({
         initLauncher()
         initSolttyService()
         initSoltty()
+        initWallpaperPicker()
     },
 })

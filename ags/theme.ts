@@ -17,6 +17,17 @@ const KEYS = [
     "base08", "base09", "base0A", "base0B", "base0C", "base0D", "base0E", "base0F",
 ]
 
+// Built-in dark fallback so the shell is never unstyled if the active wallpaper
+// has no readable palette (missing/corrupt colors.json). Kept dark on purpose:
+// the UI is force-dark (see design), so a dark fallback is always safe.
+const FALLBACK_PALETTE: Record<string, string> = {
+    base00: "12131a", base01: "1b1d27", base02: "2a2d3a", base03: "3a3f52",
+    base04: "c8ccd8", base05: "e6e9f0", base06: "eef1f6", base07: "ffffff",
+    base08: "e06c75", base09: "d19a66", base0A: "e5c07b", base0B: "98c379",
+    base0C: "56b6c2", base0D: "61afef", base0E: "c678dd", base0F: "be5046",
+    accent: "61afef",
+}
+
 function read(path: string): string | null {
     try {
         const [ok, bytes] = GLib.file_get_contents(path)
@@ -31,21 +42,22 @@ function activeName(): string {
     return (read(CURRENT) ?? FALLBACK).trim() || FALLBACK
 }
 
-function paletteFor(name: string): Record<string, string> | null {
+function paletteFor(name: string): Record<string, string> {
     const raw = read(`${THEMES}/${name}/colors.json`) ?? read(`${THEMES}/${FALLBACK}/colors.json`)
-    if (!raw) return null
-    try {
-        return JSON.parse(raw)
-    } catch {
-        return null
+    if (raw) {
+        try {
+            return JSON.parse(raw) as Record<string, string>
+        } catch {
+            // corrupt JSON -> built-in fallback
+        }
     }
+    return FALLBACK_PALETTE
 }
 
 // A GTK @define-color block for the active wallpaper palette: base00..base0F
 // (faithful ANSI) plus @accent, the wallpaper-derived accent the UI themes on.
 function paletteCss(): string {
     const p = paletteFor(activeName())
-    if (!p) return ""
     const defs = KEYS.filter((k) => typeof p[k] === "string").map(
         (k) => `@define-color ${k} #${String(p[k]).replace(/^#/, "")};`,
     )

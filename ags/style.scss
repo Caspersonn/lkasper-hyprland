@@ -1994,3 +1994,78 @@ window.soltty {
 .soltty-bar-btn.running .soltty-bar-time {
     color: $w-accent;
 }
+
+// ── Wallpaper picker overlay ────────────────────────────────────────────────
+window.wallpaper-picker {
+    background-color: transparent;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+
+    .wp-backdrop {
+        background-color: ca(base00, 0.58);
+    }
+
+    .wp-modal {
+        background-color: $base-dark;
+        border: 1px solid ca(base04, 0.18);
+        border-radius: 18px;
+        padding: 22px;
+    }
+
+    .wp-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: $fg;
+        margin-bottom: 16px;
+    }
+
+    .wp-empty {
+        color: $fg-dim;
+        padding: 24px;
+    }
+
+    .wp-tile {
+        padding: 6px;
+        margin: 6px;
+        border-radius: 14px;
+        border: 2px solid transparent;
+        background: transparent;
+
+        &:hover {
+            background-color: ca(base05, 0.06);
+        }
+
+        &.selected {
+            border-color: $accent;
+            background-color: ca(accent, 0.12);
+        }
+    }
+
+    .wp-thumb {
+        min-width: 208px;
+        min-height: 124px;
+        border-radius: 10px;
+        background-color: ca(base05, 0.06);
+    }
+
+    .wp-caption {
+        margin-top: 9px;
+        padding: 0 2px;
+    }
+
+    .wp-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: $w-text;
+    }
+
+    .wp-current {
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: $base-dark;
+        background-color: $accent;
+        border-radius: 6px;
+        padding: 1px 7px;
+        margin-left: 8px;
+    }
+}

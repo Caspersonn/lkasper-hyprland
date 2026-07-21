@@ -1,11 +1,11 @@
 ---
 # lkasper-hyprland-9ura
 title: Wallpaper-driven dynamic theming for AGS
-status: in-progress
+status: completed
 type: feature
 priority: normal
 created_at: 2026-07-20T12:39:57Z
-updated_at: 2026-07-20T14:32:47Z
+updated_at: 2026-07-21T11:24:23Z
 ---
 
 The whole AGS shell (bar, overlays: launcher/soltty/shortcuts, notification center, all popups) derives every colour from the CURRENT wallpaper. Changing the wallpaper recolours the shell. No hardcoded hex anywhere. Supersedes the gruvbox vars and the static w- Wood Dark tokens from the bar redesign; overlaps de2q (colouring standard).
@@ -18,7 +18,7 @@ The whole AGS shell (bar, overlays: launcher/soltty/shortcuts, notification cent
 
 ## Tasks
 - [x] Shape requirements via opsx:explore
-- [ ] Implement via opsx:apply
+- [x] Implement via opsx:apply
 
 
 
@@ -65,3 +65,28 @@ Verified: build green; compiled CSS refs @accent 30x; colors.json accents differ
    Fix: generator now extracts accent + accent2 + accent3 (vivid, hue-diverse; hue-rotation fallback for near-monochrome wallpapers) via a python picker in regenerate-palettes.sh (needs wallust+python3+jq). themes.nix colors.json (AGS-only) overrides base0A..base0F with the triple (0A/0C=accent2, 0B/0E=accent3, 0D/0F=accent); colorScheme (terminal foot/btop/ghostty) keeps faithful base16 so red=red. No style.scss change (values flow through existing @base0A..0F).
    Result: zero static colours in AGS; terminal stays faithful. Tradeoff accepted: battery/warning/critical no longer guaranteed green/yellow/red.
    Verified: AGS colors.json base0B/0C/0D vivid per-wallpaper (wood-dark 438697/BE9294/37BDC0; ghibli 8A6356/DA7360/F9AC5C); palette base0B stays 2F8D5F for terminal. Builds green.
+
+
+## Group 5 - wallpaper picker overlay (+ 4.3 verified)
+- 4.3 live recolour verified by user (theme-switch recolours Hyprland + AGS instantly).
+- ags/windows/wallpaper-picker/index.tsx: per-monitor Astal overlay (focused-monitor visibility), 3-col grid of wallpaper thumbnails (Gtk.Picture, COVER, overflow-clipped rounded), marks the active one ("current" chip). Arrow-key nav + click; Escape/backdrop closes without changing. Selection dispatches `theme-switch <slug>` via Hyprland IPC (session PATH, not the stripped shell PATH) and closes.
+- app.ts: toggle-wallpaper-picker request handler + initWallpaperPicker in main.
+- bindings.nix: SUPER, W -> ags request toggle-wallpaper-picker.
+- style.scss: window.wallpaper-picker styles, all theme tokens (no static colours).
+- Build green; bundle has the toggle, theme-switch dispatch, wp-tile, Picture.
+- 5.5 pending user live-verify (open, lists wallpapers, select switches + recolours).
+
+
+## Group 6 - guardrails
+- 6.1 Fallback palette: ags/theme.ts has a built-in dark FALLBACK_PALETTE (base00-0F + accent); paletteFor() returns it when colors.json is missing/corrupt, so the shell is never unstyled and @baseNN/@accent always resolve. colorScheme build-time default stays wood-dark (always present).
+- 6.2 Force-dark (resolved): generator ansidark16 -> always dark base00; UI authored dark-surface + light-text fg ramps; fallback is dark too. No light mode.
+- 6.2 Contrast clamp (resolved): wallust check_contrast=true covers base00-0F fg/bg; the wallpaper-derived accent triple isn't covered by it, so regenerate-palettes.sh clamps each accent to HSV v>=0.55 (readable on the near-black bar). Threshold leaves current accents unchanged except studio-ghibli accent3 8A6356->8C6557 (~1%). design.md open questions resolved.
+- Build green; FALLBACK_PALETTE in bundle; ghibli colors.json base0B=8C6557.
+- Next: group 7 (opsx:verify + link change to this bean).
+
+
+## Group 7 - verified (opsx:verify)
+Implemented via OpenSpec change: openspec/changes/wallpaper-driven-theming (proposal/design/specs/tasks).
+opsx:verify: 8/8 requirements implemented, all scenarios covered, follows design (Approach C, base16-native, whole-desktop, force-dark + contrast clamp). No critical issues. Tasks 28/28.
+Optional follow-ups (non-blocking): (1) opsx:sync a note that base0A/base0B are remapped to accent2/accent3 in the AGS colors.json ("everything dynamic"); (2) pin wallust version in regenerate-palettes.sh for byte-deterministic regen.
+Ready to archive the change + close this bean.

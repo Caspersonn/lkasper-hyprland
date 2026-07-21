@@ -32,6 +32,7 @@ in
       "SUPER, N, [System] Notification center, exec, ags request toggle-notifications"
       "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
       "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
+      "SUPER, W, [System] Wallpaper picker, exec, ags request toggle-wallpaper-picker"
 
       # Windows
       "SUPER, I, [Windows] Pin window, exec, hyprctl dispatch pin"

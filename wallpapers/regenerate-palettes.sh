@@ -50,6 +50,8 @@ def hexof(hh,s,v):
 def hue_deg(h): return hsv(h)[0]*360
 def far(a,b,th=40):
     d=abs(a-b)%360; d=min(d,360-d); return d>=th
+def lift(c):                                    # floor brightness: dark UI clamp
+    h,s,v=hsv('#'+c); return hexof(h,s,max(v,0.55))
 cands=[c.lstrip('#') for c in json.load(sys.stdin) if c]
 viv=[c for c in cands if chroma(c)>=40 and max(rgb(c))>=55]
 viv.sort(key=lambda c:-chroma(c))
@@ -67,7 +69,7 @@ if picks:                                       # rotate primary hue to fill 3
         picks.append(hexof(ph+(1.0/3)*len(picks), ps, pv))
 else:
     picks=['888888','888888','888888']
-print(json.dumps(picks[:3]))
+print(json.dumps([lift(c) for c in picks[:3]]))
 PY
 
 shopt -s nullglob

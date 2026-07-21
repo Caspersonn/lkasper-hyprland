@@ -24,28 +24,28 @@
 - [x] 3.3 Load the active `colors.json` at startup and apply the colour provider
 - [x] 3.4 Recolour live on change (watch `current` / `colors.json`, re-apply) with no shell restart
 - [x] 3.5 Remove the gruvbox `$…` and `$w-*` vars from `style.scss`; map every colour, including semantics (base0B/base0A/base08), to the palette
-- [ ] 3.6 Verify the running shell recolours live on a manual palette change
+- [x] 3.6 Verify the running shell recolours live on a manual palette change
 
 ## 4. Switch orchestration
 
 - [x] 4.1 Implement `theme-switch <wallpaper>`: set wallpaper via hyprpaper IPC, repoint `current/theme.name`, reload apps
 - [x] 4.2 Reload matrix: `hyprctl` (borders), AGS `apply_css`, terminals/btop via their reload path
-- [ ] 4.3 Verify a switch recolours Hyprland + AGS immediately and completes without error
+- [x] 4.3 Verify a switch recolours Hyprland + AGS immediately and completes without error
 
 ## 5. Wallpaper picker overlay
 
-- [ ] 5.1 Create `ags/windows/wallpaper-picker/` — per-monitor Astal overlay, thumbnail grid of available wallpapers, marks the active one
-- [ ] 5.2 Keyboard + click selection; Escape / backdrop closes without changing the wallpaper
-- [ ] 5.3 Selection invokes `theme-switch` and closes the picker
-- [ ] 5.4 Register `toggle-wallpaper-picker` in `app.ts` + a keybind in `bindings.nix` (optional bar button)
-- [ ] 5.5 Verify the picker opens, lists wallpapers, and selecting one switches + recolours
+- [x] 5.1 Create `ags/windows/wallpaper-picker/` — per-monitor Astal overlay, thumbnail grid of available wallpapers, marks the active one
+- [x] 5.2 Keyboard + click selection; Escape / backdrop closes without changing the wallpaper
+- [x] 5.3 Selection invokes `theme-switch` and closes the picker
+- [x] 5.4 Register `toggle-wallpaper-picker` in `app.ts` + a keybind in `bindings.nix` (optional bar button)
+- [x] 5.5 Verify the picker opens, lists wallpapers, and selecting one switches + recolours
 
 ## 6. Guardrails
 
-- [ ] 6.1 Fallback palette when the active wallpaper has no committed palette (no crash, nothing unstyled)
-- [ ] 6.2 Decide/implement light-dark policy and an optional min-contrast clamp for bar/overlay text (design open questions)
+- [x] 6.1 Fallback palette when the active wallpaper has no committed palette (no crash, nothing unstyled)
+- [x] 6.2 Decide/implement light-dark policy and an optional min-contrast clamp for bar/overlay text (design open questions)
 
 ## 7. Wrap-up
 
-- [ ] 7.1 Verify implementation against specs (`opsx:verify`)
-- [ ] 7.2 Link this change to bean `lkasper-hyprland-9ura` and tick its todos
+- [x] 7.1 Verify implementation against specs (`opsx:verify`)
+- [x] 7.2 Link this change to bean `lkasper-hyprland-9ura` and tick its todos

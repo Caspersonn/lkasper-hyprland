@@ -1,4 +1,9 @@
+import { Accessor, createComputed } from "ags"
 import { Gtk } from "ags/gtk4"
+
+export function when<T>(cond: Accessor<boolean>, on: T, off: T): Accessor<T> {
+    return createComputed([cond], (c) => (c ? on : off))
+}
 
 export function isInside(widget: Gtk.Widget | null, ancestor: Gtk.Widget | null): boolean {
     let w = widget

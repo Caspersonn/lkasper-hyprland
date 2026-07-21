@@ -2,11 +2,12 @@ import Gdk from "gi://Gdk"
 import GLib from "gi://GLib"
 import AstalHyprland from "gi://AstalHyprland"
 import App from "ags/gtk4/app"
-import { For, createBinding, createComputed, createState } from "ags"
+import { Accessor, For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
+import { createPoll } from "ags/time"
 import { glyph } from "../bar/glyphs"
-import { isInside } from "../utils"
+import { isInside, pad, when } from "../utils"
 import {
     solttyState,
     setSolttyActive,
@@ -15,6 +16,7 @@ import {
     stopTimer,
     updateRunningDescription,
     updateRunningProject,
+    NO_PROJECT_COLOR,
     type Project,
     type RecentEntry,
 } from "./service"
@@ -44,33 +46,70 @@ const filteredProjects = createComputed(
     },
 )
 
+const now = createPoll(0, 1000, () => Date.now())
 const elapsedText = createComputed(
-    [solttyState.running, solttyState.startedAt, solttyState.tick],
-    (running, started) => {
+    [solttyState.running, solttyState.startedAt, now],
+    (running, started, t) => {
         if (!running || !started) return "00:00:00"
-        const e = Math.max(0, Math.floor((Date.now() - started) / 1000))
-        const h = Math.floor(e / 3600)
-        const m = Math.floor((e % 3600) / 60)
-        const s = e % 60
-        return [h, m, s].map((n) => String(n).padStart(2, "0")).join(":")
+        const e = Math.max(0, Math.floor((t - started) / 1000))
+        return [Math.floor(e / 3600), Math.floor((e % 3600) / 60), e % 60].map(pad).join(":")
     },
 )
 
-function paintDot(w: Gtk.Widget, color: string): Gtk.CssProvider {
-    const p = new Gtk.CssProvider()
-    try {
-        p.load_from_string(`* { background-color: ${color}; }`)
-    } catch {
+const statusClasses = when(solttyState.running, ["soltty-status", "running"], ["soltty-status", "idle"])
+const statusDotClasses = when(solttyState.running, ["soltty-status-dot", "running"], ["soltty-status-dot"])
+const elapsedClasses = when(solttyState.running, ["soltty-elapsed", "running"], ["soltty-elapsed"])
+const statusLabel = when(solttyState.running, "Recording", "Idle")
+const connClasses = when(solttyState.connected, ["soltty-conn-dot", "ok"], ["soltty-conn-dot", "bad"])
+const connText = when(solttyState.connected, "solidtime · connected", "disconnected")
+const primaryClasses = when(solttyState.running, ["soltty-primary", "stop"], ["soltty-primary", "start"])
+const primaryLabel = when(solttyState.running, "Stop timer", "Start timer")
+const primaryGlyph = when(solttyState.running, glyph.stop, glyph.play)
+const actionKey = when(solttyState.running, "S", "Enter")
+
+const statusSub = createComputed(
+    [solttyState.running, solttyState.runningProject, solttyState.runningDesc],
+    (r, proj, d) => {
+        if (!r) return "no active timer"
+        const parts = [proj, d].filter((x) => x && x.length) as string[]
+        return parts.length ? parts.join(" · ") : "tracking to solidtime"
+    },
+)
+
+const triggerLabel = createComputed([selectedProject], (p) => p ?? "No project")
+const triggerColor = createComputed(
+    [selectedProject, solttyState.projects],
+    (p, list) => list.find((x) => x.name === p)?.color ?? NO_PROJECT_COLOR,
+)
+
+function Dot(color: string | Accessor<string>) {
+    const paint = (w: Gtk.Widget) => {
+        const p = new Gtk.CssProvider()
+        const apply = (c: string) => {
+            try {
+                p.load_from_string(`* { background-color: ${c}; }`)
+            } catch {
+            }
+        }
+        w.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        if (typeof color === "string") {
+            apply(color)
+        } else {
+            apply(color())
+            color.subscribe(() => apply(color()))
+        }
     }
-    w.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-    return p
+    return <box class="soltty-dot" valign={Gtk.Align.CENTER} $={paint} />
 }
 
-function repaintDot(p: Gtk.CssProvider, color: string): void {
-    try {
-        p.load_from_string(`* { background-color: ${color}; }`)
-    } catch {
-    }
+function Section({ label, caption }: { label: string; caption?: string }) {
+    return (
+        <box class="soltty-sec" valign={Gtk.Align.CENTER}>
+            <label class="soltty-sec-label" label={label} />
+            <box class="soltty-sec-rule" hexpand valign={Gtk.Align.CENTER} />
+            {caption ? <label class="soltty-sec-caption" label={caption} /> : <box />}
+        </box>
+    )
 }
 
 function focusWidget(map: Map<string, Gtk.Entry>, name: string | null): void {
@@ -101,37 +140,31 @@ function primaryAction(): void {
     }
 }
 
-function openProjectMenu(name: string | null): void {
+function setProjectMenu(open: boolean, name: string | null): void {
+    setProjectMenuOpen(open)
     setProjectQuery("")
-    setProjectMenuOpen(true)
-    if (name) {
+    if (open && name) {
         const e = searchEntries.get(name)
         if (e) e.text = ""
     }
-    focusWidget(searchEntries, name)
-}
-
-function closeProjectMenu(name: string | null): void {
-    setProjectMenuOpen(false)
-    setProjectQuery("")
-    focusWidget(descEntries, name)
-}
-
-function toggleProjectMenu(name: string | null): void {
-    if (projectMenuOpen()) closeProjectMenu(name)
-    else openProjectMenu(name)
+    focusWidget(open ? searchEntries : descEntries, name)
 }
 
 function pickProject(name: string | null, projName: string): void {
     setSelectedProject(projName)
-    closeProjectMenu(name)
+    setProjectMenu(false, name)
     updateRunningProject(projName)
 }
 
 function selectFirstProject(name: string | null): void {
     const p = filteredProjects()[0]
     if (p) pickProject(name, p.name)
-    else closeProjectMenu(name)
+    else setProjectMenu(false, name)
+}
+
+function prefillFromRunning(name: string | null): void {
+    applyDesc(name, solttyState.runningDesc())
+    setSelectedProject(solttyState.runningProject())
 }
 
 export function toggleSoltty(): void {
@@ -139,23 +172,15 @@ export function toggleSoltty(): void {
         close()
         return
     }
-    const fm = hypr.focusedMonitor
-    const name = fm ? fm.name : null
+    const name = hypr.focusedMonitor?.name ?? null
     setConnector(name)
-    setProjectMenuOpen(false)
-    setProjectQuery("")
-    const initDesc = solttyState.running() ? solttyState.runningDesc() : ""
-    applyDesc(name, initDesc)
-    if (solttyState.running()) setSelectedProject(solttyState.runningProject())
+    setProjectMenu(false, name)
+    if (solttyState.running()) prefillFromRunning(name)
+    else applyDesc(name, "")
     setVisible(true)
     setSolttyActive(true)
-    focusWidget(descEntries, name)
     refreshCurrent().then(() => {
-        if (!visible()) return
-        if (solttyState.running() && desc().trim() === "") {
-            applyDesc(name, solttyState.runningDesc())
-            setSelectedProject(solttyState.runningProject())
-        }
+        if (visible() && solttyState.running() && desc().trim() === "") prefillFromRunning(name)
     })
 }
 
@@ -168,51 +193,12 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
     let modalBox: Gtk.Widget | null = null
     let backdropBox: Gtk.Widget | null = null
 
-    const triggerLabel = createComputed([selectedProject], (p) => p ?? "No project")
-    const triggerColor = createComputed(
-        [selectedProject, solttyState.projects],
-        (p, list) => list.find((x) => x.name === p)?.color ?? "#6a615a",
-    )
-
-    const statusClasses = createComputed([solttyState.running], (r) =>
-        r ? ["soltty-status", "running"] : ["soltty-status", "idle"],
-    )
-    const statusDotClasses = createComputed([solttyState.running], (r) =>
-        r ? ["soltty-status-dot", "running"] : ["soltty-status-dot"],
-    )
-    const elapsedClasses = createComputed([solttyState.running], (r) =>
-        r ? ["soltty-elapsed", "running"] : ["soltty-elapsed"],
-    )
-    const statusLabel = createComputed([solttyState.running], (r) => (r ? "Recording" : "Idle"))
-    const statusSub = createComputed(
-        [solttyState.running, solttyState.runningProject, solttyState.runningDesc],
-        (r, proj, d) => {
-            if (!r) return "no active timer"
-            const parts = [proj, d].filter((x) => x && x.length) as string[]
-            return parts.length ? parts.join(" · ") : "tracking to solidtime"
-        },
-    )
-
-    const connClasses = createComputed([solttyState.connected], (c) =>
-        c ? ["soltty-conn-dot", "ok"] : ["soltty-conn-dot", "bad"],
-    )
-    const connText = createComputed([solttyState.connected], (c) =>
-        c ? "solidtime · connected" : "disconnected",
-    )
-
-    const primaryClasses = createComputed([solttyState.running], (r) =>
-        r ? ["soltty-primary", "stop"] : ["soltty-primary", "start"],
-    )
-    const primaryLabel = createComputed([solttyState.running], (r) => (r ? "Stop timer" : "Start timer"))
-    const primaryGlyph = createComputed([solttyState.running], (r) => (r ? glyph.stop : glyph.play))
-    const actionKey = createComputed([solttyState.running], (r) => (r ? "S" : "Enter"))
-
     const keys = new Gtk.EventControllerKey()
     keys.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
     keys.connect("key-pressed", (_c, keyval) => {
         if (keyval === Gdk.KEY_Escape) {
             if (projectMenuOpen()) {
-                closeProjectMenu(myConnector)
+                setProjectMenu(false, myConnector)
                 return true
             }
             close()
@@ -282,10 +268,7 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     </box>
                 </box>
 
-                <box class="soltty-sec" valign={Gtk.Align.CENTER}>
-                    <label class="soltty-sec-label" label="TIMER" />
-                    <box class="soltty-sec-rule" hexpand valign={Gtk.Align.CENTER} />
-                </box>
+                <Section label="TIMER" />
                 <box cssClasses={statusClasses} valign={Gtk.Align.CENTER}>
                     <box valign={Gtk.Align.CENTER}>
                         <box cssClasses={statusDotClasses} valign={Gtk.Align.CENTER} />
@@ -321,17 +304,10 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     <label class="soltty-flabel" xalign={0} label="PROJECT" />
                     <button
                         class="soltty-proj-trigger"
-                        onClicked={() => toggleProjectMenu(myConnector)}
+                        onClicked={() => setProjectMenu(!projectMenuOpen(), myConnector)}
                     >
                         <box valign={Gtk.Align.CENTER}>
-                            <box
-                                class="soltty-dot"
-                                valign={Gtk.Align.CENTER}
-                                $={(self) => {
-                                    const p = paintDot(self, triggerColor())
-                                    triggerColor.subscribe(() => repaintDot(p, triggerColor()))
-                                }}
-                            />
+                            {Dot(triggerColor)}
                             <label class="soltty-proj-name" xalign={0} hexpand label={triggerLabel} />
                             <label class="soltty-proj-caret" label={glyph.chevronRight} />
                         </box>
@@ -363,7 +339,7 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                                             onClicked={() => pickProject(myConnector, p.name)}
                                         >
                                             <box valign={Gtk.Align.CENTER}>
-                                                <box class="soltty-dot" valign={Gtk.Align.CENTER} $={(w) => paintDot(w, p.color)} />
+                                                {Dot(p.color)}
                                                 <label class="soltty-menu-name" xalign={0} hexpand label={p.name} />
                                                 <label class="soltty-menu-client" label={p.client ?? ""} />
                                             </box>
@@ -392,18 +368,14 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     </box>
                 </box>
 
-                <box class="soltty-sec" valign={Gtk.Align.CENTER}>
-                    <label class="soltty-sec-label" label="RECENT" />
-                    <box class="soltty-sec-rule" hexpand valign={Gtk.Align.CENTER} />
-                    <label class="soltty-sec-caption" label="soltty list" />
-                </box>
+                <Section label="RECENT" caption="soltty list" />
                 <box class="soltty-recent" orientation={Gtk.Orientation.VERTICAL}>
                     <For each={solttyState.recent} id={(e: RecentEntry) => e.id}>
                         {(e: RecentEntry) => (
                             <box class="soltty-recent-row" valign={Gtk.Align.CENTER}>
                                 <label class="soltty-recent-start" label={e.start} />
                                 <label class="soltty-recent-dur" label={e.dur} />
-                                <box class="soltty-dot" valign={Gtk.Align.CENTER} $={(w) => paintDot(w, e.color)} />
+                                {Dot(e.color)}
                                 <label class="soltty-recent-desc" xalign={0} hexpand label={e.desc} />
                                 <label class="soltty-recent-id" label={e.id} />
                             </box>
@@ -416,10 +388,8 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
 }
 
 export function SolttyIndicator() {
-    const cls = createComputed([solttyState.running], (r) =>
-        r ? ["soltty-bar-btn", "island-btn", "running"] : ["soltty-bar-btn", "island-btn"],
-    )
-    const icon = createComputed([solttyState.running], (r) => (r ? "󱫡" : "󱫟"))
+    const cls = when(solttyState.running, ["soltty-bar-btn", "island-btn", "running"], ["soltty-bar-btn", "island-btn"])
+    const icon = when(solttyState.running, "󱫡", "󱫟")
     return (
         <button cssClasses={cls} onClicked={() => execAsync(["ags", "request", "toggle-soltty"])}>
             <box valign={Gtk.Align.CENTER}>

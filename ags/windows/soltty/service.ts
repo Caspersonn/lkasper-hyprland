@@ -1,13 +1,20 @@
 import GLib from "gi://GLib"
 import { createState } from "ags"
 import { execAsync } from "ags/process"
+import { pad } from "../utils"
 
 const BIN = GLib.getenv("SOLTTY_BIN") || "soltty"
 
 const DOT_PALETTE = ["#6c8ea3", "#c58a5a", "#8ba368", "#a3799a", "#6a615a"]
+export const NO_PROJECT_COLOR = DOT_PALETTE[4]
 
 const POLL_IDLE_MS = 15000
 const POLL_ACTIVE_MS = 2500
+
+const DESC_KEYS = ["description", "desc"]
+const PROJECT_KEYS = ["project", "project_name"]
+const START_KEYS = ["start_time", "start", "started_at"]
+const COLOR_KEYS = ["color", "colour"]
 
 export interface Project {
     id: string
@@ -31,7 +38,6 @@ const [runningDesc, setRunningDesc] = createState("")
 const [runningProject, setRunningProject] = createState<string | null>(null)
 const [projects, setProjects] = createState<Project[]>([])
 const [recent, setRecent] = createState<RecentEntry[]>([])
-const [tick, setTick] = createState(0)
 
 let runningEntryId: string | null = null
 
@@ -43,7 +49,6 @@ export const solttyState = {
     runningProject,
     projects,
     recent,
-    tick,
 }
 
 function dotColor(idx: number): string {
@@ -52,13 +57,9 @@ function dotColor(idx: number): string {
 
 type Json = Record<string, unknown>
 
-function run(args: string[]): Promise<string> {
-    return execAsync([BIN, ...args])
-}
-
-function parseJson(out: string): unknown {
+async function runJson(args: string[]): Promise<unknown> {
     try {
-        return JSON.parse(out) as unknown
+        return JSON.parse(await execAsync([BIN, ...args])) as unknown
     } catch {
         return null
     }
@@ -74,117 +75,85 @@ function pickStr(obj: Json | null, keys: string[], fallback = ""): string {
 
 function toArray(data: unknown): Json[] {
     if (Array.isArray(data)) return data as Json[]
-    const o = data as Json | null
-    for (const k of ["projects", "entries", "data"]) {
-        const v = o?.[k]
-        if (Array.isArray(v)) return v as Json[]
-    }
-    return []
+    const o = (data ?? {}) as Json
+    return ([o.projects, o.entries, o.data].find(Array.isArray) as Json[] | undefined) ?? []
 }
 
 function hhmm(s: string): string {
-    if (!s) return ""
     const ms = Date.parse(s)
-    if (!Number.isNaN(ms)) {
-        const d = new Date(ms)
-        return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
-    }
-    return s.slice(0, 5)
+    if (Number.isNaN(ms)) return s.slice(0, 5)
+    const d = new Date(ms)
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 function entrySeconds(e: Json): number {
-    const raw = e?.duration ?? e?.dur ?? e?.elapsed
-    if (typeof raw === "number" && raw > 0) return raw
-    if (typeof raw === "string") {
-        const n = Number(raw)
-        if (Number.isFinite(n) && n > 0) return n
-    }
-    const start = Date.parse(pickStr(e, ["start_time", "start", "started_at"]))
-    if (Number.isNaN(start)) return 0
+    const n = Number(e.duration ?? e.dur ?? e.elapsed)
+    if (Number.isFinite(n) && n > 0) return n
+    const start = Date.parse(pickStr(e, START_KEYS))
     const endStr = pickStr(e, ["end_time", "end", "ended_at", "stop"])
     const end = endStr ? Date.parse(endStr) : Date.now()
-    if (Number.isNaN(end) || end <= start) return 0
-    return Math.floor((end - start) / 1000)
+    return end > start ? Math.floor((end - start) / 1000) : 0
 }
 
 function fmtDur(sec: number): string {
     if (!Number.isFinite(sec) || sec <= 0) return "–"
     const h = Math.floor(sec / 3600)
     const m = Math.floor((sec % 3600) / 60)
-    if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m`
+    if (h > 0) return `${h}h ${pad(m)}m`
     if (m > 0) return `${m}m`
     return "<1m"
 }
 
 export async function refreshCurrent(): Promise<void> {
-    try {
-        const data = parseJson(await run(["current", "--json"])) as Json | null
-        if (!data || typeof data.running !== "boolean") {
-            setConnected(false)
-            return
-        }
-        setConnected(true)
-        if (data.running) {
-            setRunning(true)
-            runningEntryId = pickStr(data, ["id"]) || null
-            setRunningDesc(pickStr(data, ["description", "desc"]))
-            setRunningProject(pickStr(data, ["project", "project_name"]) || null)
-            const iso = pickStr(data, ["start", "started_at"])
-            const ms = iso ? Date.parse(iso) : NaN
-            setStartedAt(Number.isNaN(ms) ? null : ms)
-        } else {
-            setRunning(false)
-            runningEntryId = null
-            setStartedAt(null)
-            setRunningDesc("")
-            setRunningProject(null)
-        }
-    } catch {
+    const data = (await runJson(["current", "--json"])) as Json | null
+    if (!data || typeof data.running !== "boolean") {
         setConnected(false)
+        return
     }
+    setConnected(true)
+    const r = data.running
+    setRunning(r)
+    runningEntryId = r ? pickStr(data, ["id"]) || null : null
+    setRunningDesc(r ? pickStr(data, DESC_KEYS) : "")
+    setRunningProject(r ? pickStr(data, PROJECT_KEYS) || null : null)
+    const ms = r ? Date.parse(pickStr(data, START_KEYS)) : NaN
+    setStartedAt(Number.isNaN(ms) ? null : ms)
 }
 
 export async function refreshProjects(): Promise<void> {
-    try {
-        const arr = toArray(parseJson(await run(["list", "projects", "--json"])))
-        setProjects(
-            arr.map((p, i) => ({
-                id: pickStr(p, ["id", "project_id"]),
-                name: pickStr(p, ["name", "project", "title"], "(unnamed)"),
-                color: pickStr(p, ["color", "colour"]) || dotColor(i),
-                client: pickStr(p, ["client", "client_name", "clientName"]) || null,
-            })),
-        )
-    } catch {
-    }
+    const arr = toArray(await runJson(["list", "projects", "--json"]))
+    if (!arr.length) return
+    setProjects(
+        arr.map((p, i) => ({
+            id: pickStr(p, ["id", "project_id"]),
+            name: pickStr(p, ["name", "project", "title"], "(unnamed)"),
+            color: pickStr(p, COLOR_KEYS) || dotColor(i),
+            client: pickStr(p, ["client", "client_name", "clientName"]) || null,
+        })),
+    )
 }
 
 export async function refreshRecent(): Promise<void> {
-    try {
-        const arr = toArray(parseJson(await run(["list", "--json", "--limit", "4"])))
-        const byName = new Map(projects().map((p) => [p.name, p.color]))
-        setRecent(
-            arr.map((e, i) => {
-                const proj = pickStr(e, ["project", "project_name"])
-                const rawId = pickStr(e, ["id", "short_id", "shortId"])
-                return {
-                    id: rawId ? rawId.slice(0, 8) : `e${i}`,
-                    start: hhmm(pickStr(e, ["start_time", "start", "started_at"])),
-                    dur: fmtDur(entrySeconds(e)),
-                    color: pickStr(e, ["color", "colour"]) || byName.get(proj) || dotColor(i),
-                    desc: pickStr(e, ["description", "desc"], "(no description)"),
-                }
-            }),
-        )
-    } catch {
-    }
+    const arr = toArray(await runJson(["list", "--json", "--limit", "4"]))
+    if (!arr.length) return
+    const byName = new Map(projects().map((p) => [p.name, p.color]))
+    setRecent(
+        arr.map((e, i) => {
+            const rawId = pickStr(e, ["id", "short_id", "shortId"])
+            return {
+                id: rawId ? rawId.slice(0, 8) : `e${i}`,
+                start: hhmm(pickStr(e, START_KEYS)),
+                dur: fmtDur(entrySeconds(e)),
+                color: pickStr(e, COLOR_KEYS) || byName.get(pickStr(e, PROJECT_KEYS)) || dotColor(i),
+                desc: pickStr(e, DESC_KEYS, "(no description)"),
+            }
+        }),
+    )
 }
 
-export async function startTimer(desc: string, project: string | null): Promise<void> {
-    const args = ["start", desc, "--yes"]
-    if (project) args.push("--project", project)
+async function execRefresh(args: string[]): Promise<void> {
     try {
-        await run(args)
+        await execAsync([BIN, ...args])
     } catch {
     } finally {
         await refreshCurrent()
@@ -192,14 +161,12 @@ export async function startTimer(desc: string, project: string | null): Promise<
     }
 }
 
-export async function stopTimer(): Promise<void> {
-    try {
-        await run(["stop"])
-    } catch {
-    } finally {
-        await refreshCurrent()
-        await refreshRecent()
-    }
+export function startTimer(desc: string, project: string | null): Promise<void> {
+    return execRefresh(["start", desc, "--yes", ...(project ? ["--project", project] : [])])
+}
+
+export function stopTimer(): Promise<void> {
+    return execRefresh(["stop"])
 }
 
 interface SolttyConfig {
@@ -233,38 +200,31 @@ function readSolttyConfig(): SolttyConfig | null {
     return null
 }
 
-async function putEntry(fields: Record<string, unknown>): Promise<void> {
+async function patchRunning(fields: Record<string, unknown>): Promise<void> {
     const cfg = readSolttyConfig()
     if (!cfg || !runningEntryId) return
     const url = `${cfg.base_url}/organizations/${cfg.workspace_id}/time-entries/${runningEntryId}`
-    await execAsync([
-        "curl", "-sS", "-X", "PUT", url,
-        "-H", `Authorization: Bearer ${cfg.api_token}`,
-        "-H", "Content-Type: application/json",
-        "-H", "Accept: application/json",
-        "-d", JSON.stringify(fields),
-    ])
+    try {
+        await execAsync([
+            "curl", "-sS", "-X", "PUT", url,
+            "-H", `Authorization: Bearer ${cfg.api_token}`,
+            "-H", "Content-Type: application/json",
+            "-H", "Accept: application/json",
+            "-d", JSON.stringify(fields),
+        ])
+    } catch {
+    }
+    refreshCurrent()
 }
 
 export async function updateRunningDescription(text: string): Promise<void> {
     if (!running() || text === runningDesc()) return
-    try {
-        await putEntry({ description: text })
-    } catch {
-    }
-    refreshCurrent()
+    await patchRunning({ description: text })
 }
 
 export async function updateRunningProject(projectName: string | null): Promise<void> {
     if (!running() || projectName === runningProject()) return
-    const pid = projectName
-        ? projects().find((p) => p.name === projectName)?.id ?? null
-        : null
-    try {
-        await putEntry({ project_id: pid })
-    } catch {
-    }
-    refreshCurrent()
+    await patchRunning({ project_id: projects().find((p) => p.name === projectName)?.id ?? null })
 }
 
 let pollId = 0
@@ -281,17 +241,12 @@ function schedulePoll(): void {
 export function initSolttyService(): void {
     refreshCurrent()
     schedulePoll()
-    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
-        if (running()) setTick(tick() + 1)
-        return GLib.SOURCE_CONTINUE
-    })
 }
 
 export function setSolttyActive(active: boolean): void {
     pollMs = active ? POLL_ACTIVE_MS : POLL_IDLE_MS
     schedulePoll()
     if (active) {
-        setTick(tick() + 1)
         refreshProjects()
         refreshRecent()
     }

@@ -514,6 +514,12 @@ tooltip {
     .stat-temp-icon {
         color: $w-faint;
     }
+
+    .stat-power-icon {
+        color: $w-dim;
+        margin-right: 0;
+        font-size: 16px;
+    }
 }
 
 .tray image {

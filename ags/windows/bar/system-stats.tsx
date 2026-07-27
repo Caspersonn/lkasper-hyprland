@@ -1,7 +1,41 @@
+import Gio from "gi://Gio"
 import { readFile } from "ags/file"
 import { createPoll } from "ags/time"
+import { createState } from "ags"
 import { Gtk } from "ags/gtk4"
 import { glyph } from "./glyphs"
+
+const PROFILE_ICON: Record<string, string> = {
+    "power-saver": "󰾆",
+    balanced: "󰾅",
+    performance: "󰓅",
+}
+
+const [powerProfile, setPowerProfile] = createState("")
+
+let powerProxy: Gio.DBusProxy | null = null
+
+function initPowerProfile() {
+    try {
+        powerProxy = Gio.DBusProxy.new_for_bus_sync(
+            Gio.BusType.SYSTEM,
+            Gio.DBusProxyFlags.NONE,
+            null,
+            "net.hadess.PowerProfiles",
+            "/net/hadess/PowerProfiles",
+            "net.hadess.PowerProfiles",
+            null,
+        )
+        const sync = () => {
+            const v = powerProxy?.get_cached_property("ActiveProfile")
+            if (v) setPowerProfile(v.deep_unpack() as string)
+        }
+        sync()
+        powerProxy.connect("g-properties-changed", sync)
+    } catch {
+    }
+}
+initPowerProfile()
 
 let prevIdle = 0
 let prevTotal = 0
@@ -101,6 +135,9 @@ export default function SystemStats() {
             <box class="stat stat-temp" visible={hasTemp}>
                 <label class="stat-icon stat-temp-icon" label={glyph.thermometer} />
                 <label class="stat-value" label={temp((v) => (v !== null ? `${v}°` : ""))} />
+            </box>
+            <box class="stat stat-power" visible={powerProfile((p) => p in PROFILE_ICON)}>
+                <label class="stat-icon stat-power-icon" label={powerProfile((p) => PROFILE_ICON[p] ?? "")} />
             </box>
         </box>
     )

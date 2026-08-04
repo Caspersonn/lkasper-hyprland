@@ -1,5 +1,6 @@
 import Gdk from "gi://Gdk"
 import GLib from "gi://GLib"
+import Pango from "gi://Pango"
 import AstalHyprland from "gi://AstalHyprland"
 import App from "ags/gtk4/app"
 import { Accessor, For, createBinding, createComputed, createState } from "ags"
@@ -274,7 +275,13 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                         <box cssClasses={statusDotClasses} valign={Gtk.Align.CENTER} />
                         <box orientation={Gtk.Orientation.VERTICAL} valign={Gtk.Align.CENTER}>
                             <label class="soltty-status-label" xalign={0} label={statusLabel} />
-                            <label class="soltty-status-sub" xalign={0} label={statusSub} />
+                            <label
+                                class="soltty-status-sub"
+                                xalign={0}
+                                maxWidthChars={44}
+                                ellipsize={Pango.EllipsizeMode.END}
+                                label={statusSub}
+                            />
                         </box>
                     </box>
                     <box hexpand />
@@ -308,7 +315,14 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                     >
                         <box valign={Gtk.Align.CENTER}>
                             {Dot(triggerColor)}
-                            <label class="soltty-proj-name" xalign={0} hexpand label={triggerLabel} />
+                            <label
+                                class="soltty-proj-name"
+                                xalign={0}
+                                hexpand
+                                maxWidthChars={32}
+                                ellipsize={Pango.EllipsizeMode.END}
+                                label={triggerLabel}
+                            />
                             <label class="soltty-proj-caret" label={glyph.chevronRight} />
                         </box>
                     </button>
@@ -340,8 +354,20 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                                         >
                                             <box valign={Gtk.Align.CENTER}>
                                                 {Dot(p.color)}
-                                                <label class="soltty-menu-name" xalign={0} hexpand label={p.name} />
-                                                <label class="soltty-menu-client" label={p.client ?? ""} />
+                                                <label
+                                                    class="soltty-menu-name"
+                                                    xalign={0}
+                                                    hexpand
+                                                    maxWidthChars={24}
+                                                    ellipsize={Pango.EllipsizeMode.END}
+                                                    label={p.name}
+                                                />
+                                                <label
+                                                    class="soltty-menu-client"
+                                                    maxWidthChars={18}
+                                                    ellipsize={Pango.EllipsizeMode.END}
+                                                    label={p.client ?? ""}
+                                                />
                                             </box>
                                         </button>
                                     )}
@@ -376,7 +402,14 @@ function SolttyWindow(gdkmonitor: Gdk.Monitor) {
                                 <label class="soltty-recent-start" label={e.start} />
                                 <label class="soltty-recent-dur" label={e.dur} />
                                 {Dot(e.color)}
-                                <label class="soltty-recent-desc" xalign={0} hexpand label={e.desc} />
+                                <label
+                                    class="soltty-recent-desc"
+                                    xalign={0}
+                                    hexpand
+                                    maxWidthChars={28}
+                                    ellipsize={Pango.EllipsizeMode.END}
+                                    label={e.desc}
+                                />
                                 <label class="soltty-recent-id" label={e.id} />
                             </box>
                         )}

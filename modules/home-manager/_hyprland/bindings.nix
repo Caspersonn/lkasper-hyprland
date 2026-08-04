@@ -128,9 +128,9 @@ in
 
     bindp = [
       # Powerprofileselecter
-      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver & notify-send -u low 'Power Profile 🚀' 'power-saver'"
-      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced & notify-send -u low 'Power Profile 🚀' 'balanced'"
-      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance & notify-send -u low 'Power Profile 🚀' 'perfomance'"
+      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver & notify-send -u low 'Power Profile ' 'power-saver'"
+      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced & notify-send -u low 'Power Profile ' 'balanced'"
+      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance & notify-send -u low 'Power Profile ' 'perfomance'"
     ];
   };
 }

@@ -15,6 +15,7 @@ let
     libsForQt5.qtstyleplugin-kvantum
     qt6Packages.qtstyleplugin-kvantum
     pavucontrol
+    nautilus
     adwaita-icon-theme
     gruvbox-plus-icons
     hicolor-icon-theme

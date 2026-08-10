@@ -38,6 +38,10 @@
         # Install packages
         environment.systemPackages = packages.systemPackages;
         programs.direnv.enable = true;
+        programs.nautilus-open-any-terminal = {
+          enable = true;
+          terminal = "ghostty";
+        };
 
         # Networking
         services.resolved.enable = true;

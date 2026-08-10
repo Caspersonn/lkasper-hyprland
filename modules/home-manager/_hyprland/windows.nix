@@ -29,9 +29,9 @@
       "size 622 652, match:title (nmtui)"
       "stay_focused on, match:title (nmtui)"
 
-      "float on, match:title ^(yazi)$"
-      "size 992 608, match:title ^(yazi)$"
-      "stay_focused on, match:title ^(yazi)$"
+      "float on, match:class ^(org.gnome.Nautilus)$"
+      "size 992 608, match:class ^(org.gnome.Nautilus)$"
+      "stay_focused on, match:class ^(org.gnome.Nautilus)$"
     ];
 
     layerrule = [

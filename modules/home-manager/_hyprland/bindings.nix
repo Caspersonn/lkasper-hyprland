@@ -33,6 +33,7 @@ in
       "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
       "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
       "SUPER, W, [System] Wallpaper picker, exec, ags request toggle-wallpaper-picker"
+      "SUPER SHIFT, W, [System] Toggle light dark mode, exec, theme-toggle"
 
       # Windows
       "SUPER, I, [Windows] Pin window, exec, hyprctl dispatch pin"

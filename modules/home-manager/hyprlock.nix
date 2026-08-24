@@ -1,24 +1,14 @@
-{ inputs, ... }:
+{ ... }:
 {
   flake.homeManagerModules.lkh-hyprlock =
-    {
-      config,
-      pkgs,
-      lib,
-      ...
-    }:
-    let
-      palette = config.colorScheme.palette;
-      convert = inputs.nix-colors.lib.conversions.hexToRGBString;
-
-      surfaceRgb = "rgb(${convert ", " palette.base02})";
-      foregroundRgb = "rgb(${convert ", " palette.base05})";
-      foregroundMutedRgb = "rgb(${convert ", " palette.base04})";
-    in
+    { ... }:
     {
       programs.hyprlock = {
         enable = true;
+        sourceFirst = true;
         settings = {
+          source = [ "~/.config/lkasper-hyprland/current/hyprlock.conf" ];
+
           general = {
             disable_loading_bar = true;
             no_fade_in = false;
@@ -39,17 +29,17 @@
             halign = "center";
             valign = "center";
 
-            inner_color = surfaceRgb;
-            outer_color = foregroundRgb; # #d3c6aa
+            inner_color = "$lkh_surface";
+            outer_color = "$lkh_accent";
             outline_thickness = 4;
 
             font_family = "CaskaydiaMono Nerd Font";
             font_size = 32;
-            font_color = foregroundRgb;
+            font_color = "$lkh_foreground";
 
-            placeholder_color = foregroundMutedRgb;
+            placeholder_color = "$lkh_muted";
             placeholder_text = "  Enter Password 󰈷 ";
-            check_color = "rgba(131, 192, 146, 1.0)";
+            check_color = "$lkh_ok";
             fail_text = "Wrong";
 
             rounding = 0;
@@ -61,7 +51,7 @@
             monitor = "";
             text = ''cmd[update:1000] echo "$(date +"%H:%M")"'';
 
-            color = foregroundMutedRgb;
+            color = "$lkh_muted";
             font_size = 64;
             font_family = "CaskaydiaMono Nerd Font";
             position = "0, 120";

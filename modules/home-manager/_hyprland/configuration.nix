@@ -27,7 +27,6 @@ in
     monitor = if cfg.monitors != [ ] then cfg.monitors else [ ",preferred,auto,1" ];
   };
 
-  # Remove start-hyprland error
   wayland.windowManager.hyprland.settings.misc.disable_watchdog_warning = true;
 
   wayland.windowManager.hyprland.plugins = [
@@ -36,6 +35,6 @@ in
   wayland.windowManager.hyprland.extraConfig = ''
     source = ~/.config/hypr/monitors.conf
     source = ~/.config/hypr/workspaces.conf
-    source = ~/.config/hypr/theme.conf
+    source = ~/.config/lkasper-hyprland/current/hypr.conf
   '';
 }

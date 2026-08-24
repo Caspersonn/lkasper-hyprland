@@ -20,7 +20,8 @@
           portalPackage = hyprpkgs.xdg-desktop-portal-hyprland; # Use stable nixpkgs version to fix Qt version mismatch
         };
 
-      # Configure XDG desktop portals for proper GTK dark mode support
+      programs.dconf.enable = true;
+
       xdg.portal = {
         enable = true;
         extraPortals = [

@@ -31,19 +31,12 @@ in
     OZONE_PLATFORM = "wayland";
     CHROMIUM_FLAGS = "--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4";
     EDITOR = "nvim";
-    # Disable libadwaita portal for dark mode - portal is broken, use direct GTK settings instead
-    ADW_DISABLE_PORTAL = "1";
     XDG_DATA_DIRS = "$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share";
-    GTK_THEME = "Adwaita-dark";
   };
 
-  # Import environment variables into systemd user environment
-  # This is needed for apps launched via .desktop files (e.g., from wofi)
   systemd.user.sessionVariables = config.home.sessionVariables;
 
   wayland.windowManager.hyprland.settings = {
-    # Environment variables — mirrors home.sessionVariables so Hyprland
-    # child processes also see them before the session vars are sourced
     env = (lib.optionals hasNvidiaDrivers nvidiaEnv) ++ [
       "GDK_SCALE,${toString cfg.scale}"
       "XCURSOR_SIZE,24"
@@ -60,15 +53,12 @@ in
       ''CHROMIUM_FLAGS,"--enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4"''
       "XDG_DATA_DIRS,$XDG_DATA_DIRS:$HOME/.nix-profile/share:/nix/var/nix/profiles/default/share"
       "EDITOR,nvim"
-      "ADW_DISABLE_PORTAL,1"
-      "GTK_THEME,Adwaita-dark"
     ];
 
     xwayland = {
       force_zero_scaling = true;
     };
 
-    # Don't show update on first launch
     ecosystem = {
       no_update_news = true;
     };

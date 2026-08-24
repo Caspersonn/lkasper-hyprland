@@ -10,7 +10,7 @@ import { initLauncher, toggleLauncher } from "./windows/launcher"
 import { initSoltty, toggleSoltty } from "./windows/soltty"
 import { initSolttyService } from "./windows/soltty/service"
 import { initWallpaperPicker, toggleWallpaperPicker } from "./windows/wallpaper-picker"
-import { themedCss, watchTheme } from "./theme"
+import { themedCss, watchTheme, applyTheme } from "./theme"
 
 App.start({
     css: themedCss(),
@@ -51,6 +51,11 @@ App.start({
         }
         if (argv.includes("toggle-soltty")) {
             toggleSoltty()
+            res("ok")
+            return
+        }
+        if (argv.includes("theme-reload")) {
+            applyTheme()
             res("ok")
             return
         }

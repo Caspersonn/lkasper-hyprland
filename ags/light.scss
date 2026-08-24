@@ -1,0 +1,24 @@
+@import "tokens";
+
+window.bar {
+    background-color: ca(base00, 0.9);
+    border: 1px solid ca(base05, 0.14);
+    box-shadow: 0 6px 20px -14px ca(shade, 0.45), inset 0 1px 0 ca(base00, 0.7);
+}
+
+.launcher-modal,
+.sc-modal,
+.wp-modal,
+.soltty-card,
+.notifications-popover,
+.np-card {
+    border: 1px solid ca(base05, 0.14);
+    box-shadow: 0 24px 60px -34px ca(shade, 0.4);
+}
+
+.launcher-backdrop,
+.sc-backdrop,
+.soltty-backdrop,
+.wp-backdrop {
+    background-color: ca(base00, 0.36);
+}

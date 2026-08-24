@@ -13,6 +13,7 @@
           window-padding-y = 14;
           background-opacity = 0.95;
           window-decoration = "none";
+          app-notifications = false;
 
           font-family = "CaskaydiaMono NF";
           font-size = 12;

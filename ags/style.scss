@@ -1,55 +1,10 @@
-@function c($n) {
-    @return unquote("@#{$n}");
-}
-@function ca($n, $a) {
-    @return unquote("alpha(@#{$n}, #{$a})");
-}
-
-$base: c(base00);
-$surface0: c(base01);
-$surface1: c(base02);
-$surface2: c(base03);
-$subtext0: ca(base05, 0.72);
-$text: c(base05);
-$green: c(base0B);
-$yellow: c(base0A);
-$red: c(base08);
-$orange: c(base09);
-$purple: c(base0E);
-$blue: c(base0D);
-$aqua: c(base0C);
-$fg2: c(base06);
-$gray: ca(base05, 0.6);
-$base-dark: c(base00);
-
-$bg: $base;
-$fg: $text;
-$fg-dim: $subtext0;
-$accent: c(accent);
-
-$island-radius: 14px;
-$island-border: ca(base04, 0.24);
-$hover-bg: ca(base05, 0.1);
-
-$w-bg: ca(base00, 0.72);
-$w-hover: ca(base05, 0.07);
-$w-line: ca(base05, 0.09);
-$w-text: c(base05);
-$w-dim: ca(base05, 0.75);
-$w-faint: ca(base05, 0.5);
-$w-accent: c(accent);
-$w-accent-soft: ca(accent, 0.16);
-$w-teal: c(base0C);
-$w-ok: c(base0B);
-$w-warn: c(base0A);
-$w-crit: c(base08);
-$w-bar-radius: 14px;
+@import "tokens";
 
 window.bar {
     background-color: $w-bg;
     border: 1px solid $w-line;
     border-radius: $w-bar-radius;
-    box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    box-shadow: 0 8px 30px -12px ca(shade, 0.7), inset 0 1px 0 ca(hairline, 0.04);
     color: $w-text;
     font-family: "JetBrainsMono Nerd Font", monospace;
     font-size: 13px;
@@ -1286,12 +1241,11 @@ window.soltty {
 
     .soltty-card {
         min-width: 540px;
-        max-width: 540px;
         background-color: $so-panel;
-        border: 1px solid rgba(255, 255, 255, 0.07);
+        border: 1px solid ca(hairline, 0.07);
         border-radius: 18px;
         padding: 22px 24px 20px;
-        box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.75);
+        box-shadow: 0 40px 90px -30px ca(shade, 0.75);
     }
 
     .soltty-header {
@@ -1377,8 +1331,8 @@ window.soltty {
         }
 
         &.idle {
-            background-color: rgba(255, 255, 255, 0.02);
-            border-color: rgba(255, 255, 255, 0.06);
+            background-color: ca(hairline, 0.02);
+            border-color: ca(hairline, 0.06);
         }
 
         &.running {
@@ -1461,7 +1415,7 @@ window.soltty {
         margin-top: 6px;
         padding: 6px;
         background-color: $so-menu;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid ca(hairline, 0.1);
         border-radius: 12px;
     }
 
@@ -1543,7 +1497,7 @@ window.soltty {
         padding: 0 9px;
         border-radius: 7px;
         background-color: c(base01);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid ca(hairline, 0.06);
         color: c(base04);
         font-size: 12px;
         margin-left: 5px;
@@ -1587,7 +1541,7 @@ window.soltty {
         border: 1px solid transparent;
 
         &:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: ca(hairline, 0.05);
         }
     }
 

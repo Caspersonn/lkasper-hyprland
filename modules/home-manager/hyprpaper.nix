@@ -1,21 +1,29 @@
 { ... }:
 {
   flake.homeManagerModules.lkh-hyprpaper =
-    { config, pkgs, ... }:
+    { lib, ... }:
     let
-      # Default wallpaper, now colocated in-repo (slugified name). The runtime
-      # wallpaper picker overrides this live via hyprpaper IPC.
-      selected_wallpaper_path = "${../../wallpapers/wood-dark.png}";
+      pairs = import ../../wallpapers/pairs.nix;
+      pairNames = builtins.attrNames pairs;
+      defaultPair = if builtins.elem "beach" pairNames then "beach" else builtins.head pairNames;
+      wallpapers = lib.concatMap (
+        pair:
+        map (mode: "${../../wallpapers + "/${pairs.${pair}.${mode}}"}") [
+          "light"
+          "dark"
+        ]
+      ) pairNames;
+      defaultWallpaper = "${../../wallpapers + "/${pairs.${defaultPair}.dark}"}";
     in
     {
       services.hyprpaper = {
         enable = true;
         settings = {
-          preload = [ selected_wallpaper_path ];
+          preload = wallpapers;
           wallpaper = [
             {
               monitor = "";
-              path = selected_wallpaper_path;
+              path = defaultWallpaper;
               fit_mode = "cover";
             }
           ];

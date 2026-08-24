@@ -5,15 +5,18 @@ import AstalHyprland from "gi://AstalHyprland"
 import { For, createBinding, createComputed, createState } from "ags"
 import { Astal, Gtk } from "ags/gtk4"
 import { isInside } from "../utils"
-import { CURRENT, read } from "../../theme"
+import { STATE, activeMode, read } from "../../theme"
 
 const HOME = GLib.get_home_dir()
-const WALLPAPER_DIR = `${HOME}/.local/share/lkasper-hyprland/wallpapers`
+const SHARE = `${HOME}/.local/share/lkasper-hyprland`
+const WALLPAPER_DIR = `${SHARE}/wallpapers`
+const PAIRS = `${SHARE}/pairs.json`
 const COLS = 3
 
 interface Wallpaper {
     slug: string
-    path: string
+    light: string
+    dark: string
 }
 
 const hypr = AstalHyprland.get_default()
@@ -23,24 +26,31 @@ const [selectedSlug, setSelectedSlug] = createState("")
 const [activeSlug, setActiveSlug] = createState("")
 
 function listWallpapers(): Wallpaper[] {
-    const out: Wallpaper[] = []
+    const raw = read(PAIRS)
+    if (!raw) return []
     try {
-        const dir = GLib.Dir.open(WALLPAPER_DIR, 0)
-        let name: string | null
-        while ((name = dir.read_name()) !== null) {
-            const m = name.match(/^(.+)\.(?:png|jpe?g)$/i)
-            if (m) out.push({ slug: m[1], path: `${WALLPAPER_DIR}/${name}` })
-        }
-        dir.close()
+        const parsed = JSON.parse(raw) as Record<string, Record<string, string>>
+        return Object.keys(parsed)
+            .map((slug) => ({
+                slug,
+                light: `${WALLPAPER_DIR}/${parsed[slug].light}`,
+                dark: `${WALLPAPER_DIR}/${parsed[slug].dark}`,
+            }))
+            .sort((a, b) => a.slug.localeCompare(b.slug))
     } catch {
+        return []
     }
-    return out.sort((a, b) => a.slug.localeCompare(b.slug))
 }
 
 const WALLPAPERS = listWallpapers()
 
 function readActive(): string {
-    return (read(CURRENT) ?? "").trim()
+    const state = (read(STATE) ?? "").trim()
+    return state.split(/\s+/)[0] ?? ""
+}
+
+function thumbFor(w: Wallpaper): string {
+    return activeMode() === "light" ? w.light : w.dark
 }
 
 function prettyName(slug: string): string {
@@ -75,6 +85,7 @@ export function toggleWallpaperPicker() {
         close()
         return
     }
+    refreshThumbs()
     const active = readActive()
     setActiveSlug(active)
     setSelectedSlug(
@@ -85,14 +96,23 @@ export function toggleWallpaperPicker() {
     setPVisible(true)
 }
 
-function paintThumb(self: Gtk.Box, path: string) {
+const thumbs: Array<{ wallpaper: Wallpaper; picture: Gtk.Picture }> = []
+
+function paintThumb(self: Gtk.Box, w: Wallpaper) {
     self.set_overflow(Gtk.Overflow.HIDDEN)
-    const pic = Gtk.Picture.new_for_filename(path)
+    const pic = Gtk.Picture.new_for_filename(thumbFor(w))
     pic.set_content_fit(Gtk.ContentFit.COVER)
     pic.set_can_shrink(true)
     pic.set_hexpand(true)
     pic.set_vexpand(true)
     self.append(pic)
+    thumbs.push({ wallpaper: w, picture: pic })
+}
+
+function refreshThumbs() {
+    for (const { wallpaper, picture } of thumbs) {
+        picture.set_filename(thumbFor(wallpaper))
+    }
 }
 
 function Tile(w: Wallpaper) {
@@ -112,7 +132,7 @@ function Tile(w: Wallpaper) {
             $={(self) => self.add_controller(motion)}
         >
             <box orientation={Gtk.Orientation.VERTICAL}>
-                <box class="wp-thumb" $={(self: Gtk.Box) => paintThumb(self, w.path)} />
+                <box class="wp-thumb" $={(self: Gtk.Box) => paintThumb(self, w)} />
                 <box class="wp-caption" valign={Gtk.Align.CENTER}>
                     <label class="wp-name" xalign={0} hexpand label={prettyName(w.slug)} />
                     <label class="wp-current" label="current" visible={isCurrent} />

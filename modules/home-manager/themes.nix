@@ -8,123 +8,578 @@
       ...
     }:
     let
-      # Palettes are generated from each wallpaper by
-      # wallpapers/regenerate-palettes.sh and committed as base16 JSON
-      # (base00-base0F, bare hex). No static theme is picked any more.
-      paletteDir = ../../wallpapers/palettes;
-      paletteNames = map (n: lib.removeSuffix ".json" n) (
-        builtins.filter (n: lib.hasSuffix ".json" n) (builtins.attrNames (builtins.readDir paletteDir))
-      );
-      palettes = builtins.listToAttrs (
-        map (name: {
-          inherit name;
-          value = builtins.fromJSON (builtins.readFile (paletteDir + "/${name}.json"));
-        }) paletteNames
-      );
+      wallpaperRoot = ../../wallpapers;
+      paletteDir = wallpaperRoot + "/palettes";
+      pairs = import (wallpaperRoot + "/pairs.nix");
 
-      # Default active wallpaper; the runtime picker overrides current/theme.name.
-      activeWallpaper = "wood-dark";
-      activePalette = palettes.${activeWallpaper};
+      dataRoot = ".local/share/lkasper-hyprland";
+      themeRoot = "${dataRoot}/themes";
+      stateDir = "$HOME/.config/lkasper-hyprland";
 
-      # A nix-colors-shaped colorScheme built from a wallpaper palette.
-      mkColorScheme = name: palette: {
-        slug = name;
-        name = name;
-        author = "wallust (wallpaper-derived)";
-        inherit palette;
+      modes = [
+        "light"
+        "dark"
+      ];
+      pairNames = builtins.attrNames pairs;
+
+      imageNames = builtins.filter (
+        n: lib.hasSuffix ".png" n || lib.hasSuffix ".jpg" n || lib.hasSuffix ".jpeg" n
+      ) (builtins.attrNames (builtins.readDir wallpaperRoot));
+
+      claimed = lib.concatMap (pair: builtins.attrValues pairs.${pair}) pairNames;
+      unpaired = builtins.filter (image: !(builtins.elem image claimed)) imageNames;
+      duplicated = builtins.filter (image: lib.count (c: c == image) claimed > 1) (lib.unique claimed);
+      missingImages = builtins.filter (image: !(builtins.elem image imageNames)) claimed;
+      malformed = builtins.filter (
+        pair:
+        builtins.attrNames pairs.${pair} != [
+          "dark"
+          "light"
+        ]
+      ) pairNames;
+
+      slugOf = image: lib.removeSuffix ".jpeg" (lib.removeSuffix ".jpg" (lib.removeSuffix ".png" image));
+
+      paletteOf = image: builtins.fromJSON (builtins.readFile (paletteDir + "/${slugOf image}.json"));
+
+      missingPalettes = builtins.filter (
+        image: !(builtins.pathExists (paletteDir + "/${slugOf image}.json"))
+      ) claimed;
+
+      defaultPair = if builtins.elem "beach" pairNames then "beach" else builtins.head pairNames;
+      defaultMode = "dark";
+
+      hexToRgb = inputs.nix-colors.lib.conversions.hexToRGBString ", ";
+
+      retrobox = {
+        dark = {
+          bg = "1c1c1c";
+          fg = "ebdbb2";
+          surface = "303030";
+          selection = "2a405a";
+          comment = "928374";
+          accent = "d79921";
+          info = "83a598";
+          ansi = [
+            "1c1c1c"
+            "cc241d"
+            "98971a"
+            "d79921"
+            "458588"
+            "b16286"
+            "689d6a"
+            "a89984"
+            "928374"
+            "fb5944"
+            "b8bb26"
+            "fabd2f"
+            "83a598"
+            "d3869b"
+            "8ec07c"
+            "ebdbb2"
+          ];
+        };
+        light = {
+          bg = "fbf1c7";
+          fg = "3c3836";
+          surface = "e5d4b1";
+          selection = "b0d0d0";
+          comment = "928374";
+          accent = "b57614";
+          info = "076678";
+          ansi = [
+            "3c3836"
+            "cc241d"
+            "98971a"
+            "d79921"
+            "458588"
+            "b16286"
+            "689d6a"
+            "7c6f64"
+            "928374"
+            "9d0006"
+            "79740e"
+            "b57614"
+            "076678"
+            "8f3f71"
+            "427b58"
+            "fbf1c7"
+          ];
+        };
       };
 
-      # Wallpaper images exposed at a runtime path, so the picker + theme-switch
-      # can find them by slug (filename without extension).
-      wallpaperImages = builtins.filter (
-        n: lib.hasSuffix ".png" n || lib.hasSuffix ".jpg" n || lib.hasSuffix ".jpeg" n
-      ) (builtins.attrNames (builtins.readDir ../../wallpapers));
-      wallpaperFiles = builtins.listToAttrs (
-        map (f: {
-          name = ".local/share/lkasper-hyprland/wallpapers/${f}";
-          value = {
-            source = ../../wallpapers + "/${f}";
+      base16Slots = map (c: "base0${c}") (lib.stringToCharacters "0123456789ABCDEF");
+
+      accentPalette =
+        palette:
+        palette
+        // {
+          base0A = palette.accent2;
+          base0B = palette.accent3;
+          base0C = palette.accent2;
+          base0D = palette.accent;
+          base0E = palette.accent3;
+          base0F = palette.accent;
+        };
+
+      themeFiles =
+        pair: mode:
+        let
+          image = pairs.${pair}.${mode};
+          palette = paletteOf image;
+          shell = accentPalette palette;
+          accent = palette.accent;
+          rb = retrobox.${mode};
+          rbAnsi = i: builtins.elemAt rb.ansi i;
+          wallpaper = wallpaperRoot + "/${image}";
+        in
+        {
+          "colors.json" = builtins.toJSON (
+            shell
+            // {
+              inherit mode;
+              background = "#${shell.base00}";
+              foreground = "#${shell.base05}";
+              accent = accent;
+              hairline = if mode == "light" then shell.base05 else shell.base07;
+              shade = if mode == "light" then shell.base03 else "000000";
+            }
+          );
+
+          "colors-ansi.json" = builtins.toJSON (palette // { inherit mode; });
+
+          "nvim.lua" = ''
+            return {
+              mode = "${mode}",
+              colorscheme = "retrobox",
+              background = "${mode}",
+              wallpaper_background = "#${palette.base00}",
+              palette = {
+            ${lib.concatMapStringsSep "\n" (slot: "    ${slot} = \"#${palette.${slot}}\",") base16Slots}
+              },
+            }
+          '';
+
+          "wallpaper.path" = "${wallpaper}\n";
+
+          "foot.ini" = ''
+            [colors]
+            background=${rb.bg}
+            foreground=${rb.fg}
+            selection-background=${rb.selection}
+            selection-foreground=${rb.fg}
+            ${lib.concatStringsSep "\n" (lib.genList (i: "regular${toString i}=${rbAnsi i}") 8)}
+            ${lib.concatStringsSep "\n" (lib.genList (i: "bright${toString i}=${rbAnsi (i + 8)}") 8)}
+          '';
+
+          "ghostty" = ''
+            background = #${rb.bg}
+            foreground = #${rb.fg}
+            selection-background = #${rb.selection}
+            selection-foreground = #${rb.fg}
+            ${lib.concatStringsSep "\n" (lib.genList (i: "palette = ${toString i}=#${rbAnsi i}") 16)}
+          '';
+
+          "clipse-theme.json" = builtins.toJSON {
+            useCustomTheme = true;
+            TitleFore = "#${rb.bg}";
+            TitleBack = "#${rb.fg}";
+            TitleInfo = "#${rbAnsi 12}";
+            NormalTitle = "#${rb.fg}";
+            DimmedTitle = "#${rb.comment}";
+            SelectedTitle = "#${rbAnsi 11}";
+            NormalDesc = "#${rb.comment}";
+            DimmedDesc = "#${rb.comment}";
+            SelectedDesc = "#${rbAnsi 11}";
+            StatusMsg = "#${rbAnsi 10}";
+            PinIndicatorColor = "#${rbAnsi 11}";
+            SelectedBorder = "#${rb.accent}";
+            SelectedDescBorder = "#${rb.accent}";
+            FilteredMatch = "#${rbAnsi 10}";
+            FilterPrompt = "#${rbAnsi 10}";
+            FilterInfo = "#${rbAnsi 12}";
+            FilterText = "#${rb.fg}";
+            FilterCursor = "#${rb.accent}";
+            HelpKey = "#${rbAnsi 12}";
+            HelpDesc = "#${rb.comment}";
+            PageActiveDot = "#${rb.accent}";
+            PageInactiveDot = "#${rb.comment}";
+            DividerDot = "#${rb.comment}";
+            PreviewedText = "#${rb.fg}";
+            PreviewBorder = "#${rb.comment}";
           };
-        }) wallpaperImages
+
+          "fish.fish" = ''
+            set -U fish_color_normal ${rb.fg}
+            set -U fish_color_command ${rbAnsi 10}
+            set -U fish_color_keyword ${rbAnsi 9}
+            set -U fish_color_quote ${rbAnsi 10}
+            set -U fish_color_redirection ${rbAnsi 14}
+            set -U fish_color_end ${rbAnsi 11}
+            set -U fish_color_error ${rbAnsi 9}
+            set -U fish_color_param ${rb.fg}
+            set -U fish_color_option ${rbAnsi 14}
+            set -U fish_color_comment ${rb.comment}
+            set -U fish_color_operator ${rbAnsi 14}
+            set -U fish_color_escape ${rbAnsi 11}
+            set -U fish_color_autosuggestion ${rb.comment}
+            set -U fish_color_cwd ${rbAnsi 11}
+            set -U fish_color_user ${rbAnsi 14}
+            set -U fish_color_host ${rbAnsi 12}
+            set -U fish_color_valid_path --underline
+            set -U fish_color_selection ${rb.fg} --background=${rb.selection}
+            set -U fish_color_search_match --background=${rb.selection}
+            set -U fish_pager_color_prefix ${rb.accent} --bold
+            set -U fish_pager_color_completion ${rb.fg}
+            set -U fish_pager_color_description ${rb.comment}
+            set -U fish_pager_color_progress ${rb.comment}
+            set -U fish_pager_color_selected_background --background=${rb.selection}
+            set -U lkh_fg ${rb.fg}
+            set -U lkh_dim ${rb.comment}
+            set -U lkh_red ${rbAnsi 9}
+            set -U lkh_green ${rbAnsi 10}
+            set -U lkh_yellow ${rbAnsi 11}
+            set -U lkh_blue ${rbAnsi 12}
+            set -U lkh_magenta ${rbAnsi 13}
+            set -U lkh_cyan ${rbAnsi 14}
+          '';
+
+          "tmux.conf" = ''
+            set -g status-style "fg=#${rb.fg},bg=#${rb.surface}"
+            set -g status-left-style "fg=#${rb.accent},bold"
+            set -g status-right-style "fg=#${rb.comment}"
+            set -g window-status-style "fg=#${rb.comment}"
+            set -g window-status-current-style "fg=#${rb.bg},bg=#${rb.accent},bold"
+            set -g window-status-activity-style "fg=#${rbAnsi 3}"
+            set -g pane-border-style "fg=#${rb.comment}"
+            set -g pane-active-border-style "fg=#${rb.info}"
+            set -g message-style "fg=#${rb.bg},bg=#${rb.accent}"
+            set -g message-command-style "fg=#${rb.fg},bg=#${rb.surface}"
+            set -g mode-style "fg=#${rb.fg},bg=#${rb.selection}"
+            set -g clock-mode-colour "#${rb.info}"
+            set -g copy-mode-match-style "fg=#${rb.bg},bg=#${rb.info}"
+            set -g copy-mode-current-match-style "fg=#${rb.bg},bg=#${rb.accent}"
+          '';
+
+          "btop.theme" = ''
+            theme[main_bg]="#${rb.bg}"
+            theme[main_fg]="#${rb.fg}"
+            theme[title]="#${rb.fg}"
+            theme[hi_fg]="#${rbAnsi 11}"
+            theme[selected_bg]="#${rb.selection}"
+            theme[selected_fg]="#${rb.fg}"
+            theme[inactive_fg]="#${rb.comment}"
+            theme[graph_text]="#${rb.comment}"
+            theme[meter_bg]="#${rb.surface}"
+            theme[proc_misc]="#${rbAnsi 12}"
+            theme[cpu_box]="#${rbAnsi 10}"
+            theme[mem_box]="#${rbAnsi 11}"
+            theme[net_box]="#${rbAnsi 13}"
+            theme[proc_box]="#${rbAnsi 12}"
+            theme[div_line]="#${rb.comment}"
+            theme[temp_start]="#${rbAnsi 10}"
+            theme[temp_mid]="#${rbAnsi 11}"
+            theme[temp_end]="#${rbAnsi 9}"
+            theme[cpu_start]="#${rbAnsi 10}"
+            theme[cpu_mid]="#${rbAnsi 11}"
+            theme[cpu_end]="#${rbAnsi 9}"
+            theme[free_start]="#${rbAnsi 10}"
+            theme[cached_start]="#${rbAnsi 14}"
+            theme[available_start]="#${rbAnsi 11}"
+            theme[used_start]="#${rbAnsi 9}"
+            theme[download_start]="#${rbAnsi 14}"
+            theme[download_mid]="#${rbAnsi 12}"
+            theme[download_end]="#${rbAnsi 13}"
+            theme[upload_start]="#${rbAnsi 14}"
+            theme[upload_mid]="#${rbAnsi 12}"
+            theme[upload_end]="#${rbAnsi 13}"
+          '';
+
+          "starship.toml" = ''
+            add_newline = false
+            format = "$directory$git_branch$git_status$character"
+
+            [directory]
+            style = "bold #${accent}"
+            truncation_length = 4
+
+            [git_branch]
+            style = "bold #${palette.base05}"
+
+            [git_status]
+            style = "#${palette.base05}"
+
+            [character]
+            success_symbol = "[>](bold #${accent})"
+            error_symbol = "[>](bold #${palette.base08})"
+          '';
+
+          "hypr.conf" = ''
+            general {
+              col.active_border = rgba(${accent}ee)
+              col.inactive_border = rgba(${palette.base03}aa)
+            }
+
+            group {
+              col.border_active = rgba(${accent}ee)
+              col.border_inactive = rgba(${palette.base03}aa)
+            }
+          '';
+
+          "hyprlock.conf" = ''
+            $lkh_surface = rgb(${hexToRgb palette.base02})
+            $lkh_foreground = rgb(${hexToRgb palette.base05})
+            $lkh_muted = rgb(${hexToRgb palette.base04})
+            $lkh_accent = rgb(${hexToRgb accent})
+            $lkh_ok = rgb(${hexToRgb palette.base0B})
+          '';
+
+          "gtk.css" = ''
+            @define-color accent_color #${accent};
+            @define-color accent_bg_color #${accent};
+            @define-color accent_fg_color #${palette.base00};
+            @define-color theme_bg_color #${palette.base00};
+            @define-color theme_fg_color #${palette.base05};
+            @define-color theme_base_color #${palette.base00};
+            @define-color theme_text_color #${palette.base05};
+          '';
+
+          "opencode.json" = builtins.toJSON {
+            "$schema" = "https://opencode.ai/theme.json";
+            theme = {
+              primary = "#${palette.base0D}";
+              secondary = "#${palette.base0E}";
+              accent = "#${accent}";
+              error = "#${palette.base08}";
+              warning = "#${palette.base09}";
+              success = "#${palette.base0B}";
+              info = "#${palette.base0D}";
+              text = "#${palette.base05}";
+              textMuted = "#${palette.base04}";
+              background = "#${palette.base00}";
+              backgroundPanel = "#${palette.base01}";
+              backgroundElement = "#${palette.base02}";
+              border = "#${palette.base03}";
+              borderActive = "#${accent}";
+              borderSubtle = "#${palette.base02}";
+              diffAdded = "#${palette.base0B}";
+              diffRemoved = "#${palette.base08}";
+              diffContext = "#${palette.base04}";
+              diffHunkHeader = "#${palette.base0D}";
+              diffHighlightAdded = "#${palette.base0B}";
+              diffHighlightRemoved = "#${palette.base08}";
+              diffAddedBg = "#${palette.base01}";
+              diffRemovedBg = "#${palette.base01}";
+              diffContextBg = "#${palette.base00}";
+              diffLineNumber = "#${palette.base03}";
+              diffAddedLineNumberBg = "#${palette.base01}";
+              diffRemovedLineNumberBg = "#${palette.base01}";
+              markdownText = "#${palette.base05}";
+              markdownHeading = "#${palette.base0D}";
+              markdownLink = "#${palette.base0E}";
+              markdownLinkText = "#${palette.base0C}";
+              markdownCode = "#${palette.base0B}";
+              markdownBlockQuote = "#${palette.base04}";
+              markdownEmph = "#${palette.base09}";
+              markdownStrong = "#${palette.base0A}";
+              markdownHorizontalRule = "#${palette.base03}";
+              markdownListItem = "#${palette.base0D}";
+              markdownListEnumeration = "#${palette.base0C}";
+              markdownImage = "#${palette.base0E}";
+              markdownImageText = "#${palette.base0C}";
+              markdownCodeBlock = "#${palette.base0B}";
+              syntaxComment = "#${palette.base03}";
+              syntaxKeyword = "#${palette.base0E}";
+              syntaxFunction = "#${palette.base0D}";
+              syntaxVariable = "#${palette.base08}";
+              syntaxString = "#${palette.base0B}";
+              syntaxNumber = "#${palette.base09}";
+              syntaxType = "#${palette.base0A}";
+              syntaxOperator = "#${palette.base05}";
+              syntaxPunctuation = "#${palette.base04}";
+            };
+          };
+        };
+
+      bundleFiles = lib.listToAttrs (
+        lib.concatMap (
+          pair:
+          lib.concatMap (
+            mode:
+            lib.mapAttrsToList (name: content: {
+              name = "${themeRoot}/${pair}/${mode}/${name}";
+              value = {
+                text = content;
+              };
+            }) (themeFiles pair mode)
+          ) modes
+        ) pairNames
       );
 
-      # Runtime wallpaper + theme switcher (invoked by the picker and a keybind).
-      # Sets the wallpaper, repoints the active-theme pointer (AGS watches it and
-      # recolours live), and recolours Hyprland borders from the new palette.
-      theme-switch = pkgs.writeShellApplication {
-        name = "theme-switch";
+      wallpaperFiles = lib.listToAttrs (
+        map (image: {
+          name = "${dataRoot}/wallpapers/${image}";
+          value = {
+            source = wallpaperRoot + "/${image}";
+          };
+        }) claimed
+      );
+
+      pairsIndex = {
+        "${dataRoot}/pairs.json".text = builtins.toJSON pairs;
+      };
+
+      migrateCurrent = ''
+        if [ -e "${stateDir}/current" ] && [ ! -L "${stateDir}/current" ]; then
+          rm -f "${stateDir}/current/theme.name"
+          rmdir "${stateDir}/current" 2>/dev/null || rm -rf "${stateDir}/current"
+        fi
+        rm -f "${stateDir}/current.new"
+      '';
+
+      theme-apply = pkgs.writeShellApplication {
+        name = "theme-apply";
         runtimeInputs = [
-          pkgs.jq
           pkgs.coreutils
+          pkgs.glib
+          pkgs.procps
+          pkgs.tmux
+          pkgs.fish
+          pkgs.jq
         ];
         text = ''
-          name="''${1:-}"
-          if [ -z "$name" ]; then
-            echo "usage: theme-switch <wallpaper>" >&2
+          pair="''${1:-}"
+          mode="''${2:-}"
+          if [ -z "$pair" ] || [ -z "$mode" ]; then
+            echo "usage: theme-apply <pair> <light|dark>" >&2
             exit 1
           fi
-          share="$HOME/.local/share/lkasper-hyprland"
-          wp=""
-          for f in "$share/wallpapers/$name".*; do
-            if [ -e "$f" ]; then wp="$f"; break; fi
+          if [ "$mode" != "light" ] && [ "$mode" != "dark" ]; then
+            echo "theme-apply: mode must be light or dark, got '$mode'" >&2
+            exit 1
+          fi
+
+          bundle="$HOME/${themeRoot}/$pair/$mode"
+          if [ ! -d "$bundle" ]; then
+            echo "theme-apply: no theme bundle at $bundle" >&2
+            exit 1
+          fi
+
+          mkdir -p "${stateDir}"
+          ${migrateCurrent}
+          ln -sfn "$bundle" "${stateDir}/current.new"
+          mv -Tf "${stateDir}/current.new" "${stateDir}/current"
+          printf '%s %s\n' "$pair" "$mode" > "${stateDir}/state"
+
+          if [ -f "$bundle/wallpaper.path" ]; then
+            wallpaper="$(cat "$bundle/wallpaper.path")"
+            hyprctl hyprpaper preload "$wallpaper" >/dev/null 2>&1 || true
+            hyprctl hyprpaper wallpaper ",$wallpaper" >/dev/null 2>&1 || true
+          fi
+
+          hyprctl reload >/dev/null 2>&1 || true
+
+          pkill -USR1 -x foot >/dev/null 2>&1 || true
+
+          claude_settings="$HOME/.claude/settings.json"
+          if [ -f "$claude_settings" ]; then
+            if jq --arg t "$mode-ansi" '.theme = $t' "$claude_settings" > "$claude_settings.lkh-new" 2>/dev/null; then
+              mv -f "$claude_settings.lkh-new" "$claude_settings"
+            else
+              rm -f "$claude_settings.lkh-new"
+            fi
+          fi
+
+          if command -v fish >/dev/null 2>&1; then
+            fish -c 'source "'"${stateDir}"'/current/fish.fish"' >/dev/null 2>&1 || true
+          fi
+
+          for tmux_dir in "''${TMUX_TMPDIR:-}" "/run/user/$(id -u)" /tmp; do
+            [ -n "$tmux_dir" ] || continue
+            tmux_sockets="$tmux_dir/tmux-$(id -u)"
+            [ -d "$tmux_sockets" ] || continue
+            for tmux_socket in "$tmux_sockets"/*; do
+              [ -S "$tmux_socket" ] || continue
+              tmux -S "$tmux_socket" source-file "${stateDir}/current/tmux.conf" >/dev/null 2>&1 || true
+              tmux -S "$tmux_socket" refresh-client -S >/dev/null 2>&1 || true
+            done
           done
-          if [ -z "$wp" ]; then
-            echo "theme-switch: unknown wallpaper '$name'" >&2
-            exit 1
+
+          if gdbus call --session --dest org.freedesktop.DBus \
+              --object-path /org/freedesktop/DBus \
+              --method org.freedesktop.DBus.ListNames 2>/dev/null |
+              grep -q com.mitchellh.ghostty; then
+            gdbus call --session --dest com.mitchellh.ghostty \
+              --object-path /com/mitchellh/ghostty \
+              --method org.gtk.Actions.Activate reload-config "[]" "{}" >/dev/null 2>&1 || true
           fi
-          pal="$share/themes/$name/colors.json"
 
-          # wallpaper (hyprpaper IPC)
-          hyprctl hyprpaper preload "$wp" >/dev/null 2>&1 || true
-          hyprctl hyprpaper wallpaper ",$wp" >/dev/null 2>&1 || true
+          export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:''${XDG_DATA_DIRS:-}"
+          if [ "$mode" = "light" ]; then
+            gsettings set org.gnome.desktop.interface color-scheme prefer-light >/dev/null 2>&1 || true
+            gsettings set org.gnome.desktop.interface gtk-theme Adwaita >/dev/null 2>&1 || true
+          else
+            gsettings set org.gnome.desktop.interface color-scheme prefer-dark >/dev/null 2>&1 || true
+            gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark >/dev/null 2>&1 || true
+          fi
 
-          # active-theme pointer -> AGS recolours via its file monitor
-          mkdir -p "$HOME/.config/lkasper-hyprland/current"
-          printf '%s\n' "$name" > "$HOME/.config/lkasper-hyprland/current/theme.name"
+          ags request theme-reload >/dev/null 2>&1 || true
+        '';
+      };
 
-          # Hyprland borders from the new palette (active = wallpaper accent)
-          if [ -f "$pal" ]; then
-            ab="$(jq -r '.accent // .base0D // empty' "$pal")"
-            ib="$(jq -r '.base09 // empty' "$pal")"
-            if [ -n "$ab" ]; then
-              hyprctl keyword general:col.active_border "rgba(''${ab}ee)" >/dev/null 2>&1 || true
+      theme-state = pkgs.writeShellApplication {
+        name = "theme-state";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = ''
+          pair="${defaultPair}"
+          mode="${defaultMode}"
+          if [ -f "${stateDir}/state" ]; then
+            read -r saved_pair saved_mode < "${stateDir}/state" || true
+            if [ -n "''${saved_pair:-}" ] && [ -d "$HOME/${themeRoot}/$saved_pair" ]; then
+              pair="$saved_pair"
             fi
-            if [ -n "$ib" ]; then
-              hyprctl keyword general:col.inactive_border "rgba(''${ib}aa)" >/dev/null 2>&1 || true
+            if [ "''${saved_mode:-}" = "light" ] || [ "''${saved_mode:-}" = "dark" ]; then
+              mode="$saved_mode"
             fi
+          fi
+          printf '%s %s\n' "$pair" "$mode"
+        '';
+      };
+
+      theme-toggle = pkgs.writeShellApplication {
+        name = "theme-toggle";
+        runtimeInputs = [
+          pkgs.coreutils
+          theme-apply
+          theme-state
+        ];
+        text = ''
+          read -r pair mode < <(theme-state)
+          if [ "$mode" = "dark" ]; then
+            theme-apply "$pair" light
+          else
+            theme-apply "$pair" dark
           fi
         '';
       };
 
-      runtimeThemeFiles = builtins.foldl' (
-        acc: name:
-        let
-          palette = palettes.${name};
-        in
-        acc
-        // {
-          ".local/share/lkasper-hyprland/themes/${name}/colors.json".text = builtins.toJSON (
-            palette
-            // {
-              background = "#${palette.base00}";
-              foreground = "#${palette.base05}";
-              # Wallpaper-derived accent (bare hex), decoupled from the fixed
-              # ANSI base0D so the bar/borders visibly track the wallpaper.
-              accent = palette.accent or palette.base0D;
-              # Fully wallpaper-driven AGS UI: replace the ANSI-anchored accent
-              # slots (identical across wallpapers) with the per-wallpaper accent
-              # triple. Only colors.json (read by AGS) is remapped; the terminal
-              # keeps faithful base16 via colorScheme, so red=red etc. in shells.
-              base0A = palette.accent2 or palette.base0A;
-              base0B = palette.accent3 or palette.base0B;
-              base0C = palette.accent2 or palette.base0C;
-              base0D = palette.accent or palette.base0D;
-              base0E = palette.accent3 or palette.base0E;
-              base0F = palette.accent or palette.base0F;
-            }
-          );
-        }
-      ) { } paletteNames;
+      theme-switch = pkgs.writeShellApplication {
+        name = "theme-switch";
+        runtimeInputs = [
+          pkgs.coreutils
+          theme-apply
+          theme-state
+        ];
+        text = ''
+          target="''${1:-}"
+          if [ -z "$target" ]; then
+            echo "usage: theme-switch <pair>" >&2
+            exit 1
+          fi
+          read -r _ mode < <(theme-state)
+          theme-apply "$target" "$mode"
+        '';
+      };
     in
     {
       options."lkasper-hyprland" = (import ../../config.nix lib).lkasperHyprlandOptions;
@@ -132,7 +587,35 @@
       imports = [ inputs.nix-colors.homeManagerModules.default ];
 
       config = {
-        colorScheme = mkColorScheme activeWallpaper activePalette;
+        assertions = [
+          {
+            assertion = malformed == [ ];
+            message = "lkh-themes: wallpaper pairs must declare exactly a light and a dark member; malformed: ${toString malformed}";
+          }
+          {
+            assertion = unpaired == [ ];
+            message = "lkh-themes: wallpaper images are not a member of any pair in wallpapers/pairs.nix: ${toString unpaired}";
+          }
+          {
+            assertion = duplicated == [ ];
+            message = "lkh-themes: wallpaper images are claimed by more than one pair role: ${toString duplicated}";
+          }
+          {
+            assertion = missingImages == [ ];
+            message = "lkh-themes: wallpapers/pairs.nix references images that do not exist: ${toString missingImages}";
+          }
+          {
+            assertion = missingPalettes == [ ];
+            message = "lkh-themes: no committed palette for: ${toString missingPalettes} (run wallpapers/regenerate-palettes.sh)";
+          }
+        ];
+
+        colorScheme = {
+          slug = "${defaultPair}-${defaultMode}";
+          name = "${defaultPair} ${defaultMode}";
+          author = "wallust (wallpaper-derived)";
+          palette = paletteOf pairs.${defaultPair}.${defaultMode};
+        };
 
         gtk = {
           enable = true;
@@ -144,181 +627,46 @@
 
         home.packages = [
           pkgs.libadwaita
+          theme-apply
+          theme-state
+          theme-toggle
           theme-switch
         ];
 
-        home.file = {
-          ".config/opencode/themes/opencode.json".text = ''
-            {
-              "$schema": "https://opencode.ai/theme.json",
-              "theme": {
-                "primary": "#${config.colorScheme.palette.base0D}",
-                "secondary": "#${config.colorScheme.palette.base0E}",
-                "accent": "#${config.colorScheme.palette.base0C}",
-                "error": "#${config.colorScheme.palette.base08}",
-                "warning": "#${config.colorScheme.palette.base09}",
-                "success": "#${config.colorScheme.palette.base0B}",
-                "info": "#${config.colorScheme.palette.base0D}",
-                "text": "#${config.colorScheme.palette.base05}",
-                "textMuted": "#${config.colorScheme.palette.base04}",
-                "background": "#${config.colorScheme.palette.base00}",
-                "backgroundPanel": "#${config.colorScheme.palette.base01}",
-                "backgroundElement": "#${config.colorScheme.palette.base02}",
-                "border": "#${config.colorScheme.palette.base03}",
-                "borderActive": "#${config.colorScheme.palette.base0D}",
-                "borderSubtle": "#${config.colorScheme.palette.base02}",
-                "diffAdded": "#${config.colorScheme.palette.base0B}",
-                "diffRemoved": "#${config.colorScheme.palette.base08}",
-                "diffContext": "#${config.colorScheme.palette.base04}",
-                "diffHunkHeader": "#${config.colorScheme.palette.base0D}",
-                "diffHighlightAdded": "#${config.colorScheme.palette.base0B}",
-                "diffHighlightRemoved": "#${config.colorScheme.palette.base08}",
-                "diffAddedBg": "#${config.colorScheme.palette.base01}",
-                "diffRemovedBg": "#${config.colorScheme.palette.base01}",
-                "diffContextBg": "#${config.colorScheme.palette.base00}",
-                "diffLineNumber": "#${config.colorScheme.palette.base03}",
-                "diffAddedLineNumberBg": "#${config.colorScheme.palette.base01}",
-                "diffRemovedLineNumberBg": "#${config.colorScheme.palette.base01}",
-                "markdownText": "#${config.colorScheme.palette.base05}",
-                "markdownHeading": "#${config.colorScheme.palette.base0D}",
-                "markdownLink": "#${config.colorScheme.palette.base0E}",
-                "markdownLinkText": "#${config.colorScheme.palette.base0C}",
-                "markdownCode": "#${config.colorScheme.palette.base0B}",
-                "markdownBlockQuote": "#${config.colorScheme.palette.base04}",
-                "markdownEmph": "#${config.colorScheme.palette.base09}",
-                "markdownStrong": "#${config.colorScheme.palette.base0A}",
-                "markdownHorizontalRule": "#${config.colorScheme.palette.base03}",
-                "markdownListItem": "#${config.colorScheme.palette.base0D}",
-                "markdownListEnumeration": "#${config.colorScheme.palette.base0C}",
-                "markdownImage": "#${config.colorScheme.palette.base0E}",
-                "markdownImageText": "#${config.colorScheme.palette.base0C}",
-                "markdownCodeBlock": "#${config.colorScheme.palette.base0B}",
-                "syntaxComment": "#${config.colorScheme.palette.base03}",
-                "syntaxKeyword": "#${config.colorScheme.palette.base0E}",
-                "syntaxFunction": "#${config.colorScheme.palette.base0D}",
-                "syntaxVariable": "#${config.colorScheme.palette.base08}",
-                "syntaxString": "#${config.colorScheme.palette.base0B}",
-                "syntaxNumber": "#${config.colorScheme.palette.base09}",
-                "syntaxType": "#${config.colorScheme.palette.base0A}",
-                "syntaxOperator": "#${config.colorScheme.palette.base05}",
-                "syntaxPunctuation": "#${config.colorScheme.palette.base04}"
-              }
-            }
-          '';
-        }
-        // runtimeThemeFiles
-        // wallpaperFiles;
+        home.file = bundleFiles // wallpaperFiles // pairsIndex;
 
-        home.activation.writeThemeDefaults = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p "$HOME/.config/lkasper-hyprland/current"
+        home.activation.lkhThemeCurrent = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run mkdir -p "${stateDir}"
+          run mkdir -p "$HOME/.config/btop/themes"
+          run mkdir -p "$HOME/.config/ghostty/themes"
+          run mkdir -p "$HOME/.config/gtk-3.0"
+          run mkdir -p "$HOME/.config/gtk-4.0"
+          run mkdir -p "$HOME/.config/opencode/themes"
+          run mkdir -p "$HOME/.config/clipse"
 
-          # Writable default (not a read-only symlink) so theme-switch can
-          # repoint it at runtime; AGS watches it and recolours live.
-          if [ ! -f "$HOME/.config/lkasper-hyprland/current/theme.name" ]; then
-            echo "wood-dark" > "$HOME/.config/lkasper-hyprland/current/theme.name"
-          fi
-          mkdir -p "$HOME/.config/hypr"
-          mkdir -p "$HOME/.config/btop/themes"
-          mkdir -p "$HOME/.config/ghostty/themes"
+          run rm -f "$HOME/.config/hypr/theme.conf"
 
-          if [ ! -f "$HOME/.config/hypr/theme.conf" ]; then
-            cat > "$HOME/.config/hypr/theme.conf" << 'HYPREOF'
-          general {
-            col.active_border = rgba(${config.colorScheme.palette.accent or config.colorScheme.palette.base0D}aa)
-            col.inactive_border = rgba(${config.colorScheme.palette.base09}aa)
-          }
-
-          group {
-            col.border_active = rgba(${config.colorScheme.palette.accent or config.colorScheme.palette.base0D}aa)
-            col.border_inactive = rgba(${config.colorScheme.palette.base09}aa)
-          }
-          HYPREOF
+          if command -v systemctl >/dev/null 2>&1; then
+            run systemctl --user unset-environment GTK_THEME ADW_DISABLE_PORTAL || true
           fi
 
-          if [ ! -f "$HOME/.config/btop/themes/lkh-runtime.theme" ]; then
-            cat > "$HOME/.config/btop/themes/lkh-runtime.theme" << 'BTOPEOF'
-          theme[main_fg]="${config.colorScheme.palette.base05}"
-          theme[title]="${config.colorScheme.palette.base05}"
-          theme[hi_fg]="${config.colorScheme.palette.base0D}"
-          theme[selected_bg]="${config.colorScheme.palette.base01}"
-          theme[selected_fg]="${config.colorScheme.palette.base05}"
-          theme[inactive_fg]="${config.colorScheme.palette.base04}"
-          theme[proc_misc]="${config.colorScheme.palette.base0D}"
-          theme[cpu_box]="${config.colorScheme.palette.base0B}"
-          theme[mem_box]="${config.colorScheme.palette.base09}"
-          theme[net_box]="${config.colorScheme.palette.base0E}"
-          theme[proc_box]="${config.colorScheme.palette.base0C}"
-          theme[div_line]="${config.colorScheme.palette.base04}"
-          theme[temp_start]="${config.colorScheme.palette.base0B}"
-          theme[temp_mid]="${config.colorScheme.palette.base0A}"
-          theme[temp_end]="${config.colorScheme.palette.base08}"
-          theme[cpu_start]="${config.colorScheme.palette.base0B}"
-          theme[cpu_mid]="${config.colorScheme.palette.base0A}"
-          theme[cpu_end]="${config.colorScheme.palette.base08}"
-          theme[free_start]="${config.colorScheme.palette.base0B}"
-          theme[cached_start]="${config.colorScheme.palette.base0A}"
-          theme[available_start]="${config.colorScheme.palette.base09}"
-          theme[used_start]="${config.colorScheme.palette.base08}"
-          theme[download_start]="${config.colorScheme.palette.base0E}"
-          theme[download_mid]="${config.colorScheme.palette.base0D}"
-          theme[download_end]="${config.colorScheme.palette.base0C}"
-          theme[upload_start]="${config.colorScheme.palette.base0E}"
-          theme[upload_mid]="${config.colorScheme.palette.base0D}"
-          theme[upload_end]="${config.colorScheme.palette.base0C}"
-          BTOPEOF
+          ${migrateCurrent}
+
+          if [ ! -L "${stateDir}/current" ] || [ ! -d "${stateDir}/current" ]; then
+            run ln -sfn "$HOME/${themeRoot}/${defaultPair}/${defaultMode}" "${stateDir}/current"
           fi
 
-          if [ ! -f "$HOME/.config/ghostty/themes/lkh-runtime" ]; then
-            cat > "$HOME/.config/ghostty/themes/lkh-runtime" << 'GHOSTTYEOF'
-          background = #${config.colorScheme.palette.base00}
-          foreground = #${config.colorScheme.palette.base05}
-          selection-background = #${config.colorScheme.palette.base02}
-          selection-foreground = #${config.colorScheme.palette.base00}
-          palette = 0=#${config.colorScheme.palette.base00}
-          palette = 1=#${config.colorScheme.palette.base08}
-          palette = 2=#${config.colorScheme.palette.base0B}
-          palette = 3=#${config.colorScheme.palette.base0A}
-          palette = 4=#${config.colorScheme.palette.base0D}
-          palette = 5=#${config.colorScheme.palette.base0E}
-          palette = 6=#${config.colorScheme.palette.base0C}
-          palette = 7=#${config.colorScheme.palette.base05}
-          palette = 8=#${config.colorScheme.palette.base03}
-          palette = 9=#${config.colorScheme.palette.base08}
-          palette = 10=#${config.colorScheme.palette.base0B}
-          palette = 11=#${config.colorScheme.palette.base0A}
-          palette = 12=#${config.colorScheme.palette.base0D}
-          palette = 13=#${config.colorScheme.palette.base0E}
-          palette = 14=#${config.colorScheme.palette.base0C}
-          palette = 15=#${config.colorScheme.palette.base07}
-          palette = 16=#${config.colorScheme.palette.base09}
-          palette = 17=#${config.colorScheme.palette.base0F}
-          palette = 18=#${config.colorScheme.palette.base01}
-          palette = 19=#${config.colorScheme.palette.base02}
-          palette = 20=#${config.colorScheme.palette.base04}
-          palette = 21=#${config.colorScheme.palette.base06}
-          GHOSTTYEOF
+          if [ ! -f "${stateDir}/state" ]; then
+            run printf '%s %s\n' "${defaultPair}" "${defaultMode}" > "${stateDir}/state"
           fi
 
-          if [ ! -f "$HOME/.config/starship.toml" ]; then
-            cat > "$HOME/.config/starship.toml" << 'STARSHIPEOF'
-          add_newline = false
-          format = "$directory$git_branch$git_status$character"
-
-          [directory]
-          style = "bold #${config.colorScheme.palette.base0D}"
-          truncation_length = 4
-
-          [git_branch]
-          style = "bold #${config.colorScheme.palette.base05}"
-
-          [git_status]
-          style = "#${config.colorScheme.palette.base05}"
-
-          [character]
-          success_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
-          error_symbol = "[>](bold #${config.colorScheme.palette.base0D})"
-          STARSHIPEOF
-          fi
+          run ln -sfn "${stateDir}/current/btop.theme" "$HOME/.config/btop/themes/lkh-runtime.theme"
+          run ln -sfn "${stateDir}/current/ghostty" "$HOME/.config/ghostty/themes/lkh-runtime"
+          run ln -sfn "${stateDir}/current/starship.toml" "$HOME/.config/starship.toml"
+          run ln -sfn "${stateDir}/current/gtk.css" "$HOME/.config/gtk-3.0/gtk.css"
+          run ln -sfn "${stateDir}/current/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
+          run ln -sfn "${stateDir}/current/opencode.json" "$HOME/.config/opencode/themes/opencode.json"
+          run ln -sfn "${stateDir}/current/clipse-theme.json" "$HOME/.config/clipse/custom_theme.json"
         '';
       };
     };

@@ -10,5 +10,10 @@
         package = inputs.hyprland.packages.${pkgs.system}.hyprland;
       };
       services.hyprpolkitagent.enable = true;
+
+      xdg.portal = {
+        enable = true;
+        extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+      };
     };
 }

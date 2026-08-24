@@ -63,49 +63,44 @@
         ];
 
         installPhase = ''
-  runHook preInstall
+          runHook preInstall
 
-  mkdir -p $out/bin
-  mkdir -p $out/share/glib-2.0/schemas
+          mkdir -p $out/bin
+          mkdir -p $out/share/glib-2.0/schemas
 
-  ags bundle \
-  app.ts \
-  $out/bin/.lkasper-shell-unwrapped
+          ags bundle \
+          app.ts \
+          $out/bin/.lkasper-shell-unwrapped
 
-  # Collect all GSettings schema XML files from runtime dependencies.
-  # nixpkgs installs schemas under share/gsettings-schemas/<name>/glib-2.0/schemas
-  # (via the glib setup hook), not the plain share/glib-2.0/schemas layout, so
-  # scan both. Missing globs stay literal and fail the -d test harmlessly.
-  for dependency in ${pkgs.lib.escapeShellArgs typelibOutputs}; do
-    for schemaDir in \
-      "$dependency"/share/gsettings-schemas/*/glib-2.0/schemas \
-      "$dependency"/share/glib-2.0/schemas; do
+          for dependency in ${pkgs.lib.escapeShellArgs typelibOutputs}; do
+            for schemaDir in \
+              "$dependency"/share/gsettings-schemas/*/glib-2.0/schemas \
+              "$dependency"/share/glib-2.0/schemas; do
 
-      if [ -d "$schemaDir" ]; then
-        for schema in "$schemaDir"/*.gschema.xml; do
-          if [ -e "$schema" ]; then
-            ln -sf "$schema" \
-            "$out/share/glib-2.0/schemas/$(basename "$schema")"
-          fi
-        done
-      fi
-    done
-  done
+              if [ -d "$schemaDir" ]; then
+                for schema in "$schemaDir"/*.gschema.xml; do
+                  if [ -e "$schema" ]; then
+                    ln -sf "$schema" \
+                    "$out/share/glib-2.0/schemas/$(basename "$schema")"
+                  fi
+                done
+              fi
+            done
+          done
 
-  # Compile the collected schemas into one deterministic schema database.
-  glib-compile-schemas $out/share/glib-2.0/schemas
+          glib-compile-schemas $out/share/glib-2.0/schemas
 
-  makeWrapper \
-  $out/bin/.lkasper-shell-unwrapped \
-  $out/bin/lkasper-shell \
-  --prefix GI_TYPELIB_PATH : "${typelibPath}" \
-  --prefix LD_LIBRARY_PATH : "${libraryPath}" \
-  --prefix XDG_DATA_DIRS : "$out/share:${dataPath}" \
-  --set GSETTINGS_SCHEMA_DIR "$out/share/gsettings-schemas/$name/glib-2.0/schemas" \
-  --set GDK_PIXBUF_MODULE_FILE "${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache" \
-  --set SOLTTY_BIN "${solttyPkg}/bin/soltty"
+          makeWrapper \
+          $out/bin/.lkasper-shell-unwrapped \
+          $out/bin/lkasper-shell \
+          --prefix GI_TYPELIB_PATH : "${typelibPath}" \
+          --prefix LD_LIBRARY_PATH : "${libraryPath}" \
+          --prefix XDG_DATA_DIRS : "$out/share:${dataPath}" \
+          --set GSETTINGS_SCHEMA_DIR "$out/share/gsettings-schemas/$name/glib-2.0/schemas" \
+          --set GDK_PIXBUF_MODULE_FILE "${pkgs.librsvg.out}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache" \
+          --set SOLTTY_BIN "${solttyPkg}/bin/soltty"
 
-  runHook postInstall
+          runHook postInstall
         '';
       };
     in

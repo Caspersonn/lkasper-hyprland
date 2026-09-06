@@ -20,15 +20,6 @@
       config = {
         nixpkgs.config.allowUnfree = true;
 
-        security.rtkit.enable = true;
-        services.pulseaudio.enable = false;
-        services.pipewire = {
-          enable = true;
-          alsa.enable = true;
-          pulse.enable = true;
-          jack.enable = true;
-        };
-
         # Initial login experience
         services.greetd = {
           enable = true;
@@ -43,28 +34,17 @@
           terminal = "ghostty";
         };
 
-        # Networking
-        services.resolved.enable = true;
-        hardware.bluetooth.enable = true;
-        services.blueman.enable = true;
-        networking = {
-          networkmanager.enable = true;
-        };
-
         # For battery display ags
         services.upower = {
           enable = true;
         };
 
-        # For mpris cached spotify covers ags
-        services.gvfs.enable = true;
-
-        fonts.packages = with pkgs; [
-          noto-fonts
-          noto-fonts-color-emoji
-          nerd-fonts.caskaydia-mono
-          nerd-fonts.jetbrains-mono
-        ];
+        #fonts.packages = with pkgs; [
+        #  noto-fonts
+        #  noto-fonts-color-emoji
+        #  nerd-fonts.caskaydia-mono
+        #  nerd-fonts.jetbrains-mono
+        #];
       };
     };
 }

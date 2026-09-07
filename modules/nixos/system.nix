@@ -39,12 +39,12 @@
           enable = true;
         };
 
-        fonts.packages = with pkgs; [
-          noto-fonts
-          noto-fonts-color-emoji
-          nerd-fonts.caskaydia-mono
-          nerd-fonts.jetbrains-mono
-        ];
+        #fonts.packages = with pkgs; [
+        #  noto-fonts
+        #  noto-fonts-color-emoji
+        #  nerd-fonts.caskaydia-mono
+        #  nerd-fonts.jetbrains-mono
+        #];
       };
     };
 }

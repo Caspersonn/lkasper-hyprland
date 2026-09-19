@@ -5,7 +5,7 @@
     { pkgs, ... }:
 
     let
-      system = pkgs.stdenv.hostPlatform.system;
+      system = pkgs.system;
       agsPkgs = inputs.ags.packages.${system};
       solttyPkg = inputs.soltty.packages.${system}.soltty;
 

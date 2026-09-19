@@ -12,7 +12,7 @@
 
       programs.hyprland =
         let
-          hyprpkgs = inputs.hyprland.packages."${pkgs.stdenv.hostPlatform.system}";
+          hyprpkgs = inputs.hyprland.packages."${pkgs.system}";
         in
         {
           enable = true;

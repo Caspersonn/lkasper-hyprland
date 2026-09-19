@@ -20,7 +20,7 @@ let
     gruvbox-plus-icons
     hicolor-icon-theme
 
-    clipse # Clipboard manager
+    unstable.clipse # Clipboard manager
     wl-clipboard # Command-line copy/paste utilities for Wayland
   ];
 

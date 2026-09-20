@@ -21,19 +21,9 @@ in
     # The description carries no commas; the leading [Group] tag drives grouping.
     bindd = [
       # Launcher
-      "SUPER, SPACE, [Launcher] App launcher, exec, ags request toggle-launcher"
       "SUPER CTRL, SPACE, [Launcher] Walker fallback, exec, walker"
       "CTRL SUPER, V, [Launcher] Clipboard history, exec, foot --title=clipse clipse"
       "CTRL SUPER, N, [Launcher] Network manager, exec, foot --title=nmtui nmtui"
-
-      # System
-      "SUPER, slash, [System] Keyboard shortcuts, exec, ags request toggle-shortcuts"
-      "SUPER SHIFT, SPACE, [System] Toggle bars, exec, ags request toggle-bars"
-      "SUPER, N, [System] Notification center, exec, ags request toggle-notifications"
-      "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
-      "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
-      "SUPER, W, [System] Wallpaper picker, exec, ags request toggle-wallpaper-picker"
-      "SUPER SHIFT, W, [System] Toggle light dark mode, exec, theme-toggle"
 
       # Windows
       "SUPER, I, [Windows] Pin window, exec, hyprctl dispatch pin"
@@ -114,17 +104,6 @@ in
       ",XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
       ",XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+"
       ",XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-"
-    ];
-
-    bindl = [
-      # Requires playerctl
-      # Each media key pings AGS with its action so the OSD shows the matching
-      # icon (play/pause/next/prev). Keyboard-only on purpose: MPRIS cannot tell
-      # a user skip from a track auto-advance, so we never trigger reactively.
-      ", XF86AudioNext, exec, playerctl next && ags request osd-media next"
-      ", XF86AudioPause, exec, playerctl play-pause && ags request osd-media playpause"
-      ", XF86AudioPlay, exec, playerctl play-pause && ags request osd-media playpause"
-      ", XF86AudioPrev, exec, playerctl previous && ags request osd-media prev"
     ];
 
     bindp = [

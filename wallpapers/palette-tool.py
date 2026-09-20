@@ -10,6 +10,10 @@ ACCENT_HUE_SPREAD = 40
 ACCENT_MIN_CHROMA = 40
 ACCENT_MIN_LEVEL = 55
 
+UI_TEXT_MIN_CONTRAST = 4.5
+UI_MUTED_MIN_CONTRAST = 3.0
+UI_BACKGROUND_SLOTS = ["base00", "base01"]
+
 
 def rgb(value):
     value = value.lstrip("#")
@@ -145,6 +149,47 @@ def derive_surfaces(palette, mode):
     return palette
 
 
+def worst_contrast(value, backgrounds):
+    return min(contrast(value, background) for background in backgrounds)
+
+
+def push_to_contrast(value, backgrounds, target, mode):
+    if worst_contrast(value, backgrounds) >= target:
+        return value.lstrip("#").upper()
+    h, s, v = hsv(value)
+    if mode == "light":
+        lo, hi = 0.0, v
+        for _ in range(40):
+            mid = (lo + hi) / 2
+            if worst_contrast(to_hex(h, s, mid), backgrounds) >= target:
+                lo = mid
+            else:
+                hi = mid
+        candidate = to_hex(h, s, lo)
+    else:
+        lo, hi = v, 1.0
+        for _ in range(40):
+            mid = (lo + hi) / 2
+            if worst_contrast(to_hex(h, s, mid), backgrounds) >= target:
+                hi = mid
+            else:
+                lo = mid
+        candidate = to_hex(h, s, hi)
+    if worst_contrast(candidate, backgrounds) < target:
+        candidate = "000000" if mode == "light" else "FFFFFF"
+    return candidate
+
+
+def enforce_ui_contrast(palette, mode):
+    backgrounds = [palette[slot] for slot in UI_BACKGROUND_SLOTS]
+    for slot, target in (
+        ("base05", UI_TEXT_MIN_CONTRAST),
+        ("base04", UI_MUTED_MIN_CONTRAST),
+    ):
+        palette[slot] = push_to_contrast(palette[slot], backgrounds, target, mode)
+    return palette
+
+
 def strip(palette):
     return {k: v.lstrip("#").upper() for k, v in palette.items()}
 
@@ -163,6 +208,7 @@ def build(mode, shell_path, ansi_path, accents_path):
         palette = derive_surfaces(palette, mode)
         background = palette["base00"]
     accents = pick_accents(json.load(open(accents_path)), mode, background)
+    palette = enforce_ui_contrast(palette, mode)
     palette["mode"] = mode
     palette["accent"], palette["accent2"], palette["accent3"] = accents
     return palette

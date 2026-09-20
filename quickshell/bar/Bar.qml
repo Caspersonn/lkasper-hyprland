@@ -7,9 +7,9 @@ import Quickshell.Services.SystemTray
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
+import "../theme"
 Scope {
   id: root
-  property var theme: DefaultTheme {}
   property string font: "Hack Nerd Font"
   property bool barVisible: true
 
@@ -93,7 +93,7 @@ Scope {
       }
 
       implicitHeight: 32
-      color: root.theme.bgBase
+      color: Theme.background
 
       Item {
         anchors.fill: parent
@@ -112,7 +112,7 @@ Scope {
             height: 24
             width: timeDate.width + 16
             radius: 12
-            color: root.theme.bgSurface
+            color: Theme.surface
 
             Row {
               id: timeDate
@@ -122,7 +122,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: ""
-                color: root.theme.accentPrimary
+                color: Theme.accent
                 font.pixelSize: 14
                 font.family: root.font
               }
@@ -130,7 +130,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Time.timeString
-                color: root.theme.textPrimary
+                color: Theme.text
                 font.pixelSize: 12
                 font.family: root.font
               }
@@ -138,7 +138,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Time.dateString
-                color: root.theme.textSecondary
+                color: Theme.textSecondary
                 font.pixelSize: 12
                 font.family: root.font
               }
@@ -163,8 +163,8 @@ Scope {
                 width: modelData.focused ? 32 : 24
                 height: 24
                 radius: 12
-                color: modelData.focused ? root.theme.accentPrimary :
-                       modelData.urgent && urgentBlink ? root.theme.accentRed : root.theme.bgSurface
+                color: modelData.focused ? Theme.accent :
+                       modelData.urgent && urgentBlink ? Theme.error : Theme.surface
 
                 Behavior on color {
                   ColorAnimation { duration: 150 }
@@ -185,7 +185,7 @@ Scope {
                 Text {
                   anchors.centerIn: parent
                   text: wsPill.modelData.id
-                  color: wsPill.modelData.focused ? root.theme.bgBase : root.theme.textPrimary
+                  color: wsPill.modelData.focused ? Theme.background : Theme.text
                   font.pixelSize: 11
                   font.family: root.font
                   font.bold: wsPill.modelData.focused
@@ -208,7 +208,7 @@ Scope {
             height: 24
             width: nowPlayingContent.width + 16
             radius: 12
-            color: root.theme.bgSurface
+            color: Theme.surface
             visible: root.activePlayer !== null
 
             Accessible.role: Accessible.Button
@@ -229,7 +229,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.activePlayer && root.activePlayer.isPlaying ? "󰐊" : "󰏤"
-                color: root.theme.accentPrimary
+                color: Theme.accent
                 font.pixelSize: 14
                 font.family: root.font
               }
@@ -242,7 +242,7 @@ Scope {
                   const title = root.activePlayer.trackTitle || "";
                   return artist ? artist + " - " + title : title;
                 }
-                color: root.theme.textPrimary
+                color: Theme.text
                 font.pixelSize: 11
                 font.family: root.font
                 elide: Text.ElideRight
@@ -268,7 +268,7 @@ Scope {
             Accessible.role: Accessible.StaticText
             Accessible.name: "Active window: " + text
             text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
-            color: root.theme.textPrimary
+            color: Theme.text
             font.pixelSize: 13
             font.family: root.font
             elide: Text.ElideRight
@@ -289,7 +289,7 @@ Scope {
             height: 24
             width: volContent.width + 12
             radius: 12
-            color: root.theme.bgSurface
+            color: Theme.surface
 
             Accessible.role: Accessible.StaticText
             Accessible.name: {
@@ -315,8 +315,8 @@ Scope {
                 }
                 color: {
                   const sink = Pipewire.defaultAudioSink;
-                  if (!sink || !sink.audio || sink.audio.muted) return root.theme.textMuted;
-                  return root.theme.accentPrimary;
+                  if (!sink || !sink.audio || sink.audio.muted) return Theme.textMuted;
+                  return Theme.accent;
                 }
                 font.pixelSize: 14
                 font.family: root.font
@@ -330,7 +330,7 @@ Scope {
                   if (sink.audio.muted) return "Mute";
                   return Math.round(sink.audio.volume * 100) + "%";
                 }
-                color: root.theme.textPrimary
+                color: Theme.text
                 font.pixelSize: 11
                 font.family: root.font
               }
@@ -358,7 +358,7 @@ Scope {
             height: 24
             width: brightContent.width + 12
             radius: 12
-            color: root.theme.bgSurface
+            color: Theme.surface
             visible: brightnessFile.path !== ""
 
             Accessible.role: Accessible.StaticText
@@ -372,7 +372,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "󰃠"
-                color: root.theme.accentOrange
+                color: Theme.textSecondary
                 font.pixelSize: 14
                 font.family: root.font
               }
@@ -380,7 +380,7 @@ Scope {
               Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Math.round(root.brightnessValue * 100) + "%"
-                color: root.theme.textPrimary
+                color: Theme.text
                 font.pixelSize: 11
                 font.family: root.font
               }
@@ -403,10 +403,10 @@ Scope {
             id: sysInfo
 
             readonly property color batteryColor: {
-              if (SystemInfo.batteryCharging) return root.theme.accentGreen;
-              if (SystemInfo.batteryLevelRaw > 20) return root.theme.batteryGood;
-              if (SystemInfo.batteryLevelRaw > 10) return root.theme.batteryWarning;
-              return root.theme.batteryCritical;
+              if (SystemInfo.batteryCharging) return Theme.success;
+              if (SystemInfo.batteryLevelRaw > 20) return Theme.text;
+              if (SystemInfo.batteryLevelRaw > 10) return Theme.warning;
+              return Theme.error;
             }
 
             spacing: 4
@@ -416,7 +416,7 @@ Scope {
               height: 24
               width: cpuContent.width + 12
               radius: 12
-              color: root.theme.bgSurface
+              color: Theme.surface
               Accessible.role: Accessible.StaticText
               Accessible.name: "CPU: " + SystemInfo.cpuUsage
 
@@ -428,14 +428,14 @@ Scope {
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: "󰻠"
-                  color: root.theme.accentOrange
+                  color: Theme.textSecondary
                   font.pixelSize: 14
                   font.family: root.font
                 }
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: SystemInfo.cpuUsage
-                  color: root.theme.textPrimary
+                  color: Theme.text
                   font.pixelSize: 11
                   font.family: root.font
                 }
@@ -447,7 +447,7 @@ Scope {
               height: 24
               width: netContent.width + 12
               radius: 12
-              color: root.theme.bgSurface
+              color: Theme.surface
               Accessible.role: Accessible.StaticText
               Accessible.name: {
                 if (SystemInfo.networkType === "ethernet") return "Network: Ethernet"
@@ -467,14 +467,14 @@ Scope {
                     if (SystemInfo.networkType === "wifi") return "󰖩"
                     return "󰖪"
                   }
-                  color: SystemInfo.networkType === "disconnected" ? root.theme.textMuted : root.theme.accentGreen
+                  color: SystemInfo.networkType === "disconnected" ? Theme.textMuted : Theme.text
                   font.pixelSize: 14
                   font.family: root.font
                 }
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: SystemInfo.networkInfo
-                  color: root.theme.textPrimary
+                  color: Theme.text
                   font.pixelSize: 11
                   font.family: root.font
                 }
@@ -486,7 +486,7 @@ Scope {
               height: 24
               width: battContent.width + 12
               radius: 12
-              color: root.theme.bgSurface
+              color: Theme.surface
               Accessible.role: Accessible.StaticText
               Accessible.name: "Battery: " + SystemInfo.batteryLevel
 
@@ -505,7 +505,7 @@ Scope {
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: SystemInfo.batteryLevel
-                  color: root.theme.textPrimary
+                  color: Theme.text
                   font.pixelSize: 11
                   font.family: root.font
                 }
@@ -517,7 +517,7 @@ Scope {
               height: 24
               width: tempContent.width + 12
               radius: 12
-              color: root.theme.bgSurface
+              color: Theme.surface
               Accessible.role: Accessible.StaticText
               Accessible.name: "Temperature: " + SystemInfo.temperature
 
@@ -529,14 +529,14 @@ Scope {
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: "󰔏"
-                  color: root.theme.accentRed
+                  color: Theme.textSecondary
                   font.pixelSize: 14
                   font.family: root.font
                 }
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: SystemInfo.temperature
-                  color: root.theme.textPrimary
+                  color: Theme.text
                   font.pixelSize: 11
                   font.family: root.font
                 }
@@ -552,7 +552,7 @@ Scope {
             implicitHeight: 24
             implicitWidth: trayIcons.implicitWidth + 4
             radius: 12
-            color: root.theme.bgSurface
+            color: Theme.surface
 
             RowLayout {
               id: trayIcons

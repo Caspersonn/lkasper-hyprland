@@ -24,7 +24,7 @@ in
     HYPRCURSOR_THEME = "Adwaita";
     GDK_BACKEND = "wayland";
     QT_QPA_PLATFORM = "wayland";
-    QT_STYLE_OVERRIDE = "adwaita";
+    QT_QPA_PLATFORMTHEME = "gtk3";
     SDL_VIDEODRIVER = "wayland";
     MOZ_ENABLE_WAYLAND = "1";
     ELECTRON_OZONE_PLATFORM_HINT = "wayland";
@@ -45,7 +45,7 @@ in
       "HYPRCURSOR_THEME,Adwaita"
       "GDK_BACKEND,wayland"
       "QT_QPA_PLATFORM,wayland"
-      "QT_STYLE_OVERRIDE,kvantum"
+      "QT_QPA_PLATFORMTHEME,gtk3"
       "SDL_VIDEODRIVER,wayland"
       "MOZ_ENABLE_WAYLAND,1"
       "ELECTRON_OZONE_PLATFORM_HINT,wayland"

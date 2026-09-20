@@ -3,11 +3,12 @@ import Quickshell.Io
 import Quickshell.Wayland
 import QtQuick
 import QtQuick.Layouts
+import "../theme"
 
 Scope {
   id: root
 
-  property var  theme: DefaultTheme {}
+  readonly property var theme: Theme
   property string font: "Hack Nerd Font"
 
   property var  editState:       []

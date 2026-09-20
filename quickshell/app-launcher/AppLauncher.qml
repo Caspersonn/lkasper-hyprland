@@ -5,10 +5,10 @@ import Quickshell.Widgets
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../theme"
 
 Scope {
   id: root
-  property var theme: DefaultTheme {}
   property string font: "Hack Nerd Font"
 
   IpcHandler {
@@ -81,7 +81,7 @@ Scope {
 
       Rectangle {
         anchors.fill: parent
-        color: root.theme.bgOverlay
+        color: Theme.overlay
       }
     }
 
@@ -92,8 +92,8 @@ Scope {
       width: 580
       height: 480
       radius: 16
-      color: root.theme.bgBase
-      border.color: root.theme.bgBorder
+      color: Theme.background
+      border.color: Theme.border
       border.width: 1
 
       ColumnLayout {
@@ -104,7 +104,7 @@ Scope {
         // Header
         Text {
           text: "  Applications"
-          color: root.theme.accentPrimary
+          color: Theme.accent
           font.pixelSize: 14
           font.family: root.font
           font.bold: true
@@ -115,8 +115,8 @@ Scope {
           Layout.fillWidth: true
           height: 44
           radius: 10
-          color: root.theme.bgSurface
-          border.color: searchInput.activeFocus ? root.theme.accentPrimary : root.theme.bgBorder
+          color: Theme.surface
+          border.color: searchInput.activeFocus ? Theme.accent : Theme.border
           border.width: 1
 
           Behavior on border.color {
@@ -131,7 +131,7 @@ Scope {
 
             Text {
               text: ""
-              color: root.theme.textMuted
+              color: Theme.textMuted
               font.pixelSize: 16
               font.family: root.font
               Layout.alignment: Qt.AlignVCenter
@@ -141,7 +141,7 @@ Scope {
               id: searchInput
               Layout.fillWidth: true
               Layout.alignment: Qt.AlignVCenter
-              color: root.theme.textPrimary
+              color: Theme.text
               font.pixelSize: 15
               font.family: root.font
               clip: true
@@ -152,7 +152,7 @@ Scope {
               Text {
                 anchors.fill: parent
                 text: "Type to search..."
-                color: root.theme.textMuted
+                color: Theme.textMuted
                 font: parent.font
                 visible: !parent.text && !parent.activeFocus
                 verticalAlignment: Text.AlignVCenter
@@ -190,7 +190,7 @@ Scope {
         // Results count
         Text {
           text: resultsList.count + " application" + (resultsList.count !== 1 ? "s" : "")
-          color: root.theme.textMuted
+          color: Theme.textMuted
           font.pixelSize: 11
           font.family: root.font
         }
@@ -210,14 +210,14 @@ Scope {
 
           highlight: Rectangle {
             radius: 8
-            color: root.theme.bgSelected
+            color: Theme.surfaceSelected
             visible: root.selectedIndex >= 0
 
             Rectangle {
               width: 3
               height: 24
               radius: 2
-              color: root.theme.accentPrimary
+              color: Theme.accent
               anchors.left: parent.left
               anchors.leftMargin: 2
               anchors.verticalCenter: parent.verticalCenter
@@ -259,7 +259,7 @@ Scope {
                 Text {
                   anchors.centerIn: parent
                   text: ""
-                  color: root.theme.accentPrimary
+                  color: Theme.accent
                   font.pixelSize: 20
                   font.family: root.font
                   visible: (delegateRoot.modelData.icon ?? "") === ""
@@ -274,7 +274,7 @@ Scope {
 
                 Text {
                   text: delegateRoot.modelData.name ?? ""
-                  color: root.selectedIndex === delegateRoot.index ? root.theme.textPrimary : root.theme.textSecondary
+                  color: root.selectedIndex === delegateRoot.index ? Theme.text : Theme.textSecondary
                   font.pixelSize: 13
                   font.family: root.font
                   font.bold: root.selectedIndex === delegateRoot.index
@@ -284,7 +284,7 @@ Scope {
 
                 Text {
                   text: delegateRoot.modelData.genericName ?? delegateRoot.modelData.comment ?? ""
-                  color: root.theme.textMuted
+                  color: Theme.textMuted
                   font.pixelSize: 11
                   font.family: root.font
                   elide: Text.ElideRight
@@ -307,7 +307,7 @@ Scope {
           Text {
             anchors.centerIn: parent
             text: "  No applications found"
-            color: root.theme.textMuted
+            color: Theme.textMuted
             font.pixelSize: 14
             font.family: root.font
             visible: resultsList.count === 0 && searchInput.text !== ""
@@ -322,28 +322,28 @@ Scope {
           Row {
             spacing: 4
             Rectangle {
-              width: hintUp.width + 8; height: 18; radius: 4; color: root.theme.bgSurface
-              Text { id: hintUp; anchors.centerIn: parent; text: "↑↓"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font }
+              width: hintUp.width + 8; height: 18; radius: 4; color: Theme.surface
+              Text { id: hintUp; anchors.centerIn: parent; text: "↑↓"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font }
             }
-            Text { text: "navigate"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "navigate"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Row {
             spacing: 4
             Rectangle {
-              width: hintEnter.width + 8; height: 18; radius: 4; color: root.theme.bgSurface
-              Text { id: hintEnter; anchors.centerIn: parent; text: "⏎"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font }
+              width: hintEnter.width + 8; height: 18; radius: 4; color: Theme.surface
+              Text { id: hintEnter; anchors.centerIn: parent; text: "⏎"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font }
             }
-            Text { text: "launch"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "launch"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Row {
             spacing: 4
             Rectangle {
-              width: hintEsc.width + 8; height: 18; radius: 4; color: root.theme.bgSurface
-              Text { id: hintEsc; anchors.centerIn: parent; text: "esc"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font }
+              width: hintEsc.width + 8; height: 18; radius: 4; color: Theme.surface
+              Text { id: hintEsc; anchors.centerIn: parent; text: "esc"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font }
             }
-            Text { text: "close"; color: root.theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
+            Text { text: "close"; color: Theme.textMuted; font.pixelSize: 10; font.family: root.font; anchors.verticalCenter: parent.verticalCenter }
           }
 
           Item { Layout.fillWidth: true }

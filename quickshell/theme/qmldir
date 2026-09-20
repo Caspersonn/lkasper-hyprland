@@ -1,0 +1,3 @@
+module theme
+singleton UiPalette 1.0 UiPalette.qml
+singleton Theme 1.0 Theme.qml

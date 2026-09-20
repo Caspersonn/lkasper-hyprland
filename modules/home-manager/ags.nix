@@ -133,5 +133,28 @@
           "graphical-session.target"
         ];
       };
+      wayland.windowManager.hyprland.settings = {
+
+        bindd = [
+          # Launcher
+          "SUPER, SPACE, [Launcher] App launcher, exec, ags request toggle-launcher"
+
+          # System
+          "SUPER, slash, [System] Keyboard shortcuts, exec, ags request toggle-shortcuts"
+          "SUPER SHIFT, SPACE, [System] Toggle bars, exec, ags request toggle-bars"
+          "SUPER, N, [System] Notification center, exec, ags request toggle-notifications"
+          "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
+          "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
+          "SUPER, W, [System] Wallpaper picker, exec, ags request toggle-wallpaper-picker"
+          "SUPER SHIFT, W, [System] Toggle light dark mode, exec, theme-toggle"
+        ];
+
+        bindl = [
+          ", XF86AudioNext, exec, playerctl next && ags request osd-media next"
+          ", XF86AudioPause, exec, playerctl play-pause && ags request osd-media playpause"
+          ", XF86AudioPlay, exec, playerctl play-pause && ags request osd-media playpause"
+          ", XF86AudioPrev, exec, playerctl previous && ags request osd-media prev"
+        ];
+      };
     };
 }

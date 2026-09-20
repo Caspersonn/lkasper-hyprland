@@ -37,7 +37,13 @@
               { description = "[Launcher] App launcher"; }
             ];
           }
-
+          {
+            _args = [
+              "SUPER + D"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("qs ipc call monitors toggle")'')
+              { description = "[monitor] Show monitor configration"; }
+            ];
+          }
           {
             _args = [
               "SUPER + SHIFT + SPACE"

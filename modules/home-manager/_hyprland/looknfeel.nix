@@ -4,9 +4,9 @@
     config = {
       general = {
         gaps_in = 5;
-        gaps_out = 8;
+        gaps_out = 15;
 
-        border_size = 2;
+        border_size = 1;
 
         resize_on_border = false;
 

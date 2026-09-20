@@ -14,6 +14,8 @@ let
     gnome-themes-extra
     libsForQt5.qtstyleplugin-kvantum
     qt6Packages.qtstyleplugin-kvantum
+    adwaita-qt
+    qt6Packages.qt6ct
     pavucontrol
     nautilus
     adwaita-icon-theme

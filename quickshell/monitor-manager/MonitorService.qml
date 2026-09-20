@@ -11,7 +11,7 @@ Singleton {
   property var  monitors:             []
   property bool loading:              false
   property bool persistenceAvailable: false
-  property string configFormat:       "conf" // "conf" or "lua" — which hyprland.* is active
+  property string configFormat:       "lua" // "conf" or "lua" — which hyprland.* is active
 
   property var  _lastEdits:     []
   property bool _pendingVerify: false

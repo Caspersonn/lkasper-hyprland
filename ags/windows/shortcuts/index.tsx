@@ -107,7 +107,6 @@ function buildGroups(binds: HyprBind[]): Group[] {
                         !used.has(j) &&
                         /^[0-9]$/.test(c.key) &&
                         c.modmask === b.modmask &&
-                        c.dispatcher === b.dispatcher &&
                         parseDesc(c.description).label === label
                     ) {
                         mates.push(c)

@@ -1,116 +1,322 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config."lkasper-hyprland";
+
+  inline = lib.generators.mkLuaInline;
+
+  luaValue =
+    v: if lib.isAttrs v && (v._type or "") == "lua-inline" then v.expr else builtins.toJSON v;
+
+  dsp = expr: inline "hl.dsp.${expr}";
+  execCmd = cmd: dsp "exec_cmd(${luaValue cmd})";
+
+  mkBind =
+    {
+      keys,
+      dispatcher,
+      description ? null,
+      opts ? { },
+    }:
+    let
+      allOpts = opts // lib.optionalAttrs (description != null) { inherit description; };
+    in
+    {
+      _args = [
+        keys
+        dispatcher
+      ]
+      ++ lib.optional (allOpts != { }) allOpts;
+    };
+
+  quickAppBinds = map (
+    b:
+    mkBind {
+      inherit (b) keys;
+      dispatcher = execCmd b.exec;
+      description = b.description or null;
+    }
+  ) cfg.quick_app_bindings;
+
+  digitKey = i: toString (lib.mod i 10);
+
+  workspaceBinds = lib.concatMap (i: [
+    (mkBind {
+      keys = "SUPER + ${digitKey i}";
+      dispatcher = dsp "focus({ workspace = ${toString i} })";
+      description = "[Workspaces] Switch workspace";
+    })
+    (mkBind {
+      keys = "SUPER + SHIFT + ${digitKey i}";
+      dispatcher = dsp "window.move({ workspace = ${toString i} })";
+      description = "[Workspaces] Move to workspace";
+    })
+  ]) (lib.range 1 10);
+
+  mediaKeys = {
+    locked = true;
+    repeating = true;
+  };
 in
 {
   wayland.windowManager.hyprland.settings = {
-    # Plain binds: app launchers (from config) plus mouse-scroll workspace
-    # switching. These carry no description and are intentionally hidden from
-    # the keybind cheatsheet overlay.
-    bind = cfg.quick_app_bindings ++ [
-      #"SUPER, I, exec, [workspace 1 silent;] ghostty"
-      #"SUPER, I, exec, [workspace 2 silent;] firefox"
+    bind =
+      quickAppBinds
+      ++ [
+        (mkBind {
+          keys = "SUPER + mouse_down";
+          dispatcher = dsp ''focus({ workspace = "e+1" })'';
+        })
+        (mkBind {
+          keys = "SUPER + mouse_up";
+          dispatcher = dsp ''focus({ workspace = "e-1" })'';
+        })
 
-      # Scroll through existing workspaces with mainMod + scroll
-      "SUPER, mouse_down, workspace, e+1"
-      "SUPER, mouse_up, workspace, e-1"
-    ];
+        (mkBind {
+          keys = "SUPER + CTRL + SPACE";
+          dispatcher = execCmd "walker";
+          description = "[Launcher] Walker fallback";
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + V";
+          dispatcher = execCmd "foot --title=clipse clipse";
+          description = "[Launcher] Clipboard history";
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + N";
+          dispatcher = execCmd "foot --title=nmtui nmtui";
+          description = "[Launcher] Network manager";
+        })
 
-    # Described binds: surfaced in the keybind cheatsheet overlay (SUPER, slash).
-    # Format: MODS, KEY, [Group] Label, DISPATCHER, ARGS
-    # The description carries no commas; the leading [Group] tag drives grouping.
-    bindd = [
-      # Launcher
-      "SUPER CTRL, SPACE, [Launcher] Walker fallback, exec, walker"
-      "CTRL SUPER, V, [Launcher] Clipboard history, exec, foot --title=clipse clipse"
-      "CTRL SUPER, N, [Launcher] Network manager, exec, foot --title=nmtui nmtui"
+        (mkBind {
+          keys = "SUPER + I";
+          dispatcher = dsp "window.pin()";
+          description = "[Windows] Pin window";
+        })
+        (mkBind {
+          keys = "SUPER + Q";
+          dispatcher = dsp "window.close()";
+          description = "[Windows] Close window";
+        })
+        (mkBind {
+          keys = "SUPER + Backspace";
+          dispatcher = dsp "window.close()";
+          description = "[Windows] Close window";
+        })
+        (mkBind {
+          keys = "SUPER + V";
+          dispatcher = dsp ''window.float({ action = "toggle" })'';
+          description = "[Windows] Toggle floating";
+        })
+        (mkBind {
+          keys = "SUPER + F";
+          dispatcher = dsp ''window.fullscreen({ mode = "maximized" })'';
+          description = "[Windows] Fullscreen";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + F";
+          dispatcher = dsp ''window.fullscreen({ mode = "fullscreen" })'';
+          description = "[Windows] Maximize";
+        })
 
-      # Windows
-      "SUPER, I, [Windows] Pin window, exec, hyprctl dispatch pin"
-      "SUPER, Q, [Windows] Close window, killactive,"
-      "SUPER, Backspace, [Windows] Close window, killactive,"
-      "SUPER, V, [Windows] Toggle floating, togglefloating,"
-      "SUPER, F, [Windows] Fullscreen, fullscreen, 1"
-      "SUPER SHIFT, F, [Windows] Maximize, fullscreen, 0"
+        (mkBind {
+          keys = "SUPER + left";
+          dispatcher = dsp ''focus({ direction = "left" })'';
+          description = "[Focus] Focus left";
+        })
+        (mkBind {
+          keys = "SUPER + right";
+          dispatcher = dsp ''focus({ direction = "right" })'';
+          description = "[Focus] Focus right";
+        })
+        (mkBind {
+          keys = "SUPER + up";
+          dispatcher = dsp ''focus({ direction = "up" })'';
+          description = "[Focus] Focus up";
+        })
+        (mkBind {
+          keys = "SUPER + down";
+          dispatcher = dsp ''focus({ direction = "down" })'';
+          description = "[Focus] Focus down";
+        })
 
-      # Focus
-      "SUPER, left, [Focus] Focus left, movefocus, l"
-      "SUPER, right, [Focus] Focus right, movefocus, r"
-      "SUPER, up, [Focus] Focus up, movefocus, u"
-      "SUPER, down, [Focus] Focus down, movefocus, d"
+        (mkBind {
+          keys = "SUPER + J";
+          dispatcher = dsp ''layout("togglesplit")'';
+          description = "[Tiling] Toggle split";
+        })
+        (mkBind {
+          keys = "SUPER + P";
+          dispatcher = dsp "window.pseudo()";
+          description = "[Tiling] Pseudotile";
+        })
+        (mkBind {
+          keys = "SUPER + minus";
+          dispatcher = dsp "window.resize({ x = -100, y = 0, relative = true })";
+          description = "[Tiling] Shrink width";
+        })
+        (mkBind {
+          keys = "SUPER + equal";
+          dispatcher = dsp "window.resize({ x = 100, y = 0, relative = true })";
+          description = "[Tiling] Grow width";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + minus";
+          dispatcher = dsp "window.resize({ x = 0, y = -100, relative = true })";
+          description = "[Tiling] Shrink height";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + equal";
+          dispatcher = dsp "window.resize({ x = 0, y = 100, relative = true })";
+          description = "[Tiling] Grow height";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + left";
+          dispatcher = dsp ''window.swap({ direction = "left" })'';
+          description = "[Tiling] Swap left";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + right";
+          dispatcher = dsp ''window.swap({ direction = "right" })'';
+          description = "[Tiling] Swap right";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + up";
+          dispatcher = dsp ''window.swap({ direction = "up" })'';
+          description = "[Tiling] Swap up";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + down";
+          dispatcher = dsp ''window.swap({ direction = "down" })'';
+          description = "[Tiling] Swap down";
+        })
+      ]
+      ++ workspaceBinds
+      ++ [
+        (mkBind {
+          keys = "SUPER + comma";
+          dispatcher = dsp ''focus({ workspace = "-1" })'';
+          description = "[Workspaces] Previous workspace";
+        })
+        (mkBind {
+          keys = "SUPER + period";
+          dispatcher = dsp ''focus({ workspace = "+1" })'';
+          description = "[Workspaces] Next workspace";
+        })
+        (mkBind {
+          keys = "SUPER + S";
+          dispatcher = dsp ''workspace.toggle_special("magic")'';
+          description = "[Workspaces] Toggle scratchpad";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + S";
+          dispatcher = dsp ''window.move({ workspace = "special:magic" })'';
+          description = "[Workspaces] Move to scratchpad";
+        })
 
-      # Tiling
-      "SUPER, J, [Tiling] Toggle split, layoutmsg, togglesplit"
-      "SUPER, P, [Tiling] Pseudotile, pseudo,"
-      "SUPER, minus, [Tiling] Shrink width, resizeactive, -100 0"
-      "SUPER, equal, [Tiling] Grow width, resizeactive, 100 0"
-      "SUPER SHIFT, minus, [Tiling] Shrink height, resizeactive, 0 -100"
-      "SUPER SHIFT, equal, [Tiling] Grow height, resizeactive, 0 100"
-      "SUPER SHIFT, left, [Tiling] Swap left, swapwindow, l"
-      "SUPER SHIFT, right, [Tiling] Swap right, swapwindow, r"
-      "SUPER SHIFT, up, [Tiling] Swap up, swapwindow, u"
-      "SUPER SHIFT, down, [Tiling] Swap down, swapwindow, d"
+        (mkBind {
+          keys = "SUPER + ESCAPE";
+          dispatcher = execCmd "hyprlock";
+          description = "[Session] Lock screen";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + ESCAPE";
+          dispatcher = dsp "exit()";
+          description = "[Session] Exit Hyprland";
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + ESCAPE";
+          dispatcher = execCmd "reboot";
+          description = "[Session] Reboot";
+        })
+        (mkBind {
+          keys = "SUPER + SHIFT + CTRL + ESCAPE";
+          dispatcher = execCmd "hyprlock & disown && systemctl suspend";
+          description = "[Session] Suspend";
+        })
 
-      # Workspaces (SUPER + digit binds collapse into a range row in the overlay)
-      "SUPER, 1, [Workspaces] Switch workspace, workspace, 1"
-      "SUPER, 2, [Workspaces] Switch workspace, workspace, 2"
-      "SUPER, 3, [Workspaces] Switch workspace, workspace, 3"
-      "SUPER, 4, [Workspaces] Switch workspace, workspace, 4"
-      "SUPER, 5, [Workspaces] Switch workspace, workspace, 5"
-      "SUPER, 6, [Workspaces] Switch workspace, workspace, 6"
-      "SUPER, 7, [Workspaces] Switch workspace, workspace, 7"
-      "SUPER, 8, [Workspaces] Switch workspace, workspace, 8"
-      "SUPER, 9, [Workspaces] Switch workspace, workspace, 9"
-      "SUPER, 0, [Workspaces] Switch workspace, workspace, 10"
-      "SUPER, comma, [Workspaces] Previous workspace, workspace, -1"
-      "SUPER, period, [Workspaces] Next workspace, workspace, +1"
-      "SUPER SHIFT, 1, [Workspaces] Move to workspace, movetoworkspace, 1"
-      "SUPER SHIFT, 2, [Workspaces] Move to workspace, movetoworkspace, 2"
-      "SUPER SHIFT, 3, [Workspaces] Move to workspace, movetoworkspace, 3"
-      "SUPER SHIFT, 4, [Workspaces] Move to workspace, movetoworkspace, 4"
-      "SUPER SHIFT, 5, [Workspaces] Move to workspace, movetoworkspace, 5"
-      "SUPER SHIFT, 6, [Workspaces] Move to workspace, movetoworkspace, 6"
-      "SUPER SHIFT, 7, [Workspaces] Move to workspace, movetoworkspace, 7"
-      "SUPER SHIFT, 8, [Workspaces] Move to workspace, movetoworkspace, 8"
-      "SUPER SHIFT, 9, [Workspaces] Move to workspace, movetoworkspace, 9"
-      "SUPER SHIFT, 0, [Workspaces] Move to workspace, movetoworkspace, 10"
-      "SUPER, S, [Workspaces] Toggle scratchpad, togglespecialworkspace, magic"
-      "SUPER SHIFT, S, [Workspaces] Move to scratchpad, movetoworkspace, special:magic"
+        (mkBind {
+          keys = "SUPER + CTRL + S";
+          dispatcher = execCmd "hyprshot -m region";
+          description = "[Screenshots] Region";
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + W";
+          dispatcher = execCmd "hyprshot -m window -m active";
+          description = "[Screenshots] Active window";
+        })
+        (mkBind {
+          keys = "CTRL + PRINT";
+          dispatcher = execCmd "hyprshot -m output";
+          description = "[Screenshots] Full output";
+        })
+        (mkBind {
+          keys = "SUPER + PRINT";
+          dispatcher = execCmd "hyprpicker -a";
+          description = "[Screenshots] Color picker";
+        })
 
-      # Session
-      "SUPER, ESCAPE, [Session] Lock screen, exec, hyprlock"
-      "SUPER SHIFT, ESCAPE, [Session] Exit Hyprland, exit,"
-      "SUPER CTRL, ESCAPE, [Session] Reboot, exec, reboot"
-      "SUPER SHIFT CTRL, ESCAPE, [Session] Suspend, exec, hyprlock & disown && systemctl suspend"
+        (mkBind {
+          keys = "SUPER + mouse:272";
+          dispatcher = dsp "window.drag()";
+          opts.mouse = true;
+        })
+        (mkBind {
+          keys = "SUPER + mouse:273";
+          dispatcher = dsp "window.resize()";
+          opts.mouse = true;
+        })
 
-      # Screenshots
-      "SUPER CTRL, S, [Screenshots] Region, exec, hyprshot -m region"
-      "SUPER CTRL, W, [Screenshots] Active window, exec, hyprshot -m window -m active"
-      "CTRL, PRINT, [Screenshots] Full output, exec, hyprshot -m output"
-      "SUPER, PRINT, [Screenshots] Color picker, exec, hyprpicker -a"
-    ];
+        (mkBind {
+          keys = "XF86AudioRaiseVolume";
+          dispatcher = execCmd "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86AudioLowerVolume";
+          dispatcher = execCmd "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86AudioMute";
+          dispatcher = execCmd "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86AudioMicMute";
+          dispatcher = execCmd "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86MonBrightnessUp";
+          dispatcher = execCmd "brightnessctl -e4 -n2 set 5%+";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86MonBrightnessDown";
+          dispatcher = execCmd "brightnessctl -e4 -n2 set 5%-";
+          opts = mediaKeys;
+        })
 
-    bindm = [
-      # Move/resize windows with mainMod + LMB/RMB and dragging
-      "SUPER, mouse:272, movewindow"
-      "SUPER, mouse:273, resizewindow"
-    ];
-
-    bindel = [
-      # Laptop multimedia keys for volume and LCD brightness
-      ",XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
-      ",XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-      ",XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-      ",XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-      ",XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+"
-      ",XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-"
-    ];
-
-    bindp = [
-      # Powerprofileselecter
-      "SUPER+Ctrl+Shift, W, exec, powerprofilesctl set power-saver & notify-send -u low 'Power Profile ' 'power-saver'"
-      "SUPER+Ctrl+Shift, E, exec, powerprofilesctl set balanced & notify-send -u low 'Power Profile ' 'balanced'"
-      "SUPER+Ctrl+Shift, R, exec, powerprofilesctl set performance & notify-send -u low 'Power Profile ' 'perfomance'"
-    ];
+        (mkBind {
+          keys = "SUPER + CTRL + SHIFT + W";
+          dispatcher = execCmd "powerprofilesctl set power-saver & notify-send -u low 'Power Profile ' 'power-saver'";
+          opts.dont_inhibit = true;
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + SHIFT + E";
+          dispatcher = execCmd "powerprofilesctl set balanced & notify-send -u low 'Power Profile ' 'balanced'";
+          opts.dont_inhibit = true;
+        })
+        (mkBind {
+          keys = "SUPER + CTRL + SHIFT + R";
+          dispatcher = execCmd "powerprofilesctl set performance & notify-send -u low 'Power Profile ' 'perfomance'";
+          opts.dont_inhibit = true;
+        })
+      ];
   };
 }

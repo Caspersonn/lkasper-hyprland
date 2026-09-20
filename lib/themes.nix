@@ -339,16 +339,22 @@ themeFiles =
       error_symbol = "[>](bold #${palette.base08})"
     '';
 
-    "hypr.conf" = ''
-      general {
-        col.active_border = rgba(${accent}ee)
-        col.inactive_border = rgba(${palette.base03}aa)
-      }
+    "hypr.lua" = ''
+      hl.config({
+        general = {
+          col = {
+            active_border = "rgba(${accent}ee)",
+            inactive_border = "rgba(${palette.base03}aa)",
+          },
+        },
 
-      group {
-        col.border_active = rgba(${accent}ee)
-        col.border_inactive = rgba(${palette.base03}aa)
-      }
+        group = {
+          col = {
+            border_active = "rgba(${accent}ee)",
+            border_inactive = "rgba(${palette.base03}aa)",
+          },
+        },
+      })
     '';
 
     "hyprlock.conf" = ''

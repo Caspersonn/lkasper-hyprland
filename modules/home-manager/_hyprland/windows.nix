@@ -1,42 +1,115 @@
 { config, pkgs, ... }:
 {
   wayland.windowManager.hyprland.settings = {
-    windowrule = [
-      "suppress_event maximize, match:class .*"
+    window_rule = [
+      {
+        match.class = ".*";
+        suppress_event = "maximize";
+      }
 
-      "tile on, match:class ^(chromium)$"
+      {
+        match.class = "^(chromium)$";
+        tile = true;
+      }
 
-      "float on, match:class ^(org.pulseaudio.pavucontrol|blueman|nwg-displays)$"
+      {
+        match.class = "^(org.pulseaudio.pavucontrol|blueman|nwg-displays)$";
+        float = true;
+      }
 
-      "float on, match:class ^(steam)$"
-      "fullscreen on, match:class ^(com.libretro.RetroArch)$"
+      {
+        match.class = "^(steam)$";
+        float = true;
+      }
+      {
+        match.class = "^(com.libretro.RetroArch)$";
+        fullscreen = true;
+      }
 
-      "opacity 0.97 0.9, match:class .*"
-      "opacity 1 1, match:class ^(chromium|google-chrome|google-chrome-unstable)$, match:title .*Youtube.*"
-      "opacity 1 0.97, match:class ^(chromium|google-chrome|google-chrome-unstable)$"
-      "opacity 0.97 0.9, match:initial_class ^(chrome-.*-Default)$"
-      "opacity 1 1, match:initial_class ^(chrome-youtube.*-Default)$"
-      "opacity 1 1, match:class ^(zoom|vlc|org.kde.kdenlive|com.obsproject.Studio)$"
-      "opacity 1 1, match:class ^(com.libretro.RetroArch|steam)$"
+      {
+        match.class = ".*";
+        opacity = "0.97 0.9";
+      }
+      {
+        match = {
+          class = "^(chromium|google-chrome|google-chrome-unstable)$";
+          title = ".*Youtube.*";
+        };
+        opacity = "1 1";
+      }
+      {
+        match.class = "^(chromium|google-chrome|google-chrome-unstable)$";
+        opacity = "1 0.97";
+      }
+      {
+        match.initial_class = "^(chrome-.*-Default)$";
+        opacity = "0.97 0.9";
+      }
+      {
+        match.initial_class = "^(chrome-youtube.*-Default)$";
+        opacity = "1 1";
+      }
+      {
+        match.class = "^(zoom|vlc|org.kde.kdenlive|com.obsproject.Studio)$";
+        opacity = "1 1";
+      }
+      {
+        match.class = "^(com.libretro.RetroArch|steam)$";
+        opacity = "1 1";
+      }
 
-      "no_focus on, match:class ^$, match:title ^$, match:xwayland 1, match:float 1, match:fullscreen 0, match:pin 0"
+      {
+        match = {
+          class = "^$";
+          title = "^$";
+          xwayland = true;
+          float = true;
+          fullscreen = false;
+          pin = false;
+        };
+        no_focus = true;
+      }
 
-      "float on, match:title (clipse)"
-      "size 622 652, match:title (clipse)"
-      "stay_focused on, match:title (clipse)"
+      {
+        match.title = "(clipse)";
+        float = true;
+        size = [
+          622
+          652
+        ];
+        stay_focused = true;
+      }
 
-      "float on, match:title (nmtui)"
-      "size 622 652, match:title (nmtui)"
-      "stay_focused on, match:title (nmtui)"
+      {
+        match.title = "(nmtui)";
+        float = true;
+        size = [
+          622
+          652
+        ];
+        stay_focused = true;
+      }
 
-      "float on, match:class ^(org.gnome.Nautilus)$"
-      "size 992 608, match:class ^(org.gnome.Nautilus)$"
-      "stay_focused on, match:class ^(org.gnome.Nautilus)$"
+      {
+        match.class = "^(org.gnome.Nautilus)$";
+        float = true;
+        size = [
+          992
+          608
+        ];
+        stay_focused = true;
+      }
     ];
 
-    layerrule = [
-      "blur on, match:namespace wofi"
-      "blur on, match:namespace bar"
+    layer_rule = [
+      {
+        match.namespace = "wofi";
+        blur = true;
+      }
+      {
+        match.namespace = "bar";
+        blur = true;
+      }
     ];
   };
 }

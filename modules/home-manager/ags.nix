@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 
 {
   flake.homeManagerModules.lkh-ags =
@@ -134,26 +134,91 @@
         ];
       };
       wayland.windowManager.hyprland.settings = {
-
-        bindd = [
-          # Launcher
-          "SUPER, SPACE, [Launcher] App launcher, exec, ags request toggle-launcher"
-
-          # System
-          "SUPER, slash, [System] Keyboard shortcuts, exec, ags request toggle-shortcuts"
-          "SUPER SHIFT, SPACE, [System] Toggle bars, exec, ags request toggle-bars"
-          "SUPER, N, [System] Notification center, exec, ags request toggle-notifications"
-          "SUPER SHIFT, N, [System] Toggle do not disturb, exec, ags request toggle-dnd"
-          "SUPER, T, [System] Soltty time tracker, exec, ags request toggle-soltty"
-          "SUPER, W, [System] Wallpaper picker, exec, ags request toggle-wallpaper-picker"
-          "SUPER SHIFT, W, [System] Toggle light dark mode, exec, theme-toggle"
-        ];
-
-        bindl = [
-          ", XF86AudioNext, exec, playerctl next && ags request osd-media next"
-          ", XF86AudioPause, exec, playerctl play-pause && ags request osd-media playpause"
-          ", XF86AudioPlay, exec, playerctl play-pause && ags request osd-media playpause"
-          ", XF86AudioPrev, exec, playerctl previous && ags request osd-media prev"
+        bind = [
+          {
+            _args = [
+              "SUPER + SPACE"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-launcher")'')
+              { description = "[Launcher] App launcher"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + slash"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-shortcuts")'')
+              { description = "[System] Keyboard shortcuts"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + SHIFT + SPACE"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-bars")'')
+              { description = "[System] Toggle bars"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + N"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-notifications")'')
+              { description = "[System] Notification center"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + SHIFT + N"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-dnd")'')
+              { description = "[System] Toggle do not disturb"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + T"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-soltty")'')
+              { description = "[System] Soltty time tracker"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + W"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("ags request toggle-wallpaper-picker")'')
+              { description = "[System] Wallpaper picker"; }
+            ];
+          }
+          {
+            _args = [
+              "SUPER + SHIFT + W"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("theme-toggle")'')
+              { description = "[System] Toggle light dark mode"; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioNext"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("playerctl next && ags request osd-media next")'')
+              { locked = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioPause"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("playerctl play-pause && ags request osd-media playpause")'')
+              { locked = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioPlay"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("playerctl play-pause && ags request osd-media playpause")'')
+              { locked = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioPrev"
+              (lib.generators.mkLuaInline ''hl.dsp.exec_cmd("playerctl previous && ags request osd-media prev")'')
+              { locked = true; }
+            ];
+          }
         ];
       };
     };

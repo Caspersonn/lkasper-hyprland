@@ -121,7 +121,7 @@ interface** for other repositories -- read it at runtime rather than depending o
 | `foot.ini`, `ghostty`, `tmux.conf`, `fish.fish` | retrobox, not wallpaper-derived (see below) |
 | `btop.theme`, `clipse-theme.json` | retrobox (TUIs inside the retrobox terminal) |
 | `starship.toml`, `opencode.json` | wallpaper-derived per-app colour configs |
-| `hypr.conf`, `hyprlock.conf`, `gtk.css` | compositor, lock screen and GTK colours |
+| `hypr.lua`, `hyprlock.conf`, `gtk.css` | compositor, lock screen and GTK colours |
 | `wallpaper.path` | absolute path to the active image |
 
 ### Retrobox for the text tools

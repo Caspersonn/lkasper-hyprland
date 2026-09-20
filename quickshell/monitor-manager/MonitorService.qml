@@ -138,7 +138,7 @@ Singleton {
     command: ["sh", "-c",
       "if [ -f \"$HOME/.config/hypr/hyprland.lua\" ]; then " +
         "echo lua; " +
-        "grep -Eq 'require\\(\"monitors\"\\)' \"$HOME/.config/hypr/hyprland.lua\" && echo yes || echo no; " +
+        "grep -Eq 'require[(,][[:space:]]*\"monitors\"' \"$HOME/.config/hypr/hyprland.lua\" && echo yes || echo no; " +
       "else " +
         "echo conf; " +
         "grep -q 'source.*monitors\\.conf' \"$HOME/.config/hypr/hyprland.conf\" && echo yes || echo no; " +

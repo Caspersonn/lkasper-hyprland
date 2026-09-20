@@ -17,8 +17,9 @@ lib: {
       default = { };
     };
     monitors = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
+      type = lib.types.listOf lib.types.attrs;
       default = [ ];
+      description = "Monitor specs passed to hl.monitor(), e.g. { output = \"DP-1\"; mode = \"2560x1440@144\"; position = \"0x0\"; scale = 1; }.";
     };
     scale = lib.mkOption {
       type = lib.types.int;
@@ -26,17 +27,46 @@ lib: {
       description = "Display scale factor (1 for 1x displays, 2 for 2x displays)";
     };
     quick_app_bindings = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      description = "A list of single keystroke key bindings to launch common apps.";
+      type = lib.types.listOf lib.types.attrs;
+      description = ''
+        Single keystroke key bindings to launch common apps. Each entry is
+        { keys; exec; description? }. `exec` is passed to hl.dsp.exec_cmd, so a
+        plain string is a shell command and a lib.generators.mkLuaInline value is
+        a raw Lua expression (for instance one of the app locals below).
+      '';
       default = [
-        "SUPER, return, exec, $terminal"
-        "SUPER, E, exec, $fileManager"
-        "SUPER, B, exec, $browser"
-        "SUPER, M, exec, $music"
-        "SUPER, O, exec, foot btop"
-        "SUPER, D, exec, foot lazydocker"
-        "SUPER, G, exec, $messenger"
-        "SUPER, slash, exec, $passwordManager"
+        {
+          keys = "SUPER + return";
+          exec = lib.generators.mkLuaInline "terminal";
+        }
+        {
+          keys = "SUPER + E";
+          exec = lib.generators.mkLuaInline "fileManager";
+        }
+        {
+          keys = "SUPER + B";
+          exec = lib.generators.mkLuaInline "browser";
+        }
+        {
+          keys = "SUPER + M";
+          exec = lib.generators.mkLuaInline "music";
+        }
+        {
+          keys = "SUPER + O";
+          exec = "foot btop";
+        }
+        {
+          keys = "SUPER + D";
+          exec = "foot lazydocker";
+        }
+        {
+          keys = "SUPER + G";
+          exec = lib.generators.mkLuaInline "messenger";
+        }
+        {
+          keys = "SUPER + slash";
+          exec = lib.generators.mkLuaInline "passwordManager";
+        }
       ];
     };
     exclude_packages = lib.mkOption {

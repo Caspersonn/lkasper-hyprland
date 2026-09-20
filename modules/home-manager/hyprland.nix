@@ -6,7 +6,7 @@
       imports = [ ./_hyprland/configuration.nix ];
       wayland.windowManager.hyprland = {
         enable = true;
-        configType = "hyprlang";
+        configType = "lua";
         package = inputs.hyprland.packages.${pkgs.system}.hyprland;
       };
       services.hyprpolkitagent.enable = true;

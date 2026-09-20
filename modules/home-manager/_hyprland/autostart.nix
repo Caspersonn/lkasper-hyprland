@@ -1,13 +1,24 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   wayland.windowManager.hyprland.settings = {
-    exec-once = [
-      "sleep 1 && lkasper-shell"
-      "hyprsunset"
-      "systemctl --user start hyprpolkitagent"
-      "wl-clip-persist --clipboard regular & clipse -listen"
-      "elephant"
-      "walker --gapplication-service"
-    ];
+    on = {
+      _args = [
+        "hyprland.start"
+        (lib.generators.mkLuaInline ''
+          function()
+            hl.exec_cmd("sleep 1 && lkasper-shell")
+            hl.exec_cmd("hyprsunset")
+            hl.exec_cmd("systemctl --user start hyprpolkitagent")
+            hl.exec_cmd("wl-clip-persist --clipboard regular & clipse -listen")
+            hl.exec_cmd("elephant")
+            hl.exec_cmd("walker --gapplication-service")
+          end'')
+      ];
+    };
   };
 }

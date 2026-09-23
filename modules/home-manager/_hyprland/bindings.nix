@@ -317,6 +317,27 @@ in
           dispatcher = execCmd "powerprofilesctl set performance & notify-send -u low 'Power Profile ' 'perfomance'";
           opts.dont_inhibit = true;
         })
+
+        (mkBind {
+          keys = "XF86AudioNext";
+          dispatcher = execCmd "playerctl next";
+          opts = mediaKeys;
+        })
+        (mkBind {
+          keys = "XF86AudioPause";
+          dispatcher = execCmd "playerctl play-pause";
+          opts.dont_inhibit = true;
+        })
+        (mkBind {
+          keys = "XF86AudioPlay";
+          dispatcher = execCmd "playerctl play-pause";
+          opts.dont_inhibit = true;
+        })
+        (mkBind {
+          keys = "XF86AudioPrev";
+          dispatcher = execCmd "playerctl previous";
+          opts.dont_inhibit = true;
+        })
       ];
   };
 }

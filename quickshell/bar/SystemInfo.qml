@@ -3,6 +3,8 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import Quickshell.Bluetooth
+
 
 Singleton {
   id: root
@@ -11,6 +13,9 @@ Singleton {
   property string memoryUsage: "0%"
   property string networkInfo: "Disconnected"
   property string networkType: "disconnected"
+  property string bluStatus: "Disabled"
+  property string bluDevicesAmount: "0"
+  property string bluDevices: ""
   property int batteryLevelRaw: 0
   property string batteryLevel: "0%"
   property string batteryIcon: "󰂎"
@@ -57,6 +62,25 @@ Singleton {
         const info = result.substring(colonIdx + 1)
         root.networkType = type
         root.networkInfo = info || "Disconnected"
+      }
+    }
+  }
+
+  // Bluetooth Device
+  Process {
+    id: bluProc
+    command: [ "sh", "-c", "if bluetoothctl show 2>/dev/null | grep -q 'Powered: yes'; then echo Enabled; bluetoothctl devices Connected 2>/dev/null | grep -c '^Device'; bluetoothctl devices Connected 2>/dev/null | grep '^Device' | cut -d' ' -f3-; else echo Disabled; fi" ]
+    running: true
+
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const lines = this.text.trim().split("\n")
+        root.bluStatus = lines[0]
+        root.bluDevicesAmount = parseInt(lines[1]) || 0
+        if (root.bluDevicesAmount > 0)
+          root.bluDevices = lines.slice(2).join("\n")
+        else
+          root.bluDevices = ""
       }
     }
   }
@@ -114,6 +138,7 @@ Singleton {
       cpuProc.running = true
       memProc.running = true
       netProc.running = true
+      bluProc.running = true
       batteryProc.running = true
       tempProc.running = true
     }

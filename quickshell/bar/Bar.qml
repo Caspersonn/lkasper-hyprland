@@ -481,6 +481,74 @@ Scope {
               }
             }
 
+            // Bluetooth
+            Rectangle {
+              id: btPill
+              height: 24
+              width: bluContent.width + 12
+              radius: 12
+              color: Theme.surface
+              Accessible.role: Accessible.StaticText
+              Accessible.name: {
+                if (SystemInfo.bluStatus === "Enabled") return "Bluetooth: Enabled"
+                if (SystemInfo.bluStatus === "Disabled") return "Bluetooth: Disabled"
+              }
+              HoverHandler { id: btHover }
+
+              PopupWindow {
+                anchor.item: btPill
+                anchor.edges: Edges.Bottom
+                anchor.gravity: Edges.Bottom
+                visible: btHover.hovered && SystemInfo.bluDevicesAmount >= 1
+                implicitWidth: tipText.implicitWidth + 20
+                implicitHeight: tipText.implicitHeight + 12
+                color: "transparent"
+
+                Rectangle {
+                  anchors.fill: parent
+                  radius: 8
+                  color: Theme.surface
+
+                  Text {
+                    id: tipText
+                    anchors.centerIn: parent
+                    text: SystemInfo.bluDevices
+                    color: Theme.text
+                    font.pixelSize: 11
+                    font.family: root.font
+                  }
+                }
+              }
+
+              Row {
+                id: bluContent
+                anchors.centerIn: parent
+                spacing: 6
+
+                Text {
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: {
+                    if (SystemInfo.bluStatus === "Enabled") return ""
+                    if (SystemInfo.bluStatus === "Disabled") return "󰂲"
+                    return "󰖪"
+                  }
+                  color: SystemInfo.bluStatus === "Disabled" ? Theme.textMuted : Theme.text
+                  font.pixelSize: 14
+                  font.family: root.font
+                }
+                Text {
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: {
+                    if (SystemInfo.bluStatus === "Enabled" && SystemInfo.bluDevicesAmount >= "1" ) return SystemInfo.bluDevicesAmount
+                    else ""
+                  }
+                  color: Theme.text
+                  font.pixelSize: 11
+                  font.family: root.font
+                }
+              }
+            }
+
             // Battery
             Rectangle {
               height: 24

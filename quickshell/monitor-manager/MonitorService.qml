@@ -86,8 +86,14 @@ Singleton {
     // Guard against double-apply
     if (applyProc.running) return;
     _lastEdits = edits;
-    const parts = edits.map(buildMonitorArg);
-    applyProc.command = ["hyprctl", "--batch", parts.join(" ; ")];
+
+    if (root.configFormat === "lua") {
+      const lua = edits.map(buildMonitorLuaLine).join("\n");
+      applyProc.command = ["hyprctl", "eval", lua];
+    } else {
+      const parts = edits.map(buildMonitorArg);
+      applyProc.command = ["hyprctl", "--batch", parts.join(" ; ")];
+    }
     applyProc.running = true;
   }
 
@@ -161,12 +167,15 @@ Singleton {
   // Query live monitor state
   Process {
     id: queryProc
-    command: ["hyprctl", "-j", "monitors", "all"]
+    command: ["sh", "-c", "hyprctl -j monitors all; echo '@@ACTIVE@@'; hyprctl -j monitors"]
     running: false
     stdout: StdioCollector {
       onStreamFinished: {
         try {
-          const raw = JSON.parse(text);
+          const parts       = text.split("@@ACTIVE@@");
+          const raw         = JSON.parse(parts[0]);
+          const activeNames = JSON.parse(parts[1]).map(a => a.name);
+
           root.monitors = raw.map(m => ({
             name:           m.name,
             description:    m.description,
@@ -177,7 +186,7 @@ Singleton {
             selectedMode:   root.findCurrentMode(m),
             scale:          m.scale,
             transform:      m.transform,
-            disabled:       m.disabled,
+            disabled:       !activeNames.includes(m.name),
             mirrorOf:       (() => {
               if (!m.mirrorOf || m.mirrorOf === "none") return "";
               // hyprctl -j returns mirrorOf as a stringified monitor ID (e.g. "0") rather than

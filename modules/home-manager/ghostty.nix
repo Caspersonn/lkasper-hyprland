@@ -17,6 +17,7 @@
 
           font-family = "CaskaydiaMono NF";
           font-size = 12;
+          font-codepoint-map = "U+F1B00-U+F1B02=Symbols Nerd Font Mono CS";
 
           gtk-single-instance = true;
           keybind = [ "ctrl+k=reset" ];

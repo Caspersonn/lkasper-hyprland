@@ -33,6 +33,10 @@
           enable = true;
         };
 
+        # Keyring
+        services.gnome.gnome-keyring.enable = true;
+        security.pam.services.greetd.enableGnomeKeyring = true;
+
         # For battery display ags
         services.upower = {
           enable = true;

@@ -29,9 +29,8 @@
         # Install packages
         environment.systemPackages = packages.systemPackages;
         programs.direnv.enable = true;
-        programs.nautilus-open-any-terminal = {
+        programs.thunar = {
           enable = true;
-          terminal = "ghostty";
         };
 
         # For battery display ags

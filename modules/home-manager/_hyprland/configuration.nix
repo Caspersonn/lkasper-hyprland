@@ -18,7 +18,7 @@ in
   ];
   wayland.windowManager.hyprland.settings = {
     terminal = lib.mkDefault { _var = "ghostty"; };
-    fileManager = lib.mkDefault { _var = "nautilus --new-window"; };
+    fileManager = lib.mkDefault { _var = "thunar"; };
     browser = lib.mkDefault { _var = "firefox"; };
     music = lib.mkDefault { _var = "Aonsoku"; };
     passwordManager = lib.mkDefault { _var = "bitwarden"; };

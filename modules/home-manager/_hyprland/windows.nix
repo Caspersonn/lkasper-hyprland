@@ -89,7 +89,7 @@
       }
 
       {
-        match.class = "^(org.gnome.Nautilus)$";
+        match.class = "^(thunar)$";
         float = true;
         size = [
           992

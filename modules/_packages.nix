@@ -17,7 +17,6 @@ let
     adwaita-qt
     qt6Packages.qt6ct
     pavucontrol
-    nautilus
     adwaita-icon-theme
     gruvbox-plus-icons
     hicolor-icon-theme

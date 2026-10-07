@@ -77,7 +77,6 @@
           622
           652
         ];
-        stay_focused = true;
       }
 
       {
@@ -87,7 +86,6 @@
           622
           652
         ];
-        stay_focused = true;
       }
 
       {
@@ -97,7 +95,6 @@
           992
           608
         ];
-        stay_focused = true;
       }
     ];
 

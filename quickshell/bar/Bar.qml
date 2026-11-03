@@ -488,18 +488,30 @@ Scope {
               width: bluContent.width + 12
               radius: 12
               color: Theme.surface
-              Accessible.role: Accessible.StaticText
+              Accessible.role: Accessible.Button
               Accessible.name: {
                 if (SystemInfo.bluStatus === "Enabled") return "Bluetooth: Enabled"
                 if (SystemInfo.bluStatus === "Disabled") return "Bluetooth: Disabled"
               }
               HoverHandler { id: btHover }
 
+              BluetoothPopup {
+                id: btPopup
+                anchorItem: btPill
+                fontFamily: root.font
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: btPopup.visible = !btPopup.visible
+              }
+
               PopupWindow {
                 anchor.item: btPill
                 anchor.edges: Edges.Bottom
                 anchor.gravity: Edges.Bottom
-                visible: btHover.hovered && SystemInfo.bluDevicesAmount >= 1
+                visible: btHover.hovered && SystemInfo.bluDevicesAmount >= 1 && !btPopup.visible
                 implicitWidth: tipText.implicitWidth + 20
                 implicitHeight: tipText.implicitHeight + 12
                 color: "transparent"

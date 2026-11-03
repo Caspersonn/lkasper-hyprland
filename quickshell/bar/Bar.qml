@@ -444,15 +444,28 @@ Scope {
 
             // Network
             Rectangle {
+              id: netPill
               height: 24
               width: netContent.width + 12
               radius: 12
               color: Theme.surface
-              Accessible.role: Accessible.StaticText
+              Accessible.role: Accessible.Button
               Accessible.name: {
                 if (SystemInfo.networkType === "ethernet") return "Network: Ethernet"
                 if (SystemInfo.networkType === "wifi") return "Network: WiFi " + SystemInfo.networkInfo
                 return "Network: Disconnected"
+              }
+
+              NetworkPopup {
+                id: netPopup
+                anchorItem: netPill
+                fontFamily: root.font
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: netPopup.visible = !netPopup.visible
               }
 
               Row {

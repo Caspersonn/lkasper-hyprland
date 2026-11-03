@@ -551,12 +551,25 @@ Scope {
 
             // Battery
             Rectangle {
+              id: battPill
               height: 24
               width: battContent.width + 12
               radius: 12
               color: Theme.surface
-              Accessible.role: Accessible.StaticText
+              Accessible.role: Accessible.Button
               Accessible.name: "Battery: " + SystemInfo.batteryLevel
+
+              BatteryPopup {
+                id: battPopup
+                anchorItem: battPill
+                fontFamily: root.font
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: battPopup.visible = !battPopup.visible
+              }
 
               Row {
                 id: battContent

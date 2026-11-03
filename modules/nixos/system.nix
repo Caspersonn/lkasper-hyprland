@@ -42,6 +42,9 @@
           enable = true;
         };
 
+        # Energy mode switcher in the quickshell battery popup
+        services.power-profiles-daemon.enable = lib.mkDefault true;
+
         fonts.packages = with pkgs; [
           noto-fonts
           noto-fonts-color-emoji

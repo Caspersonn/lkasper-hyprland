@@ -22,6 +22,10 @@
 
       programs.dconf.enable = true;
 
+      security.pam.services.hyprlock = { };
+
+      services.fprintd.enable = true;
+
       xdg.portal = {
         enable = true;
         extraPortals = [

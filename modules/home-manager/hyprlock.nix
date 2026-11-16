@@ -9,10 +9,6 @@
         settings = {
           source = [ "~/.config/lkasper-hyprland/current/hyprlock.conf" ];
 
-          general = {
-            disable_loading_bar = true;
-            no_fade_in = false;
-          };
           auth = {
             fingerprint.enabled = true;
           };
@@ -34,10 +30,8 @@
             outline_thickness = 4;
 
             font_family = "CaskaydiaMono Nerd Font";
-            font_size = 32;
             font_color = "$lkh_foreground";
 
-            placeholder_color = "$lkh_muted";
             placeholder_text = "  Enter Password 󰈷 ";
             check_color = "$lkh_ok";
             fail_text = "Wrong";

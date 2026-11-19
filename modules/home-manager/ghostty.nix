@@ -14,6 +14,7 @@
           background-opacity = 0.95;
           window-decoration = "none";
           app-notifications = false;
+          clipboard-paste-protection = false;
 
           font-family = "CaskaydiaMono NF";
           font-size = 12;
